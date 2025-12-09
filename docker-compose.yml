@@ -50,6 +50,20 @@ services:
     networks:
       - laravel
 
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: matching_system_phpmyadmin
+    environment:
+      PMA_HOST: db
+      PMA_USER: root
+      PMA_PASSWORD: root
+    ports:
+      - "8081:80"
+    depends_on:
+      - db
+    networks:
+      - laravel
+
 volumes:
   dbdata:
 
