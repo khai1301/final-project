@@ -1,0 +1,58 @@
+version: "3.8"
+
+services:
+  # --------------- PHP + Laravel app -----------------
+  app:
+    build:
+      context: .
+      target: development
+    container_name: matching_system_app
+    ports:
+      - "9000:9000"
+    volumes:
+      - ./src:/var/www
+    depends_on:
+      - db
+    environment:
+      - DB_HOST=db
+      - DB_DATABASE=matching_system
+      - DB_USERNAME=root
+      - DB_PASSWORD=root
+    networks:
+      - laravel
+
+  # --------------- MySQL database -----------------
+  db:
+    image: mysql:8.0
+    container_name: matching_system_db
+    restart: always
+    environment:
+      MYSQL_DATABASE: matching_system
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3307:3306"
+    volumes:
+      - dbdata:/var/lib/mysql
+    networks:
+      - laravel
+
+  # --------------- Nginx server -----------------
+  nginx:
+    image: nginx:alpine
+    container_name: matching_system_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./src:/var/www
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+volumes:
+  dbdata:
+
+networks:
+  laravel:
+    driver: bridge
