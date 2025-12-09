@@ -1,0 +1,39 @@
+name: Laravel CI/CD
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup SSH
+        uses: webfactory/ssh-agent@v0.8.1
+        with:
+          ssh-private-key: ${{ secrets.SERVER_SSH_KEY }}
+
+      - name: Deploy to server
+        run: |
+          ssh -o StrictHostKeyChecking=no ubuntu@YOUR_SERVER_IP "
+            cd ~/final-project
+
+            # 3.1 Pull code mới
+            git pull origin main
+
+            # 3.2 Build và chạy Docker
+            docker compose down
+            docker compose up -d --build
+
+            # 3.3 Tùy chọn: Laravel specific commands
+            docker compose exec app php artisan migrate --force
+            docker compose exec app php artisan config:clear
+            docker compose exec app php artisan cache:clear
+            docker compose exec app php artisan route:clear
+            docker compose exec app php artisan view:clear
+          "
