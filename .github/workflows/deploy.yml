@@ -18,7 +18,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       # Build docker image
       - name: Build prod image
-        run: docker build -f dockerhub/Dockerfile.prod -t khai1301/matching_system:latest ./dockerhub
+        run: docker build -f dockerhub/Dockerfile.prod -t khai1301/matching_system:latest .
 
       # Push image
       - name: Push image
