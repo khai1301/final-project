@@ -6,6 +6,7 @@ services:
     container_name: matching_system_app
     volumes:
       - app_data:/var/www
+      - ./ .env:/var/www/.env
     networks:
       - laravel
 
