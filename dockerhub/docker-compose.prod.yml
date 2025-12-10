@@ -6,8 +6,8 @@ services:
     container_name: matching_system_app
     volumes:
       - ./.env:/var/www/.env
-      - app-storage:/var/www/storage       # Persistent storage
-      - app-cache:/var/www/bootstrap/cache # Persistent cache
+      - app-storage:/var/www/storage
+      - app-cache:/var/www/bootstrap/cache
     networks:
       - laravel
 
