@@ -1,0 +1,29 @@
+version: "3.8"
+
+services:
+  # --------------- PHP + Laravel app -----------------
+  app:
+    image: khai1301/matching_system:latest
+    container_name: matching_system_app
+    networks:
+      - laravel
+
+  # --------------- Nginx server -----------------
+  nginx:
+    image: nginx:alpine
+    container_name: matching_system_nginx
+    ports:
+      - "8080:80"
+    volumes:
+      - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
+    depends_on:
+      - app
+    networks:
+      - laravel
+
+networks:
+  laravel:
+    driver: bridge
+
+volumes:
+  app_data:

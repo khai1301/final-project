@@ -1,0 +1,37 @@
+# ==========================
+# Base PHP image
+# ==========================
+FROM php:8.4-fpm AS base
+
+RUN apt-get update && apt-get install -y \
+    git zip unzip libpng-dev libonig-dev libxml2-dev curl \
+    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
+
+COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
+
+WORKDIR /var/www
+
+# ==========================
+# Stage 1 - Frontend Build (LOCAL ONLY)
+# ==========================
+FROM node:18 AS frontend
+
+WORKDIR /app
+COPY . .
+RUN npm install
+RUN npm run build
+
+# ==========================
+# Stage 2: Production
+# ==========================
+FROM base AS production
+
+WORKDIR /var/www
+
+COPY . .
+
+COPY --from=frontend /app/public/build ./public/build
+
+RUN composer install --no-dev --optimize-autoloader
+
+CMD ["php-fpm"]
