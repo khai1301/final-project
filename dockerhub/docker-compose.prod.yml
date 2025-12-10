@@ -6,6 +6,8 @@ services:
     container_name: matching_system_app
     volumes:
       - ./.env:/var/www/.env
+      - app-storage:/var/www/storage       # Persistent storage
+      - app-cache:/var/www/bootstrap/cache # Persistent cache
     networks:
       - laravel
 
@@ -16,8 +18,8 @@ services:
       - "8080:80"
     volumes:
       - ./nginx/default.conf:/etc/nginx/conf.d/default.conf
-    volumes_from:
-      - app
+      - app-storage:/var/www/storage:ro
+      - app-cache:/var/www/bootstrap/cache:ro
     depends_on:
       - app
     networks:
@@ -26,3 +28,7 @@ services:
 networks:
   laravel:
     driver: bridge
+
+volumes:
+  app-storage:
+  app-cache:
