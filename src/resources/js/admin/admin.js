@@ -39,4 +39,92 @@ document.addEventListener('DOMContentLoaded', function () {
             alert('Redirecting to Add New Tutor form...');
         });
     }
+
+    // --- SweetAlert2 Configuration & Global Handlers ---
+
+    // 1. Toast Notification Config
+    // Check if Swal is defined (it should be loaded via CDN or import)
+    if (typeof Swal !== 'undefined') {
+        const Toast = Swal.mixin({
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer)
+                toast.addEventListener('mouseleave', Swal.resumeTimer)
+            }
+        });
+
+        // 2. Handle Session Flashes (passed via window.sessionMessages)
+        if (window.sessionMessages) {
+            if (window.sessionMessages.success) Toast.fire({ icon: 'success', title: window.sessionMessages.success });
+            if (window.sessionMessages.error) Toast.fire({ icon: 'error', title: window.sessionMessages.error });
+            if (window.sessionMessages.status) Toast.fire({ icon: 'info', title: window.sessionMessages.status });
+            if (window.sessionMessages.warning) Toast.fire({ icon: 'warning', title: window.sessionMessages.warning });
+        }
+
+        // 3. Handle Confirmations (Delete, Ban, Approve)
+
+        // Delete Logic
+        document.querySelectorAll('.delete-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: "You won't be able to revert this!",
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#ef4444',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, delete it!'
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            });
+        });
+
+        // Ban/Unban Logic
+        document.querySelectorAll('.ban-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                const isBanned = this.dataset.banned === '1';
+                const title = isBanned ? 'Unban User?' : 'Ban User?';
+                const text = isBanned ? "User will regain access to the system." : "User will be forbidden from logging in.";
+                const btnText = isBanned ? 'Yes, unban!' : 'Yes, ban!';
+                const btnColor = isBanned ? '#10b981' : '#f59e0b';
+
+                Swal.fire({
+                    title: title,
+                    text: text,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: btnColor,
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: btnText
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            });
+        });
+
+        // Approve Logic
+        document.querySelectorAll('.approve-form').forEach(function (form) {
+            form.addEventListener('submit', function (e) {
+                e.preventDefault();
+                Swal.fire({
+                    title: 'Approve Tutor?',
+                    text: "This user will become an approved tutor.",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#10b981',
+                    cancelButtonColor: '#6b7280',
+                    confirmButtonText: 'Yes, approve!'
+                }).then((result) => {
+                    if (result.isConfirmed) form.submit();
+                });
+            });
+        });
+    }
 });

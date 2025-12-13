@@ -7,7 +7,7 @@
 
 body {
     font-family: 'Inter', sans-serif;
-    background-color: #f5f7f8;
+    background-color: var(--light);
     min-height: 100vh;
     display: flex;
     flex-direction: column;
@@ -25,8 +25,8 @@ header {
     align-items: center;
     justify-content: space-between;
     padding: 16px 40px;
-    background-color: #f5f7f8;
-    border-bottom: 1px solid #f0f2f5;
+    background-color: var(--light);
+    border-bottom: 1px solid var(--gray-200);
     position: relative;
     width: 100%;
     z-index: 10;
@@ -36,13 +36,13 @@ header {
     display: flex;
     align-items: center;
     gap: 12px;
-    color: #1f2937;
+    color: var(--gray-800);
 }
 
 .logo-icon {
     width: 24px;
     height: 24px;
-    color: #3780f6;
+    color: var(--primary);
 }
 
 .logo-text {
@@ -54,7 +54,7 @@ header {
 .signup-btn {
     min-width: 84px;
     padding: 10px 16px;
-    background-color: #3780f6;
+    background-color: var(--primary);
     color: white;
     border: none;
     border-radius: 12px;
@@ -66,6 +66,7 @@ header {
 
 .signup-btn:hover {
     background-color: #2d6bd9;
+    /* Darker shade of primary */
 }
 
 /* Main Content */
@@ -74,7 +75,6 @@ main {
     align-items: center;
     justify-content: center;
     flex-grow: 1;
-    /* padding: 40px 16px; */
     min-height: 0;
 }
 
@@ -87,12 +87,35 @@ main {
     background-color: white;
     border-radius: 12px;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #e5e7eb;
+    border: 1px solid var(--gray-200);
     padding: 32px;
 }
 
+/* Alias for guest layout compatibility */
+.auth-card {
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+    /* Preserved shadow from guest.css for variety or replace with standard */
+    overflow: hidden;
+    max-width: 450px;
+    width: 100%;
+    margin: auto;
+}
+
+.auth-header {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    padding: 2rem;
+    text-align: center;
+}
+
+.auth-body {
+    padding: 2rem;
+}
+
 .login-title {
-    color: #111418;
+    color: var(--gray-800);
     font-size: 32px;
     font-weight: 700;
     text-align: center;
@@ -112,7 +135,7 @@ main {
 }
 
 .form-group label {
-    color: #111418;
+    color: var(--gray-800);
     font-size: 16px;
     font-weight: 500;
     margin-bottom: 8px;
@@ -134,18 +157,18 @@ main {
     border-radius: 8px;
     font-size: 16px;
     background-color: white;
-    color: #111418;
+    color: var(--gray-800);
     transition: all 0.2s;
 }
 
 .auth-form input:focus {
     outline: none;
-    border-color: #3780f6;
-    box-shadow: 0 0 0 3px rgba(55, 128, 246, 0.1);
+    border-color: var(--primary);
+    box-shadow: 0 0 0 3px var(--primary-light);
 }
 
 .auth-form input::placeholder {
-    color: #60708a;
+    color: var(--gray-600);
 }
 
 .auth-form input[type="password"] {
@@ -163,12 +186,12 @@ main {
     padding-right: 16px;
     background: none;
     border: none;
-    color: #60708a;
+    color: var(--gray-600);
     cursor: pointer;
 }
 
 .eye-btn:hover {
-    color: #3780f6;
+    color: var(--primary);
 }
 
 /* Remember Me & Forgot Password Row */
@@ -193,13 +216,13 @@ main {
 .remember-me label {
     font-size: 14px;
     font-weight: 500;
-    color: #111418;
+    color: var(--gray-800);
     margin: 0;
     cursor: pointer;
 }
 
 .forgot-link {
-    color: #3780f6;
+    color: var(--primary);
     font-size: 14px;
     font-weight: 500;
     text-decoration: none;
@@ -214,7 +237,7 @@ main {
     width: 100%;
     height: 56px;
     padding: 0 16px;
-    background-color: #3780f6;
+    background-color: var(--primary);
     color: white;
     border: none;
     border-radius: 8px;
@@ -233,13 +256,13 @@ main {
 .signup-text {
     text-align: center;
     font-size: 14px;
-    color: #6b7280;
+    color: var(--gray-600);
     margin-top: 32px;
 }
 
 .signup-link {
     font-weight: 700;
-    color: #3780f6;
+    color: var(--primary);
     text-decoration: none;
 }
 
@@ -296,32 +319,32 @@ main {
 }
 
 .role-option input[type="radio"]:checked+.role-card {
-    border-color: #3780f6;
-    background-color: rgba(55, 128, 246, 0.05);
+    border-color: var(--primary);
+    background-color: var(--primary-light);
 }
 
 .role-card:hover {
-    border-color: #3780f6;
+    border-color: var(--primary);
 }
 
 .role-card .material-symbols-outlined {
     font-size: 32px;
-    color: #60708a;
+    color: var(--gray-600);
 }
 
 .role-option input[type="radio"]:checked+.role-card .material-symbols-outlined {
-    color: #3780f6;
+    color: var(--primary);
 }
 
 .role-label {
     font-size: 14px;
     font-weight: 600;
-    color: #111418;
+    color: var(--gray-800);
 }
 
 /* Helper Text */
 .text-muted {
-    color: #60708a;
+    color: var(--gray-600);
     font-size: 14px;
 }
 
@@ -346,7 +369,7 @@ main {
 }
 
 .text-danger {
-    color: #ef4444;
+    color: var(--danger);
 }
 
 /* Responsive */
@@ -355,7 +378,8 @@ main {
         padding: 16px;
     }
 
-    .login-card {
+    .login-card,
+    .auth-card {
         padding: 24px;
     }
 

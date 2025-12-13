@@ -119,6 +119,14 @@
                                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                                             <!-- Edit Action (Opens Modal) -->
                                             <li>
+                                                <button class="dropdown-item view-user-btn" 
+                                                    data-id="{{ $user->id }}"
+                                                >
+                                                    <i class="bi bi-eye me-2 text-info"></i> View Details
+                                                </button>
+                                            </li>
+                                            <li><hr class="dropdown-divider"></li>
+                                            <li>
                                                 <button class="dropdown-item" 
                                                     data-bs-toggle="modal" 
                                                     data-bs-target="#editUserModal"
@@ -352,45 +360,130 @@
     </div>
 </div>
 
+
+<!-- View User Modal -->
+<div class="modal fade" id="viewUserModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header border-0 pb-0">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body pt-0">
+                <!-- Loading State -->
+                <div id="view_loading" class="text-center py-5">
+                    <div class="spinner-border text-primary" role="status">
+                        <span class="visually-hidden">Loading...</span>
+                    </div>
+                </div>
+
+                <!-- Content (Hidden by default) -->
+                <div id="view_content" class="d-none">
+                    <div class="text-center mb-4">
+                        <img id="view_avatar" src="" alt="Avatar" class="rounded-circle mb-3" width="100" height="100">
+                        <h4 id="view_name" class="fw-bold mb-1"></h4>
+                        <span id="view_role_badge" class="badge bg-primary rounded-pill mb-2"></span>
+                        <div class="text-muted small" id="view_email"></div>
+                    </div>
+
+                <ul class="nav nav-tabs nav-fill mb-4" id="viewUserTab" role="tablist">
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link active" id="overview-tab" data-bs-toggle="tab" data-bs-target="#overview" type="button" role="tab">Overview</button>
+                    </li>
+                    <li class="nav-item" role="presentation">
+                        <button class="nav-link" id="profile-tab" data-bs-toggle="tab" data-bs-target="#profile" type="button" role="tab">Profile Details</button>
+                    </li>
+                </ul>
+
+                <div class="tab-content" id="viewUserTabContent">
+                    <!-- Overview Tab -->
+                    <div class="tab-pane fade show active" id="overview" role="tabpanel">
+                        <div class="row g-4">
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded-3 h-100">
+                                    <div class="small text-muted text-uppercase fw-bold mb-2">Contact Info</div>
+                                    <div class="mb-2"><i class="bi bi-envelope me-2 text-muted"></i> <span id="view_email_text"></span></div>
+                                    <div class="mb-2"><i class="bi bi-phone me-2 text-muted"></i> <span id="view_phone"></span></div>
+                                </div>
+                            </div>
+                            <div class="col-sm-6">
+                                <div class="p-3 bg-light rounded-3 h-100">
+                                    <div class="small text-muted text-uppercase fw-bold mb-2">Account Status</div>
+                                    <div class="mb-2">Status: <span id="view_status"></span></div>
+                                    <div class="mb-2">Joined: <span id="view_joined"></span></div>
+                                    <div class="mb-2">Verified: <span id="view_verified"></span></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Profile Details Tab -->
+                    <div class="tab-pane fade" id="profile" role="tabpanel">
+                        <!-- Student Section -->
+                        <div id="student_details" class="d-none">
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">School</label>
+                                    <div id="view_student_school" class="fw-medium"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">Grade</label>
+                                    <div id="view_student_grade" class="fw-medium"></div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="fw-bold text-muted small">Goals</label>
+                                    <div id="view_student_goals" class="p-3 bg-light rounded-3 text-break"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Tutor Section -->
+                        <div id="tutor_details" class="d-none">
+                            <div class="row g-3">
+                                <div class="col-12">
+                                    <label class="fw-bold text-muted small">Bio</label>
+                                    <div id="view_tutor_bio" class="p-3 bg-light rounded-3 text-break mb-3"></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">Hourly Rate</label>
+                                    <div class="fw-medium"><span id="view_tutor_rate"></span></div>
+                                </div>
+                                <div class="col-md-6">
+                                    <label class="fw-bold text-muted small">Experience</label>
+                                    <div id="view_tutor_experience" class="fw-medium"></div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="fw-bold text-muted small">Subjects</label>
+                                    <div id="view_tutor_subjects" class="d-flex flex-wrap gap-2 mt-1"></div>
+                                </div>
+                                <div class="col-12">
+                                    <label class="fw-bold text-muted small">Education</label>
+                                    <div id="view_tutor_education" class="text-break"></div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Empty State -->
+                        <div id="no_profile_details" class="text-center py-4 text-muted d-none">
+                            <i class="bi bi-person-badge display-6 mb-3 d-block"></i>
+                            <p>No specific profile information available for this user role.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer border-0">
+                <button type="button" class="btn btn-secondary px-4" data-bs-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @push('scripts')
 <script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // Edit Modal Data Population
-        var editUserModal = document.getElementById('editUserModal');
-        editUserModal.addEventListener('show.bs.modal', function (event) {
-            var button = event.relatedTarget;
-            // If button is null, it means modal is opened via JS (after validation error)
-            if (!button) return;
-
-            var id = button.getAttribute('data-id');
-            var name = button.getAttribute('data-name');
-            var email = button.getAttribute('data-email');
-            var phone = button.getAttribute('data-phone');
-            var role = button.getAttribute('data-role');
-
-            var modal = this;
-            modal.querySelector('#edit_name').value = name;
-            modal.querySelector('#edit_email').value = email;
-            modal.querySelector('#edit_phone').value = phone;
-            modal.querySelector('#edit_role').value = role;
-
-            // Update Form Action
-            var form = modal.querySelector('#editUserForm');
-            form.action = '/admin/users/' + id;
-        });
-
-        // Error Handling: Re-open modal if validation errors exist
-        @if ($errors->any())
-            var formId = "{{ old('form_id') }}";
-            if (formId === 'create_user') {
-                var createModal = new bootstrap.Modal(document.getElementById('createUserModal'));
-                createModal.show();
-            } else if (formId === 'edit_user') {
-                var editModal = new bootstrap.Modal(document.getElementById('editUserModal'));
-                editModal.show();
-            }
-        @endif
-    });
+    // Pass server-side data to window for users.js
+    @if ($errors->any())
+        window.hasErrors = true;
+        window.oldFormId = "{{ old('form_id') }}";
+    @endif
 </script>
 @endpush
 @endsection

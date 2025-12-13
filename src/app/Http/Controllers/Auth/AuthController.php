@@ -10,6 +10,7 @@ use Laravel\Fortify\Contracts\LoginResponse;
 use Laravel\Fortify\Contracts\RegisterResponse;
 use Illuminate\Support\Facades\Auth;
 use Laravel\Fortify\Fortify;
+use Illuminate\Auth\Events\Registered;
 
 class AuthController extends Controller
 {
@@ -49,6 +50,8 @@ class AuthController extends Controller
         // We should modify CreateNewUser to skip validation or just pass data.
         
         $user = $creator->create($request->validated());
+
+        event(new Registered($user));
 
         Auth::login($user);
 

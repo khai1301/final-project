@@ -51,6 +51,15 @@ class UserController extends Controller
     }
 
     /**
+     * Display the specified user.
+     */
+    public function show(User $user)
+    {
+        $user->load(['studentProfile', 'tutorProfile']);
+        return response()->json($user);
+    }
+
+    /**
      * Store a newly created user in storage.
      */
     public function store(StoreUserRequest $request)
