@@ -1,27 +1,58 @@
-# ==========================
-# Base PHP image
-# ==========================
-FROM php:8.4-fpm AS base
+# =========================
+# 1. Vendor (PHP deps)
+# =========================
+FROM composer:2 AS vendor
+WORKDIR /app
+COPY src/composer.json src/composer.lock ./
+RUN composer install \
+    --no-dev \
+    --prefer-dist \
+    --no-interaction \
+    --no-progress \
+    --no-scripts \
+    --optimize-autoloader
+
+# =========================
+# 2. Frontend (Vite build)
+# =========================
+FROM node:20-alpine AS frontend
+WORKDIR /app
+COPY src/package*.json ./
+RUN npm ci
+COPY src/ .
+RUN npm run build
+
+# =========================
+# 3. Runtime (PHP-FPM)
+# =========================
+FROM php:8.4-fpm
 
 RUN apt-get update && apt-get install -y \
-    git zip unzip libpng-dev libonig-dev libxml2-dev curl \
-    && docker-php-ext-install pdo_mysql mbstring exif pcntl bcmath gd
-
-COPY --from=composer:2 /usr/bin/composer /usr/bin/composer
-
-# ==========================
-# Stage 2: Production
-# ==========================
-FROM base AS production
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    && docker-php-ext-install \
+        pdo_mysql \
+        mbstring \
+        bcmath \
+        gd \
+        zip \
+    && rm -rf /var/lib/apt/lists/*
 
 WORKDIR /var/www
 
+# App source
 COPY src/ .
 
-RUN composer install --no-dev --optimize-autoloader --no-scripts
+# PHP vendor
+COPY --from=vendor /app/vendor ./vendor
 
+# Built assets
+COPY --from=frontend /app/public/build ./public/build
+
+# Permissions
 RUN chown -R www-data:www-data /var/www \
-    && chmod -R 755 /var/www/storage \
-    && chmod -R 755 /var/www/bootstrap/cache
+ && chmod -R 775 storage bootstrap/cache
 
 CMD ["php-fpm"]

@@ -442,15 +442,6 @@
             'aliases' => array(),
             'dev_requirement' => false,
         ),
-        'laravel/pail' => array(
-            'pretty_version' => 'v1.2.4',
-            'version' => '1.2.4.0',
-            'reference' => '49f92285ff5d6fc09816e976a004f8dec6a0ea30',
-            'type' => 'library',
-            'install_path' => __DIR__ . '/../laravel/pail',
-            'aliases' => array(),
-            'dev_requirement' => true,
-        ),
         'laravel/pint' => array(
             'pretty_version' => 'v1.26.0',
             'version' => '1.26.0.0',

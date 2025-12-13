@@ -2,7 +2,7 @@
 
 use Illuminate\Support\Facades\Route;
 
-// Auth Routes Override (using FormRequest)
+// Auth Routes Override (using FormRequest) abc
 Route::post('/login', [\App\Http\Controllers\Auth\AuthController::class, 'login'])
     ->middleware(['guest', 'throttle:login']);
 Route::post('/register', [\App\Http\Controllers\Auth\AuthController::class, 'register'])

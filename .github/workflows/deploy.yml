@@ -18,7 +18,7 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       # Build docker image
       - name: Build prod image
-        run: docker build -f dockerhub/Dockerfile.prod -t khai1301/matching_system:latest .
+        run: docker build --no-cache -f dockerhub/Dockerfile.prod -t khai1301/matching_system:latest .
       # Push image
       - name: Push image
         run: docker push khai1301/matching_system:latest
@@ -35,7 +35,9 @@ jobs:
           key: ${{ secrets.SERVER_SSH_KEY }}
           script: |
             cd ~/final-project
+            docker compose -f docker-compose.prod.yml down
+            docker image rm khai1301/matching_system:latest
             docker compose -f docker-compose.prod.yml pull
-            docker compose -f docker-compose.prod.yml up -d --no-deps app
-            docker compose -f docker-compose.prod.yml exec app php artisan migrate --force --no-interaction
-            docker compose -f docker-compose.prod.yml exec app php artisan optimize
+            docker compose -f docker-compose.prod.yml up -d
+            docker compose -f docker-compose.prod.yml run --rm app php artisan migrate --force
+            docker compose -f docker-compose.prod.yml run --rm app php artisan optimize
