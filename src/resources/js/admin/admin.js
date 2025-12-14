@@ -1,3 +1,6 @@
+import Swal from 'sweetalert2';
+window.Swal = Swal;
+
 // Import admin CSS
 document.addEventListener('DOMContentLoaded', function () {
     // Mobile menu toggle
