@@ -15,22 +15,22 @@ class RedirectIfAuthenticated
      */
     public function handle(Request $request, Closure $next, string ...$guards): Response
     {
-        $guards = empty($guards) ? [null] : $guards;
+        // $guards = empty($guards) ? [null] : $guards;
 
-        foreach ($guards as $guard) {
-            if (auth()->guard($guard)->check()) {
-                $user = auth()->guard($guard)->user();
+        // foreach ($guards as $guard) {
+        //     if (auth()->guard($guard)->check()) {
+        //         $user = auth()->guard($guard)->user();
                 
-                // Redirect based on role
-                if ($user->isAdmin()) {
-                    return redirect('/admin/dashboard');
-                } elseif ($user->isTutor()) {
-                    return redirect('/tutor/dashboard');
-                } else {
-                    return redirect('/student/dashboard');
-                }
-            }
-        }
+        //         // Redirect based on role
+        //         if ($user->isAdmin()) {
+        //             return redirect('/admin/dashboard');
+        //         } elseif ($user->isTutor()) {
+        //             return redirect('/tutor/dashboard');
+        //         } else {
+        //             return redirect('/student/dashboard');
+        //         }
+        //     }
+        // }
 
         return $next($request);
     }

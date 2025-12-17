@@ -5,7 +5,7 @@
     box-sizing: border-box;
 }
 
-body {
+.auth-page {
     font-family: 'Inter', sans-serif;
     background-color: var(--light);
     min-height: 100vh;
@@ -20,7 +20,7 @@ body {
 /* Auth Pages Specific Styles */
 
 /* Header Styles */
-header {
+.auth-page header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -70,7 +70,7 @@ header {
 }
 
 /* Main Content */
-main {
+.auth-page main {
     display: flex;
     align-items: center;
     justify-content: center;
@@ -374,7 +374,7 @@ main {
 
 /* Responsive */
 @media (max-width: 640px) {
-    header {
+    .auth-page header {
         padding: 16px;
     }
 

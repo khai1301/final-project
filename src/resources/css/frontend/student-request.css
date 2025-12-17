@@ -1,0 +1,224 @@
+/* Student Request Page Styles */
+
+.student-request-card {
+    border-radius: 12px;
+}
+
+.bg-gradient-primary {
+    background: linear-gradient(135deg, var(--bs-primary) 0%, #0d6efd 100%);
+}
+
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Custom Input Styles */
+.input-with-icon .input-group-text {
+    border-right: 0;
+}
+
+.input-with-icon .form-control,
+.input-with-icon .form-select {
+    border-left: 0;
+}
+
+.input-with-icon .form-control:focus,
+.input-with-icon .form-select:focus {
+    border-color: #dee2e6;
+    box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.1);
+}
+
+.input-with-icon .input-group-text {
+    background-color: white;
+}
+
+.select-icon {
+    position: absolute;
+    right: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+    color: #6c757d;
+    z-index: 5;
+}
+
+/* Skills Input Container */
+.skills-input-container {
+    min-height: 56px;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.skills-input-container:focus-within {
+    border-color: var(--bs-primary);
+    box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.1);
+}
+
+.skills-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: rgba(var(--bs-primary-rgb), 0.1);
+    color: var(--bs-primary);
+    border: 1px solid rgba(var(--bs-primary-rgb), 0.2);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.skill-chip-remove {
+    background: none;
+    border: none;
+    padding: 0;
+    color: currentColor;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.skill-chip-remove:hover {
+    color: #dc3545;
+}
+
+.skills-input {
+    flex: 1;
+    min-width: 200px;
+    border: none;
+    outline: none;
+    padding: 6px;
+    font-size: 1rem;
+}
+
+/* Learning Mode Cards */
+.mode-card {
+    height: 100%;
+    min-height: 120px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.5rem 1rem;
+    transition: all 0.2s;
+}
+
+.mode-card .material-symbols-outlined {
+    color: #6c757d;
+    transition: color 0.2s;
+}
+
+.btn-check:checked+.mode-card {
+    background-color: rgba(var(--bs-primary-rgb), 0.05);
+    border-color: var(--bs-primary);
+}
+
+.btn-check:checked+.mode-card .material-symbols-outlined {
+    color: var(--bs-primary);
+}
+
+/* Schedule Checkboxes */
+.schedule-check {
+    padding: 12px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: white;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.schedule-check:hover {
+    background-color: #f8f9fa;
+}
+
+.schedule-check .form-check-input {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+}
+
+.schedule-check .form-check-label {
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+}
+
+/* Budget Slider */
+.budget-container {
+    background-color: #f6f7f8;
+}
+
+.budget-slider {
+    accent-color: var(--bs-primary);
+}
+
+.budget-slider::-webkit-slider-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    cursor: pointer;
+}
+
+.budget-slider::-webkit-slider-runnable-track {
+    height: 4px;
+    background: #dee2e6;
+    border-radius: 2px;
+}
+
+.budget-slider::-moz-range-thumb {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    background: var(--bs-primary);
+    cursor: pointer;
+    border: none;
+}
+
+.budget-slider::-moz-range-track {
+    height: 4px;
+    background: #dee2e6;
+    border-radius: 2px;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .mode-card {
+        min-height: 100px;
+        padding: 1rem 0.5rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+}
