@@ -4,15 +4,7 @@
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
-            {{-- Success/Error Messages --}}
-            @if (session('success'))
-                <div class="alert alert-success alert-dismissible fade show" role="alert">
-                    <i class="material-symbols-outlined me-2">check_circle</i>
-                    {{ session('success') }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-                </div>
-            @endif
-
+            {{-- Error Messages --}}
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="material-symbols-outlined me-2">error</i>
@@ -52,30 +44,22 @@
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Subject</label>
-                                <div class="input-group input-with-icon">
-                                    <span class="input-group-text bg-white">
-                                        <span class="material-symbols-outlined text-muted">search</span>
-                                    </span>
-                                    <input type="text" name="subject" class="form-control form-control-lg" 
-                                           placeholder="e.g. Mathematics, Piano" required>
-                                </div>
+                                <select name="subject" class="form-select form-select-lg" required>
+                                    <option value="" disabled selected>Select subject</option>
+                                    @foreach($subjects as $subject)
+                                        <option value="{{ $subject->name }}">{{ $subject->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                             
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Education Level</label>
-                                <div class="input-group input-with-icon">
-                                    <select name="education_level" class="form-select form-select-lg" required>
-                                        <option value="" disabled selected>Select level</option>
-                                        <option>Elementary</option>
-                                        <option>Middle School</option>
-                                        <option>High School</option>
-                                        <option>Undergraduate</option>
-                                        <option>Postgraduate</option>
-                                        <option>Professional Certification</option>
-                                        <option>Hobby / Casual</option>
-                                    </select>
-                                    <span class="select-icon material-symbols-outlined">expand_more</span>
-                                </div>
+                                <select name="education_level" class="form-select form-select-lg" required>
+                                    <option value="" disabled selected>Select level</option>
+                                    @foreach($educationLevels as $level)
+                                        <option value="{{ $level->name }}">{{ $level->name }}</option>
+                                    @endforeach
+                                </select>
                             </div>
                         </div>
 
@@ -110,20 +94,24 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Learning Mode</label>
                                 <div class="row g-3">
-                                    <div class="col-6">
-                                        <input type="radio" class="btn-check" name="mode" id="modeOnline" value="online" checked>
-                                        <label class="btn btn-outline-primary w-100 mode-card" for="modeOnline">
-                                            <span class="material-symbols-outlined fs-2 d-block mb-2">laptop_chromebook</span>
-                                            <span class="d-block">Online</span>
+                                    @foreach($learningModes as $index => $modeItem)
+                                    <div class="col-{{ count($learningModes) <= 2 ? '6' : '4' }}">
+                                        <input type="radio" class="btn-check" name="mode" 
+                                               id="mode{{ $modeItem->slug }}" 
+                                               value="{{ strtolower($modeItem->name) }}" 
+                                               {{ $index === 0 ? 'checked' : '' }}>
+                                        <label class="btn btn-outline-primary w-100 mode-card" for="mode{{ $modeItem->slug }}">
+                                            @if($modeItem->icon)
+                                                <i class="{{ $modeItem->icon }} fs-2 d-block mb-2"></i>
+                                            @else
+                                                <span class="material-symbols-outlined fs-2 d-block mb-2">
+                                                    {{ $index === 0 ? 'laptop_chromebook' : 'person_pin_circle' }}
+                                                </span>
+                                            @endif
+                                            <span class="d-block">{{ $modeItem->name }}</span>
                                         </label>
                                     </div>
-                                    <div class="col-6">
-                                        <input type="radio" class="btn-check" name="mode" id="modeOffline" value="offline">
-                                        <label class="btn btn-outline-primary w-100 mode-card" for="modeOffline">
-                                            <span class="material-symbols-outlined fs-2 d-block mb-2">person_pin_circle</span>
-                                            <span class="d-block">In Person</span>
-                                        </label>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
 
@@ -186,26 +174,23 @@
                         </h3>
                         
                         <div class="budget-container p-4 rounded-3 bg-light">
-                            <div class="d-flex justify-content-between align-items-center mb-3">
-                                <label class="form-label fw-medium mb-0">Hourly Rate Range</label>
-                                <div class="budget-display text-primary fw-bold fs-5">
-                                    $<span id="budgetMin">20</span> - $<span id="budgetMax">80</span>
-                                    <span class="text-muted fw-normal fs-6">/hr</span>
+                            <label class="form-label fw-medium mb-3">Hourly Rate Range (VNĐ)</label>
+                            <div class="row g-3">
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Minimum Rate</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control form-control-lg" name="budget_min" 
+                                               id="budgetMinInput" min="100000" max="5000000" value="500000" step="50000" required>
+                                        <span class="input-group-text">VNĐ/hr</span>
+                                    </div>
                                 </div>
-                            </div>
-                            <div class="px-2">
-                                <div class="d-flex gap-3 mb-2">
-                                    <input type="range" class="form-range budget-slider" name="budget_min" 
-                                           id="budgetMinSlider" min="10" max="200" value="20" step="5">
-                                    <input type="range" class="form-range budget-slider" name="budget_max" 
-                                           id="budgetMaxSlider" min="10" max="200" value="80" step="5">
-                                </div>
-                                <div class="d-flex justify-content-between text-muted small">
-                                    <span>$10</span>
-                                    <span>$50</span>
-                                    <span>$100</span>
-                                    <span>$150</span>
-                                    <span>$200+</span>
+                                <div class="col-md-6">
+                                    <label class="form-label small text-muted">Maximum Rate</label>
+                                    <div class="input-group">
+                                        <input type="number" class="form-control form-control-lg" name="budget_max" 
+                                               id="budgetMaxInput" min="100000" max="5000000" value="1000000" step="50000" required>
+                                        <span class="input-group-text">VNĐ/hr</span>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -237,4 +222,8 @@
         </div>
     </div>
 </div>
+
+@if(session('success'))
+<div data-success-message="{{ session('success') }}" style="display: none;"></div>
+@endif
 @endsection

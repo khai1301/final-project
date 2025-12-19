@@ -1,5 +1,7 @@
 // Student Request Form JavaScript
 
+import Swal from 'sweetalert2';
+
 document.addEventListener('DOMContentLoaded', function () {
     // Skills input functionality
     const skillsInput = document.getElementById('skillsInput');
@@ -86,46 +88,83 @@ document.addEventListener('DOMContentLoaded', function () {
             const scheduleCheckboxes = form.querySelectorAll('input[name="schedule[]"]:checked');
             if (scheduleCheckboxes.length === 0) {
                 e.preventDefault();
-                alert('Please select at least one preferred schedule.');
+                Swal.fire({
+                    icon: 'warning',
+                    title: 'Schedule Required',
+                    text: 'Please select at least one preferred schedule.',
+                    confirmButtonColor: '#3780f6'
+                });
                 return false;
             }
 
-            // Validate address for offline mode
-            const modeOffline = document.getElementById('modeOffline');
+            // Validate address for non-online modes
+            const selectedMode = form.querySelector('input[name="mode"]:checked');
             const addressInput = document.getElementById('addressInput');
-            if (modeOffline && modeOffline.checked && addressInput && !addressInput.value.trim()) {
-                e.preventDefault();
-                alert('Please enter a learning location address for in-person sessions.');
-                addressInput.focus();
-                return false;
+            if (selectedMode && addressInput) {
+                const modeValue = selectedMode.value.toLowerCase();
+                if (modeValue !== 'online' && !addressInput.value.trim()) {
+                    e.preventDefault();
+                    Swal.fire({
+                        icon: 'warning',
+                        title: 'Address Required',
+                        text: 'Please enter a learning location address for in-person sessions.',
+                        confirmButtonColor: '#3780f6'
+                    });
+                    addressInput.focus();
+                    return false;
+                }
             }
         });
     }
 
     // Toggle address field visibility based on learning mode
-    const modeOnline = document.getElementById('modeOnline');
-    const modeOffline = document.getElementById('modeOffline');
+    const modeRadios = document.querySelectorAll('input[name="mode"]');
     const addressField = document.getElementById('addressField');
     const addressInput = document.getElementById('addressInput');
 
-    if (modeOnline && modeOffline && addressField) {
+    if (modeRadios.length > 0 && addressField) {
         function toggleAddressField() {
-            if (modeOffline.checked) {
-                addressField.classList.remove('d-none');
-                if (addressInput) addressInput.required = true;
-            } else {
-                addressField.classList.add('d-none');
-                if (addressInput) {
-                    addressInput.required = false;
-                    addressInput.value = '';
+            const selectedMode = document.querySelector('input[name="mode"]:checked');
+            if (selectedMode) {
+                const modeValue = selectedMode.value.toLowerCase();
+                if (modeValue !== 'online') {
+                    addressField.classList.remove('d-none');
+                    if (addressInput) addressInput.required = true;
+                } else {
+                    addressField.classList.add('d-none');
+                    if (addressInput) {
+                        addressInput.required = false;
+                        addressInput.value = '';
+                    }
                 }
             }
         }
 
-        modeOnline.addEventListener('change', toggleAddressField);
-        modeOffline.addEventListener('change', toggleAddressField);
+        modeRadios.forEach(radio => {
+            radio.addEventListener('change', toggleAddressField);
+        });
 
         // Initial check
         toggleAddressField();
+    }
+
+    // Handle success messages from server
+    const successMessage = document.querySelector('[data-success-message]');
+    if (successMessage) {
+        const message = successMessage.getAttribute('data-success-message');
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: message,
+            toast: true,
+            position: 'top-end',
+            showConfirmButton: false,
+            timer: 5000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+                toast.addEventListener('mouseenter', Swal.stopTimer);
+                toast.addEventListener('mouseleave', Swal.resumeTimer);
+            }
+        });
     }
 });

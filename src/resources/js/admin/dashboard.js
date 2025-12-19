@@ -1,9 +1,18 @@
 document.addEventListener('DOMContentLoaded', function () {
-    // Export report button functionality
-    const exportBtn = document.getElementById('exportReportBtn');
+    // Export button
+    const exportBtn = document.querySelector('.export-report-btn');
     if (exportBtn) {
         exportBtn.addEventListener('click', function () {
-            alert('Report exported successfully!');
+            if (typeof Swal !== 'undefined') {
+                Swal.fire({
+                    toast: true,
+                    position: 'top-end',
+                    icon: 'success',
+                    title: 'Report exported successfully!',
+                    showConfirmButton: false,
+                    timer: 2000
+                });
+            }
         });
     }
 });

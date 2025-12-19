@@ -19,12 +19,24 @@
             </a>
         </div>
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-person-badge"></i>
-                <span>Tutor Management</span>
+            <a href="{{ route('admin.requests.index') }}" class="nav-link {{ request()->routeIs('admin.requests*') ? 'active' : '' }}">
+                <i class="bi bi-file-earmark-text"></i>
+                <span>Learning Requests</span>
             </a>
         </div>
         <div class="nav-item">
+            <a href="{{ route('admin.tutor-profiles.index') }}" class="nav-link {{ request()->routeIs('admin.tutor-profiles*') ? 'active' : '' }}">
+                <i class="bi bi-person-badge"></i>
+                <span>Tutor Profiles</span>
+                @php
+                    $pendingCount = \App\Models\TutorProfile::where('is_approved', false)->count();
+                @endphp
+                @if($pendingCount > 0)
+                <span class="badge bg-warning text-dark ms-auto">{{ $pendingCount }}</span>
+                @endif
+            </a>
+        </div>
+        <!-- <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-wallet2"></i>
                 <span>Financial Center</span>
@@ -47,7 +59,34 @@
                 <i class="bi bi-chat-left-text"></i>
                 <span>Dispute Resolution</span>
             </a>
+        </div> -->
+        
+        <!-- System Configuration Section with Dropdown -->
+        <div class="nav-item">
+            <a href="#" class="nav-link" data-bs-toggle="collapse" data-bs-target="#systemConfigMenu" 
+               aria-expanded="{{ request()->routeIs('admin.subjects*') || request()->routeIs('admin.education-levels*') || request()->routeIs('admin.learning-modes*') ? 'true' : 'false' }}">
+                <i class="bi bi-gear-fill"></i>
+                <span>System Configuration</span>
+                <i class="bi bi-chevron-down ms-auto"></i>
+            </a>
+            <div class="collapse {{ request()->routeIs('admin.subjects*') || request()->routeIs('admin.education-levels*') || request()->routeIs('admin.learning-modes*') ? 'show' : '' }}" id="systemConfigMenu">
+                <div class="submenu">
+                    <a href="{{ route('admin.subjects.index') }}" class="submenu-link {{ request()->routeIs('admin.subjects*') ? 'active' : '' }}">
+                        <i class="bi bi-book"></i>
+                        <span>Subjects</span>
+                    </a>
+                    <a href="{{ route('admin.education-levels.index') }}" class="submenu-link {{ request()->routeIs('admin.education-levels*') ? 'active' : '' }}">
+                        <i class="bi bi-mortarboard"></i>
+                        <span>Education Levels</span>
+                    </a>
+                    <a href="{{ route('admin.learning-modes.index') }}" class="submenu-link {{ request()->routeIs('admin.learning-modes*') ? 'active' : '' }}">
+                        <i class="bi bi-grid"></i>
+                        <span>Learning Modes</span>
+                    </a>
+                </div>
+            </div>
         </div>
+        
         <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-gear"></i>

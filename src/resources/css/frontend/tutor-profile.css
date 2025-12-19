@@ -1,0 +1,277 @@
+/* Tutor Profile Page Styles */
+
+.tutor-profile-card {
+    border-radius: 12px;
+}
+
+.bg-gradient-tutor {
+    background: linear-gradient(135deg, #059669 0%, #10b981 100%);
+}
+
+/* Inherit section styles from student-request */
+.section-title {
+    font-size: 1.125rem;
+    font-weight: 700;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.section-number {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background-color: rgba(5, 150, 105, 0.1);
+    color: #059669;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+/* Profile Photo */
+.profile-photo-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.profile-photo {
+    width: 150px;
+    height: 150px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 4px solid #e5e7eb;
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+/* Upload Area */
+.upload-area {
+    border: 2px dashed #d1d5db;
+    border-radius: 12px;
+    padding: 2rem;
+    text-align: center;
+    background-color: #f9fafb;
+    transition: all 0.2s;
+    cursor: pointer;
+}
+
+.upload-area:hover {
+    border-color: #059669;
+    background-color: rgba(5, 150, 105, 0.05);
+}
+
+.upload-area.dragover {
+    border-color: #059669;
+    background-color: rgba(5, 150, 105, 0.1);
+}
+
+.upload-area-lg {
+    padding: 3rem 2rem;
+}
+
+.upload-label {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+}
+
+.uploaded-file {
+    display: flex;
+    align-items: center;
+    padding: 0.75rem 1rem;
+    background-color: #f3f4f6;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.uploaded-file .file-name {
+    flex: 1;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+/* Inherit skills input styles from student-request */
+.skills-input-container {
+    min-height: 56px;
+    padding: 8px;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    background-color: white;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+.skills-input-container:focus-within {
+    border-color: #059669;
+    box-shadow: 0 0 0 0.25rem rgba(5, 150, 105, 0.1);
+}
+
+.skills-chips {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.skill-chip {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    background-color: rgba(5, 150, 105, 0.1);
+    color: #059669;
+    border: 1px solid rgba(5, 150, 105, 0.2);
+    border-radius: 50px;
+    font-size: 0.875rem;
+    font-weight: 500;
+}
+
+.skill-chip-remove {
+    background: none;
+    border: none;
+    padding: 0;
+    color: currentColor;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: color 0.2s;
+}
+
+.skill-chip-remove:hover {
+    color: #dc3545;
+}
+
+.skills-input {
+    flex: 1;
+    min-width: 200px;
+    border: none;
+    outline: none;
+    padding: 6px;
+    font-size: 1rem;
+}
+
+/* Certificate Card */
+.certificate-card {
+    border: 1px solid #e5e7eb;
+    border-radius: 12px;
+    overflow: hidden;
+    background-color: white;
+    transition: all 0.2s;
+}
+
+.certificate-card:hover {
+    box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+}
+
+.certificate-img {
+    width: 100%;
+    height: 120px;
+    object-fit: cover;
+    border-bottom: 1px solid #e5e7eb;
+}
+
+.certificate-info {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0.75rem;
+}
+
+.certificate-name {
+    font-size: 0.75rem;
+    font-weight: 500;
+    color: #374151;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px;
+}
+
+/* Availability Table */
+.availability-table {
+    background-color: white;
+}
+
+.availability-table th {
+    font-weight: 600;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
+.availability-table td {
+    vertical-align: middle;
+}
+
+.availability-check {
+    width: 22px;
+    height: 22px;
+    cursor: pointer;
+    accent-color: #059669;
+}
+
+.availability-check:checked {
+    background-color: #059669;
+    border-color: #059669;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .profile-photo {
+        width: 120px;
+        height: 120px;
+    }
+
+    .upload-area {
+        padding: 1.5rem;
+    }
+
+    .section-title {
+        font-size: 1rem;
+    }
+
+    .certificate-card {
+        margin-bottom: 1rem;
+    }
+}
+
+/* Form styling enhancements */
+.tutor-profile-form .form-control:focus,
+.tutor-profile-form .form-select:focus {
+    border-color: #059669;
+    box-shadow: 0 0 0 0.25rem rgba(5, 150, 105, 0.1);
+}
+
+.tutor-profile-form .btn-primary {
+    background-color: #059669;
+    border-color: #059669;
+}
+
+.tutor-profile-form .btn-primary:hover {
+    background-color: #047857;
+    border-color: #047857;
+}
+
+.tutor-profile-form .btn-outline-primary {
+    color: #059669;
+    border-color: #059669;
+}
+
+.tutor-profile-form .btn-outline-primary:hover {
+    background-color: #059669;
+    border-color: #059669;
+    color: white;
+}
+
+/* Badge styling */
+.bg-primary-subtle {
+    background-color: rgba(5, 150, 105, 0.1) !important;
+}
+
+.text-primary {
+    color: #059669 !important;
+}

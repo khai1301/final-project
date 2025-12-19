@@ -19,6 +19,7 @@ class TutorProfile extends Model
         'teaching_areas',
         'bio',
         'certificates',
+        'cv_path',
         'is_approved',
         'rating_avg',
         'review_count',
@@ -42,5 +43,13 @@ class TutorProfile extends Model
     public function user()
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Relationship to Certificates
+     */
+    public function certificates()
+    {
+        return $this->hasMany(TutorCertificate::class);
     }
 }

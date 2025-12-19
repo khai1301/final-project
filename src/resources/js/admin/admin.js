@@ -39,7 +39,14 @@ document.addEventListener('DOMContentLoaded', function () {
     const addTutorBtn = document.querySelector('.navbar-top .btn-primary');
     if (addTutorBtn) {
         addTutorBtn.addEventListener('click', function () {
-            alert('Redirecting to Add New Tutor form...');
+            Swal.fire({
+                toast: true,
+                position: 'top-end',
+                icon: 'info',
+                title: 'Redirecting to Add New Tutor form...',
+                showConfirmButton: false,
+                timer: 2000
+            });
         });
     }
 

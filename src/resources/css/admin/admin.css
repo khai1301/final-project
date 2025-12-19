@@ -73,6 +73,51 @@ body {
     text-align: center;
 }
 
+.nav-link .ms-auto {
+    margin-left: auto;
+    font-size: 0.75rem;
+    transition: transform 0.2s;
+}
+
+.nav-link[aria-expanded="true"] .ms-auto {
+    transform: rotate(180deg);
+}
+
+/* Submenu Styles */
+.submenu {
+    padding-left: 0;
+    margin-top: 0.25rem;
+}
+
+.submenu-link {
+    color: var(--gray-600);
+    padding: 0.625rem 1rem 0.625rem 2.75rem;
+    border-radius: var(--border-radius);
+    text-decoration: none;
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-size: 0.9rem;
+    transition: all 0.2s;
+}
+
+.submenu-link:hover {
+    background-color: var(--gray-200);
+    color: var(--gray-800);
+}
+
+.submenu-link.active {
+    background-color: var(--primary-light);
+    color: var(--primary);
+    font-weight: 500;
+}
+
+.submenu-link .bi {
+    width: 16px;
+    font-size: 0.875rem;
+    text-align: center;
+}
+
 .sidebar-footer {
     padding: 1.5rem;
     border-top: 1px solid var(--gray-200);

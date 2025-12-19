@@ -71,6 +71,9 @@
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userDropdown">
                             @if(auth()->user()->isAdmin())
                             <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                            @elseif(auth()->user()->role === 'tutor')
+                            <li><a class="dropdown-item" href="{{ route('tutor.profile') }}">Profile</a></li>
+                            <li><a class="dropdown-item" href="#">Settings</a></li>
                             @else
                             <li><a class="dropdown-item" href="#">Profile</a></li>
                             <li><a class="dropdown-item" href="#">Settings</a></li>
