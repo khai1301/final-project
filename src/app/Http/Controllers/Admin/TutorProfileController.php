@@ -79,17 +79,17 @@ class TutorProfileController extends Controller
     {
         $profile = TutorProfile::findOrFail($id);
         
-        // Delete associated certificates and files
+        // Delete associated certificates and files from S3
         foreach ($profile->certificates as $certificate) {
-            if (\Storage::disk('public')->exists($certificate->file_path)) {
-                \Storage::disk('public')->delete($certificate->file_path);
+            if (\Storage::disk('s3')->exists($certificate->file_path)) {
+                \Storage::disk('s3')->delete($certificate->file_path);
             }
             $certificate->delete();
         }
 
-        // Delete CV if exists
-        if ($profile->cv_path && \Storage::disk('public')->exists($profile->cv_path)) {
-            \Storage::disk('public')->delete($profile->cv_path);
+        // Delete CV from S3 if exists
+        if ($profile->cv_path && \Storage::disk('s3')->exists($profile->cv_path)) {
+            \Storage::disk('s3')->delete($profile->cv_path);
         }
 
         $profile->delete();

@@ -16,29 +16,29 @@
                                 <span class="home-badge-pulse-dot"></span>
                                 <span class="home-badge-pulse-core"></span>
                             </span>
-                            New: AI Match V2.0 is live
+                            Mới: AI Ghép đôi V2.0 đã ra mắt
                         </span>
                     </div>
 
                     {{-- Title --}}
                     <h1 class="home-hero-title">
-                        Find the right tutor in minutes with <span class="home-hero-gradient-text">AI matching</span>
+                        Tìm gia sư phù hợp trong vài phút với <span class="home-hero-gradient-text">AI tự động ghép đôi</span>
                     </h1>
 
                     {{-- Description --}}
                     <p class="home-hero-description">
-                        Stop scrolling through hundreds of profiles. Let our AI analyze your learning style, budget, and goals to connect you with the perfect verified mentor.
+                        Ngừng lướt qua hàng trăm hồ sơ. Để AI phân tích phong cách học tập, ngân sách và mục tiêu của bạn để kết nối với gia sư được xác minh hoàn hảo nhất.
                     </p>
 
                     {{-- CTA Buttons --}}
                     <div class="home-hero-buttons d-flex flex-wrap gap-3 pt-2">
                         <button class="btn btn-dark">
                             <span class="material-symbols-outlined">school</span>
-                            I am a Student
+                            Tôi là Học sinh
                         </button>
                         <button class="btn btn-outline-dark">
                             <span class="material-symbols-outlined">cast_for_education</span>
-                            I am a Tutor
+                            Tôi là Gia sư
                         </button>
                     </div>
                 </div>
@@ -51,14 +51,14 @@
                     
                     {{-- Search Card --}}
                     <div class="home-search-card">
-                        <h3 class="home-search-title">Start Learning</h3>
+                        <h3 class="home-search-title">Bắt đầu Học</h3>
                         <form action="#" method="GET">
                             <div class="row g-3">
                                 {{-- Subject Input --}}
                                 <div class="col-md-4 col-12">
                                     <div class="home-search-input-wrapper">
                                         <span class="material-symbols-outlined">search</span>
-                                        <input type="text" name="subject" class="home-search-input" placeholder="Subject..." />
+                                        <input type="text" name="subject" class="home-search-input" placeholder="Môn học..." />
                                     </div>
                                 </div>
 
@@ -66,7 +66,7 @@
                                 <div class="col-md-3 col-6">
                                     <div class="home-search-input-wrapper">
                                         <span class="material-symbols-outlined">location_on</span>
-                                        <input type="text" name="location" class="home-search-input" placeholder="Zip/Online" />
+                                        <input type="text" name="location" class="home-search-input" placeholder="Khu vực/Online" />
                                     </div>
                                 </div>
 
@@ -75,10 +75,10 @@
                                     <div class="home-search-select-wrapper">
                                         <span class="material-symbols-outlined">attach_money</span>
                                         <select name="budget" class="home-search-select">
-                                            <option value="" disabled selected>Budget</option>
-                                            <option value="1">Under $20/hr</option>
-                                            <option value="2">$20 - $50/hr</option>
-                                            <option value="3">$50+/hr</option>
+                                            <option value="" disabled selected>Ngân sách</option>
+                                            <option value="1">Dưới 100k/giờ</option>
+                                            <option value="2">100k - 300k/giờ</option>
+                                            <option value="3">Trên 300k/giờ</option>
                                         </select>
                                         <span class="material-symbols-outlined dropdown-icon">expand_more</span>
                                     </div>

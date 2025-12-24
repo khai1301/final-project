@@ -49,6 +49,19 @@ class Subject extends Model
     }
 
     /**
+     * Get the tutor profiles that teach this subject.
+     */
+    public function tutorProfiles()
+    {
+        return $this->belongsToMany(
+            TutorProfile::class,
+            'tutor_profile_subject',
+            'subject_id',           // foreign key on pivot for this model
+            'tutor_profile_id'      // foreign key on pivot for related model
+        );
+    }
+
+    /**
      * Scope a query to only include active subjects.
      */
     public function scopeActive($query)

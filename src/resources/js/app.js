@@ -5,3 +5,4 @@ import './admin/users.js';
 import './admin/dashboard.js';
 import './frontend/home.js';
 import './frontend/student-request.js';
+import './frontend/tutor-profile.js';

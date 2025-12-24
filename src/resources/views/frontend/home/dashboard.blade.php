@@ -126,37 +126,154 @@
             @if(auth()->user()->isTutor())
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-0 py-3 d-flex justify-content-between align-items-center">
-                    <h5 class="mb-0 fw-bold">Yêu cầu đặt lịch mới</h5>
-                    <span class="badge bg-primary">3</span>
+                    <h5 class="mb-0 fw-bold">Yêu cầu kết nối mới</h5>
+                    <span class="badge bg-primary">{{ $incomingRequests->count() }}</span>
                 </div>
                 <div class="card-body">
-                    @php
-                    $requests = [
-                        ['student' => 'Minh', 'grade' => 'Lớp 10', 'subject' => 'Toán', 'time' => 'T3, 21/12, 18:00-19:30'],
-                    ];
-                    @endphp
-                    
-                    @foreach($requests as $request)
+                    @forelse($incomingRequests as $request)
                     <div class="border rounded p-3 mb-3">
                         <div class="d-flex align-items-center mb-2">
-                            <img src="https://i.pravatar.cc/50?img=30" class="rounded-circle me-2" width="50" height="50">
-                            <div>
-                                <h6 class="mb-0 fw-bold">{{ $request['student'] }} - {{ $request['grade'] }}</h6>
-                                <small class="text-muted">Muốn học: {{ $request['subject'] }}</small>
+                            @php
+                                $avatarUrl = $request->sender->avatar 
+                                    ? \Storage::disk('s3')->url($request->sender->avatar) 
+                                    : 'https://ui-avatars.com/api/?name='.urlencode($request->sender->name).'&size=50';
+                            @endphp
+                            <img src="{{ $avatarUrl }}" class="rounded-circle me-2" width="50" height="50">
+                            <div class="flex-grow-1">
+                                <h6 class="mb-0 fw-bold">{{ $request->sender->name }}</h6>
+                                <small class="text-muted">{{ $request->sender->email }}</small>
                             </div>
                         </div>
+                        @if($request->message)
                         <div class="small text-muted mb-2">
-                            <i class="bi bi-clock me-1"></i>{{ $request['time'] }}
+                            <i class="bi bi-chat-left-text me-1"></i>{{ Str::limit($request->message, 60) }}
+                        </div>
+                        @endif
+                        <div class="small text-muted mb-2">
+                            <i class="bi bi-clock me-1"></i>{{ $request->created_at->diffForHumans() }}
                         </div>
                         <div class="d-flex gap-2">
-                            <button class="btn btn-success btn-sm">Chấp nhận</button>
-                            <button class="btn btn-outline-danger btn-sm">Từ chối</button>
-                            <button class="btn btn-outline-secondary btn-sm">Nhắn tin</button>
+                            <button class="btn btn-info btn-sm" data-bs-toggle="modal" data-bs-target="#requestDetailModal{{ $request->id }}">
+                                <i class="bi bi-eye me-1"></i>Xem chi tiết
+                            </button>
+                            <form action="{{ route('matching.accept', $request->id) }}" method="POST" class="d-inline">
+                                @csrf
+                                @method('PATCH')
+                                <button type="submit" class="btn btn-success btn-sm">
+                                    <i class="bi bi-check-lg me-1"></i>Chấp nhận
+                                </button>
+                            </form>
+                            <button class="btn btn-outline-danger btn-sm" data-bs-toggle="modal" data-bs-target="#declineModal{{ $request->id }}">
+                                <i class="bi bi-x-lg me-1"></i>Từ chối
+                            </button>
                         </div>
                     </div>
-                    @endforeach
+
+                    {{-- Request Detail Modal --}}
+                    <div class="modal fade" id="requestDetailModal{{ $request->id }}" tabindex="-1">
+                        <div class="modal-dialog modal-lg">
+                            <div class="modal-content">
+                                <div class="modal-header">
+                                    <h5 class="modal-title">
+                                        <i class="bi bi-person-circle me-2"></i>
+                                        Chi tiết yêu cầu kết nối
+                                    </h5>
+                                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                </div>
+                                <div class="modal-body">
+                                    <div class="row">
+                                        {{-- Profile Picture and Basic Info --}}
+                                        <div class="col-md-3 text-center mb-3">
+                                            <img src="{{ $avatarUrl }}" class="rounded-circle mb-2" width="120" height="120">
+                                            <h5>{{ $request->sender->name }}</h5>
+                                            <span class="badge bg-success">Học sinh</span>
+                                        </div>
+                                        
+                                        {{-- Detailed Information --}}
+                                        <div class="col-md-9">
+                                            {{-- Request Message --}}
+                                            @if($request->message)
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">
+                                                    <i class="bi bi-chat-square-text"></i> Lời nhắn
+                                                </h6>
+                                                <p class="text-muted">{{ $request->message }}</p>
+                                            </div>
+                                            @endif
+                                            
+                                            {{-- Contact Information --}}
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">
+                                                    <i class="bi bi-envelope"></i> Liên hệ
+                                                </h6>
+                                                <p class="mb-1">
+                                                    <i class="bi bi-envelope-fill me-2"></i>{{ $request->sender->email }}
+                                                </p>
+                                                @if($request->sender->phone)
+                                                <p class="mb-1">
+                                                    <i class="bi bi-telephone-fill me-2"></i>{{ $request->sender->phone }}
+                                                </p>
+                                                @endif
+                                            </div>
+                                            
+                                            {{-- Request Info --}}
+                                            <div class="border-top pt-3">
+                                                <small class="text-muted">
+                                                    <i class="bi bi-clock me-1"></i>
+                                                    Gửi {{ $request->created_at->diffForHumans() }} ({{ $request->created_at->format('d/m/Y H:i') }})
+                                                </small>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="modal-footer">
+                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
+                                    <button class="btn btn-outline-danger" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#declineModal{{ $request->id }}">
+                                        <i class="bi bi-x-lg me-1"></i>Từ chối
+                                    </button>
+                                    <form action="{{ route('matching.accept', $request->id) }}" method="POST" class="d-inline">
+                                        @csrf
+                                        @method('PATCH')
+                                        <button type="submit" class="btn btn-success">
+                                            <i class="bi bi-check-lg me-1"></i>Chấp nhận yêu cầu
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- Decline Modal --}}
+                    <div class="modal fade" id="declineModal{{ $request->id }}" tabindex="-1">
+                        <div class="modal-dialog">
+                            <div class="modal-content">
+                                <form action="{{ route('matching.decline', $request->id) }}" method="POST">
+                                    @csrf
+                                    @method('PATCH')
+                                    <div class="modal-header">
+                                        <h5 class="modal-title">Từ chối yêu cầu</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <p>Vui lòng cho biết lý do từ chối yêu cầu này:</p>
+                                        <textarea name="reason" class="form-control" rows="3" required minlength="10" maxlength="500" placeholder="Lý do của bạn (tối thiểu 10 ký tự)"></textarea>
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                                        <button type="submit" class="btn btn-danger">Xác nhận từ chối</button>
+                                    </div>
+                                </form>
+                            </div>
+                        </div>
+                    </div>
+                    @empty
+                    <div class="text-center text-muted py-3">
+                        <i class="bi bi-inbox" style="font-size: 2rem;"></i>
+                        <p class="mb-0 mt-2">Chưa có yêu cầu mới</p>
+                    </div>
+                    @endforelse
                     
-                    <a href="#" class="btn btn-outline-primary btn-sm w-100">Xem tất cả yêu cầu →</a>
+                    <a href="{{ route('matching.my-requests') }}" class="btn btn-outline-primary btn-sm w-100 mt-2">Xem tất cả yêu cầu →</a>
                 </div>
             </div>
             @endif

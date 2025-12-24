@@ -11,29 +11,27 @@ use Illuminate\Support\Facades\DB;
 class TutorProfileController extends Controller
 {
     /**
-     * Display the tutor's profile (or redirect to edit if profile doesn't exist).
+     * Display the tutor's profile.
      */
     public function show()
     {
         $user = auth()->user();
         
-        // Get or create profile
-        $profile = TutorProfile::firstOrCreate(
-            ['user_id' => $user->id],
-            [
-                'subjects' => [],
-                'teaching_areas' => [],
-                'availability' => [],
-                'is_approved' => false,
-            ]
-        );
-
-        // If profile is empty, redirect to edit
-        if (!$profile->bio && !$profile->education) {
-            return redirect()->route('tutor.profile.edit');
+        // Get fresh profile data with subjects relationship
+        $profile = TutorProfile::with(['subjects', 'certificates'])
+            ->where('user_id', $user->id)
+            ->first();
+        
+        // If no profile exists, redirect to create one
+        if (!$profile) {
+            return redirect()->route('tutor.profile.edit')
+                ->with('info', 'Please complete your profile first.');
         }
-
-        return view('frontend.tutor.show', compact('profile', 'user'));
+        
+        // Get all active subjects for reference
+        $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
+        
+        return view('frontend.home.tutor-profile', compact('profile', 'user', 'allSubjects'));
     }
 
     /**
@@ -47,14 +45,21 @@ class TutorProfileController extends Controller
         $profile = TutorProfile::firstOrCreate(
             ['user_id' => $user->id],
             [
-                'subjects' => [],
                 'teaching_areas' => [],
                 'availability' => [],
                 'is_approved' => false,
             ]
         );
+        
+        // Reload profile with relationships (fresh() doesn't always work with eager loading)
+        $profile = TutorProfile::with(['subjects', 'certificates'])
+            ->where('id', $profile->id)
+            ->first();
 
-        return view('frontend.home.tutor-profile', compact('profile', 'user'));
+        // Get all active subjects for dropdown/selection
+        $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
+
+        return view('frontend.home.tutor-profile', compact('profile', 'user', 'allSubjects'));
     }
 
     /**
@@ -67,25 +72,25 @@ class TutorProfileController extends Controller
 
         DB::beginTransaction();
         try {
-            // Handle avatar upload
+            // Handle avatar upload to S3
             if ($request->hasFile('avatar')) {
-                // Delete old avatar
-                if ($user->avatar && Storage::disk('public')->exists($user->avatar)) {
-                    Storage::disk('public')->delete($user->avatar);
+                // Delete old avatar from S3
+                if ($user->avatar && Storage::disk('s3')->exists($user->avatar)) {
+                    Storage::disk('s3')->delete($user->avatar);
                 }
                 
-                $avatarPath = $request->file('avatar')->store('avatars', 'public');
+                $avatarPath = $request->file('avatar')->store('avatars', 's3');
                 $user->update(['avatar' => $avatarPath]);
             }
 
-            // Handle CV upload
+            // Handle CV upload to S3
             if ($request->hasFile('cv')) {
-                // Delete old CV
-                if ($profile->cv_path && Storage::disk('public')->exists($profile->cv_path)) {
-                    Storage::disk('public')->delete($profile->cv_path);
+                // Delete old CV from S3
+                if ($profile->cv_path && Storage::disk('s3')->exists($profile->cv_path)) {
+                    Storage::disk('s3')->delete($profile->cv_path);
                 }
                 
-                $cvPath = $request->file('cv')->store('cvs', 'public');
+                $cvPath = $request->file('cv')->store('cvs', 's3');
                 $profile->cv_path = $cvPath;
             }
 
@@ -94,24 +99,42 @@ class TutorProfileController extends Controller
                 $user->update(['phone' => $request->input('phone')]);
             }
 
-            // Update profile fields
+            // Parse teaching_areas from JSON string to array
+            $teachingAreas = [];
+            if ($request->has('teaching_areas')) {
+                $areasJson = $request->input('teaching_areas');
+                $teachingAreas = is_string($areasJson) ? json_decode($areasJson, true) : $areasJson;
+                $teachingAreas = $teachingAreas ?: [];
+            }
+
+            // Update profile fields (removed subjects as it's now a pivot)
             $profile->fill([
-                'subjects' => $request->input('subjects', []),
                 'education' => $request->input('education'),
                 'experience_years' => $request->input('experience_years'),
                 'hourly_rate_min' => $request->input('hourly_rate_min'),
                 'hourly_rate_max' => $request->input('hourly_rate_max'),
-                'teaching_areas' => $request->input('teaching_areas', []),
+                'teaching_areas' => $teachingAreas,
                 'bio' => $request->input('bio'),
                 'availability' => $request->input('availability', []),
             ]);
             
             $profile->save();
 
-            // Handle certificate uploads
+            // Sync subjects relationship (many-to-many)
+            // Always sync if subjects field is present (even if empty array to clear all)
+            if ($request->has('subjects')) {
+                $subjectIds = $request->input('subjects', []);
+                // Ensure it's an array
+                if (!is_array($subjectIds)) {
+                    $subjectIds = [];
+                }
+                $profile->subjects()->sync($subjectIds);
+            }
+
+            // Handle certificate uploads to S3
             if ($request->hasFile('certificates')) {
                 foreach ($request->file('certificates') as $certificate) {
-                    $path = $certificate->store('certificates', 'public');
+                    $path = $certificate->store('certificates', 's3');
                     
                     TutorCertificate::create([
                         'tutor_profile_id' => $profile->id,
@@ -126,7 +149,7 @@ class TutorProfileController extends Controller
             DB::commit();
 
             return redirect()->route('tutor.profile')
-                ->with('success', 'Profile updated successfully!');
+                ->with('success', 'Cập nhật hồ sơ thành công!');
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -149,13 +172,30 @@ class TutorProfileController extends Controller
             abort(403);
         }
 
-        // Delete file
-        if (Storage::disk('public')->exists($certificate->file_path)) {
-            Storage::disk('public')->delete($certificate->file_path);
+        // Delete file from S3
+        if (Storage::disk('s3')->exists($certificate->file_path)) {
+            Storage::disk('s3')->delete($certificate->file_path);
         }
 
         $certificate->delete();
 
-        return back()->with('success', 'Certificate deleted successfully!');
+        return back()->with('success', 'Đã xóa chứng chỉ thành công!');
+    }
+
+    /**
+     * Show public tutor profile (viewable by anyone)
+     */
+    public function showPublic($id)
+    {
+        $tutor = \App\Models\User::with(['tutorProfile.subjects', 'tutorProfile.certificates'])
+            ->where('role', 'tutor')
+            ->findOrFail($id);
+        
+        // Check if profile exists and is approved
+        if (!$tutor->tutorProfile || !$tutor->tutorProfile->is_approved) {
+            abort(404, 'Tutor profile not found or not approved');
+        }
+        
+        return view('frontend.tutor-profile.public', compact('tutor'));
     }
 }

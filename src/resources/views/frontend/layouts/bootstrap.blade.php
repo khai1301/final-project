@@ -70,6 +70,45 @@
     
     <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <!-- SweetAlert Handler -->
+    @if(session('swal'))
+    <script>
+        Swal.fire({
+            icon: '{{ session('swal.type') }}',
+            title: '{{ session('swal.title') }}',
+            text: '{{ session('swal.text') }}',
+            timer: 3000,
+            showConfirmButton: true
+        });
+    </script>
+    @endif
+    
+    @if(session('success'))
+    <script>
+        Swal.fire({
+            icon: 'success',
+            title: 'Success!',
+            text: '{{ session('success') }}',
+            timer: 3000
+        });
+    </script>
+    @endif
+    
+    @if(session('error'))
+    <script>
+        Swal.fire({
+            icon: 'error',
+            title: 'Error!',
+            text: '{{ session('error') }}',
+            timer: 3000
+        });
+    </script>
+    @endif
+    
     @stack('scripts')
 </body>
 </html>

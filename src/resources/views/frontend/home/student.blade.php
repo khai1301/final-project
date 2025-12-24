@@ -8,7 +8,7 @@
             @if ($errors->any())
                 <div class="alert alert-danger alert-dismissible fade show" role="alert">
                     <i class="material-symbols-outlined me-2">error</i>
-                    <strong>Please correct the following errors:</strong>
+                    <strong>Vui lòng sửa các lỗi sau:</strong>
                     <ul class="mb-0 mt-2">
                         @foreach ($errors->all() as $error)
                             <li>{{ $error }}</li>
@@ -23,10 +23,10 @@
                 <div class="card-header bg-gradient-primary text-white p-4 border-0">
                     <div class="d-flex align-items-center gap-3 mb-2">
                         <span class="material-symbols-outlined fs-1">auto_awesome</span>
-                        <h1 class="h2 mb-0 fw-bold">New Learning Request</h1>
+                        <h1 class="h2 mb-0 fw-bold">Yêu Cầu Học Mới</h1>
                     </div>
                     <p class="mb-0 text-white-50">
-                        Tell us what you want to learn. Our AI engine will analyze your needs, schedule, and learning style to find the top 3 tutors for you instantly.
+                        Cho chúng tôi biết bạn muốn học gì. Hệ thống AI sẽ phân tích nhu cầu, lịch trình và phong cách học của bạn để tìm ra 3 gia sư phù hợp nhất ngay lập tức.
                     </p>
                 </div>
 
@@ -38,14 +38,14 @@
                     <div class="p-4 pb-3">
                         <h3 class="section-title mb-4">
                             <span class="section-number">1</span>
-                            The Basics
+                            Thông Tin Cơ Bản
                         </h3>
                         
                         <div class="row g-3 mb-3">
                             <div class="col-md-6">
-                                <label class="form-label fw-medium">Subject</label>
+                                <label class="form-label fw-medium">Môn học</label>
                                 <select name="subject" class="form-select form-select-lg" required>
-                                    <option value="" disabled selected>Select subject</option>
+                                    <option value="" disabled selected>Chọn môn học</option>
                                     @foreach($subjects as $subject)
                                         <option value="{{ $subject->name }}">{{ $subject->name }}</option>
                                     @endforeach
@@ -53,9 +53,9 @@
                             </div>
                             
                             <div class="col-md-6">
-                                <label class="form-label fw-medium">Education Level</label>
+                                <label class="form-label fw-medium">Trình độ học vấn</label>
                                 <select name="education_level" class="form-select form-select-lg" required>
-                                    <option value="" disabled selected>Select level</option>
+                                    <option value="" disabled selected>Chọn trình độ</option>
                                     @foreach($educationLevels as $level)
                                         <option value="{{ $level->name }}">{{ $level->name }}</option>
                                     @endforeach
@@ -65,16 +65,16 @@
 
                         <div class="mb-3">
                             <div class="d-flex justify-content-between align-items-center mb-2">
-                                <label class="form-label fw-medium mb-0">Specific Skills or Topics</label>
+                                <label class="form-label fw-medium mb-0">Kỹ năng hoặc chủ đề cụ thể</label>
                                 <span class="badge bg-primary-subtle text-primary">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">bolt</span>
-                                    AI Matching Priority
+                                    Ưu tiên ghép đôi AI
                                 </span>
                             </div>
                             <div class="skills-input-container">
                                 <div id="skillsChips" class="skills-chips"></div>
                                 <input type="text" id="skillsInput" class="skills-input" 
-                                       placeholder="Type topics and press enter (e.g. Limits, Derivatives)">
+                                       placeholder="Nhập chủ đề và nhấn enter (vd: Giới hạn, Đạo hàm)">
                                 <input type="hidden" name="skills" id="skillsHidden">
                             </div>
                         </div>
@@ -86,13 +86,13 @@
                     <div class="p-4 pb-3">
                         <h3 class="section-title mb-4">
                             <span class="section-number">2</span>
-                            Logistics
+                            Thông Tin Học Tập
                         </h3>
                         
                         <div class="row g-4 mb-4">
                             <!-- Learning Mode -->
                             <div class="col-md-6">
-                                <label class="form-label fw-medium">Learning Mode</label>
+                                <label class="form-label fw-medium">Hình thức học</label>
                                 <div class="row g-3">
                                     @foreach($learningModes as $index => $modeItem)
                                     <div class="col-{{ count($learningModes) <= 2 ? '6' : '4' }}">
@@ -117,7 +117,7 @@
 
                             <!-- Schedule -->
                             <div class="col-md-6">
-                                <label class="form-label fw-medium">Preferred Schedule</label>
+                                <label class="form-label fw-medium">Lịch học ưu tiên</label>
                                 <div class="row g-2">
                                     <div class="col-6">
                                         <div class="form-check schedule-check">
@@ -150,7 +150,7 @@
                         <!-- Address Field (shown only for offline mode) -->
                         <div class="mb-3 d-none" id="addressField">
                             <label class="form-label fw-medium">
-                                Learning Location Address
+                                Địa chỉ học
                                 <span class="text-danger">*</span>
                             </label>
                             <div class="input-group">
@@ -158,9 +158,9 @@
                                     <span class="material-symbols-outlined text-muted">location_on</span>
                                 </span>
                                 <input type="text" name="address" id="addressInput" class="form-control form-control-lg" 
-                                       placeholder="Enter your preferred learning location">
+                                       placeholder="Nhập địa điểm học ưa thích của bạn">
                             </div>
-                            <small class="text-muted">Provide the address where you'd like to have in-person sessions</small>
+                            <small class="text-muted">Cung cấp địa chỉ nơi bạn muốn học trực tiếp</small>
                         </div>
                     </div>
 
@@ -170,26 +170,26 @@
                     <div class="p-4 pb-3">
                         <h3 class="section-title mb-4">
                             <span class="section-number">3</span>
-                            Budget
+                            Ngân Sách
                         </h3>
                         
                         <div class="budget-container p-4 rounded-3 bg-light">
-                            <label class="form-label fw-medium mb-3">Hourly Rate Range (VNĐ)</label>
+                            <label class="form-label fw-medium mb-3">Khoảng giá theo giờ (VNĐ)</label>
                             <div class="row g-3">
                                 <div class="col-md-6">
-                                    <label class="form-label small text-muted">Minimum Rate</label>
+                                    <label class="form-label small text-muted">Giá tối thiểu</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control form-control-lg" name="budget_min" 
                                                id="budgetMinInput" min="100000" max="5000000" value="500000" step="50000" required>
-                                        <span class="input-group-text">VNĐ/hr</span>
+                                        <span class="input-group-text">VNĐ/giờ</span>
                                     </div>
                                 </div>
                                 <div class="col-md-6">
-                                    <label class="form-label small text-muted">Maximum Rate</label>
+                                    <label class="form-label small text-muted">Giá tối đa</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control form-control-lg" name="budget_max" 
-                                               id="budgetMaxInput" min="100000" max="5000000" value="1000000" step="50000" required>
-                                        <span class="input-group-text">VNĐ/hr</span>
+                                               id="budgetMaxInput" min="100000" max="5000000" value="600000" step="50000" required>
+                                        <span class="input-group-text">VNĐ/giờ</span>
                                     </div>
                                 </div>
                             </div>
@@ -198,21 +198,21 @@
 
                     <!-- Section 4: Notes -->
                     <div class="px-4 pb-4">
-                        <label class="form-label fw-medium">Additional Notes</label>
+                        <label class="form-label fw-medium">Ghi chú thêm</label>
                         <textarea name="notes" class="form-control" rows="4" 
-                                  placeholder="e.g. I'm preparing for the SATs next month and specifically need help with Geometry problems."></textarea>
+                                  placeholder="vd: Tôi đang chuẩn bị cho kỳ thi SAT vào tháng tới và cần giúp đỡ cụ thể về các bài toán Hình học."></textarea>
                     </div>
 
                     <!-- Submit Area -->
                     <div class="card-footer bg-light p-4 border-0 d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
                         <div class="d-flex align-items-center gap-2 text-muted small">
                             <span class="material-symbols-outlined">info</span>
-                            <span>Requests are usually matched within 24 hours.</span>
+                            <span>Yêu cầu thường được ghép đôi trong vòng 24 giờ.</span>
                         </div>
                         <div class="d-flex gap-3">
-                            <button type="button" class="btn btn-outline-secondary px-4">Save Draft</button>
+                            <!-- <button type="button" class="btn btn-outline-secondary px-4">Lưu Nháp</button> -->
                             <button type="submit" class="btn btn-primary px-4">
-                                Find My Match
+                                Tìm Gia Sư Phù Hợp
                                 <span class="material-symbols-outlined ms-1" style="font-size: 18px;">arrow_forward</span>
                             </button>
                         </div>

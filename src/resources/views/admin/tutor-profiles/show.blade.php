@@ -119,7 +119,7 @@
                                         <div class="fw-medium">{{ $cert->name }}</div>
                                         <div class="text-muted small">{{ number_format($cert->file_size / 1024, 2) }} KB</div>
                                     </div>
-                                    <a href="{{ asset('storage/' . $cert->file_path) }}" target="_blank" 
+                                    <a href="{{ \Storage::disk('s3')->url($cert->file_path) }}" target="_blank" 
                                        class="btn btn-sm btn-outline-primary">
                                         <i class="bi bi-eye"></i>
                                     </a>
@@ -140,7 +140,7 @@
                                 <div class="fw-medium">Curriculum Vitae</div>
                                 <div class="text-muted small">{{ basename($profile->cv_path) }}</div>
                             </div>
-                            <a href="{{ asset('storage/' . $profile->cv_path) }}" target="_blank" 
+                            <a href="{{ \Storage::disk('s3')->url($profile->cv_path) }}" target="_blank" 
                                class="btn btn-outline-primary">
                                 <i class="bi bi-download me-1"></i> Download
                             </a>
@@ -175,7 +175,7 @@
                 <div class="card-body">
                     <div class="text-center mb-3">
                         @if($profile->user->avatar)
-                            <img src="{{ asset('storage/' . $profile->user->avatar) }}" 
+                            <img src="{{ \Storage::disk('s3')->url($profile->user->avatar) }}" 
                                  alt="Avatar" class="rounded-circle mb-2" width="80" height="80">
                         @else
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($profile->user->name) }}&size=80&background=random&color=fff" 

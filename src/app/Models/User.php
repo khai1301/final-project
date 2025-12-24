@@ -67,13 +67,73 @@ class User extends Authenticatable implements MustVerifyEmail
         return $this->hasOne(TutorProfile::class);
     }
 
+    /**
+     * Get matchings where user is the student.
+     */
+    public function studentMatchings()
+    {
+        return $this->hasMany(Matching::class, 'student_id');
+    }
+
+    /**
+     * Get matchings where user is the tutor.
+     */
+    public function tutorMatchings()
+    {
+        return $this->hasMany(Matching::class, 'tutor_id');
+    }
+
+    /**
+     * Get matchings where user is the sender.
+     */
+    public function sentMatchings()
+    {
+        return $this->hasMany(Matching::class, 'sender_id');
+    }
+
+    /**
+     * Get all matchings for this user (as student or tutor).
+     */
+    public function allMatchings()
+    {
+        return Matching::where('student_id', $this->id)
+            ->orWhere('tutor_id', $this->id);
+    }
+
+    /**
+     * Get accepted connections for this user.
+     */
+    public function connections()
+    {
+        return Matching::where(function($q) {
+            $q->where('student_id', $this->id)
+              ->orWhere('tutor_id', $this->id);
+        })->where('status', 'accepted');
+    }
+
+    /**
+     * Get notifications for this user.
+     */
+    public function notifications()
+    {
+        return $this->hasMany(Notification::class);
+    }
+
+    /**
+     * Get unread notifications count.
+     */
+    public function unreadNotificationsCount()
+    {
+        return $this->notifications()->unread()->count();
+    }
+
     public function verification()
     {
         return $this->hasOne(Verification::class);
     }
 
     /**
-     * Helper methods
+     * Helper Methods
      */
     public function isStudent(): bool
     {
@@ -92,12 +152,12 @@ class User extends Authenticatable implements MustVerifyEmail
 
     public function isBanned(): bool
     {
-        return $this->banned_at !== null;
+        return !is_null($this->banned_at);
     }
 
     public function isVerified(): bool
     {
-        return $this->verification && $this->verification->status === 'approved';
+        return !is_null($this->email_verified_at);
     }
 
     public function hasBlueTick(): bool

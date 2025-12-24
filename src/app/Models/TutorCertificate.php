@@ -24,10 +24,10 @@ class TutorCertificate extends Model
     }
 
     /**
-     * Get the full URL to the certificate file.
+     * Get the file URL from S3.
      */
     public function getFileUrlAttribute(): string
     {
-        return asset('storage/' . $this->file_path);
+        return \Storage::disk('s3')->url($this->file_path);
     }
 }

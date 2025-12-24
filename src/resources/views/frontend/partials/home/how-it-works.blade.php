@@ -3,8 +3,8 @@
     <div class="container">
         {{-- Section Header --}}
         <div class="text-center mx-auto mb-5" style="max-width: 48rem;">
-            <h2 class="home-section-title">How SmartTutor Works</h2>
-            <p class="home-section-description">Three simple steps to start your learning journey</p>
+            <h2 class="home-section-title">SmartTutor Hoạt Động Như Thế Nào</h2>
+            <p class="home-section-description">Ba bước đơn giản để bắt đầu hành trình học tập của bạn</p>
         </div>
 
         {{-- Process Steps --}}
@@ -19,9 +19,9 @@
                         <div class="home-process-icon-wrapper blue">
                             <span class="material-symbols-outlined">edit_note</span>
                         </div>
-                        <h3 class="home-process-title">1. Request a Tutor</h3>
+                        <h3 class="home-process-title">1. Yêu Cầu Gia Sư</h3>
                         <p class="home-process-description">
-                            Post your learning requirements, budget, and schedule preferences.
+                            Đăng yêu cầu học tập, ngân sách và lịch trình ưa thích của bạn.
                         </p>
                     </div>
                 </div>
@@ -32,9 +32,9 @@
                         <div class="home-process-icon-wrapper purple">
                             <span class="material-symbols-outlined">auto_awesome</span>
                         </div>
-                        <h3 class="home-process-title">2. Get Matched</h3>
+                        <h3 class="home-process-title">2. Được Ghép Đôi</h3>
                         <p class="home-process-description">
-                            Our AI instantly recommends the best tutors that fit your profile perfectly.
+                            AI của chúng tôi ngay lập tức đề xuất các gia sư phù hợp nhất với hồ sơ của bạn.
                         </p>
                     </div>
                 </div>
@@ -45,9 +45,9 @@
                         <div class="home-process-icon-wrapper green">
                             <span class="material-symbols-outlined">video_chat</span>
                         </div>
-                        <h3 class="home-process-title">3. Start Learning</h3>
+                        <h3 class="home-process-title">3. Bắt Đầu Học</h3>
                         <p class="home-process-description">
-                            Chat with your tutor, book a session, and start learning via our classroom.
+                            Trò chuyện với gia sư, đặt buổi học và bắt đầu học qua lớp học trực tuyến của chúng tôi.
                         </p>
                     </div>
                 </div>

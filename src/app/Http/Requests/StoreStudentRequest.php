@@ -40,7 +40,7 @@ class StoreStudentRequest extends FormRequest
         $validator->after(function ($validator) {
             // Require address for non-online modes
             if ($this->filled('mode') && strtolower($this->mode) !== 'online' && !$this->filled('address')) {
-                $validator->errors()->add('address', 'Please enter a learning location address for in-person sessions.');
+                $validator->errors()->add('address', 'Vui lòng nhập địa chỉ học cho các buổi học trực tiếp.');
             }
         });
     }
@@ -51,23 +51,23 @@ class StoreStudentRequest extends FormRequest
     public function messages()
     {
         return [
-            'subject.required' => 'Please enter the subject you want to learn.',
-            'education_level.required' => 'Please select your education level.',
-            'education_level.in' => 'Please select a valid education level.',
-            'mode.required' => 'Please select a learning mode.',
-            'mode.in' => 'Please select either online or in-person learning.',
-            'address.required_if' => 'Please enter a learning location address for in-person sessions.',
-            'address.max' => 'Address cannot exceed 500 characters.',
-            'schedule.required' => 'Please select at least one preferred schedule.',
-            'schedule.min' => 'Please select at least one preferred schedule.',
-            'budget_min.required' => 'Please enter your minimum hourly rate.',
-            'budget_min.min' => 'Minimum budget must be at least 100,000 VNĐ.',
-            'budget_min.max' => 'Minimum budget cannot exceed 5,000,000 VNĐ.',
-            'budget_max.required' => 'Please enter your maximum hourly rate.',
-            'budget_max.min' => 'Maximum budget must be at least 100,000 VNĐ.',
-            'budget_max.max' => 'Maximum budget cannot exceed 5,000,000 VNĐ.',
-            'budget_max.gte' => 'Maximum budget must be greater than or equal to minimum budget.',
-            'notes.max' => 'Additional notes cannot exceed 1000 characters.',
+            'subject.required' => 'Vui lòng nhập môn học bạn muốn học.',
+            'education_level.required' => 'Vui lòng chọn trình độ học vấn của bạn.',
+            'education_level.in' => 'Vui lòng chọn một trình độ học vấn hợp lệ.',
+            'mode.required' => 'Vui lòng chọn hình thức học.',
+            'mode.in' => 'Vui lòng chọn hình thức học trực tuyến hoặc trực tiếp.',
+            'address.required_if' => 'Vui lòng nhập địa chỉ học cho các buổi học trực tiếp.',
+            'address.max' => 'Địa chỉ không được vượt quá 500 ký tự.',
+            'schedule.required' => 'Vui lòng chọn ít nhất một lịch học ưa thích.',
+            'schedule.min' => 'Vui lòng chọn ít nhất một lịch học ưa thích.',
+            'budget_min.required' => 'Vui lòng nhập mức giá tối thiểu mỗi giờ.',
+            'budget_min.min' => 'Ngân sách tối thiểu phải ít nhất 100.000 VNĐ.',
+            'budget_min.max' => 'Ngân sách tối thiểu không được vượt quá 5.000.000 VNĐ.',
+            'budget_max.required' => 'Vui lòng nhập mức giá tối đa mỗi giờ.',
+            'budget_max.min' => 'Ngân sách tối đa phải ít nhất 100.000 VNĐ.',
+            'budget_max.max' => 'Ngân sách tối đa không được vượt quá 5.000.000 VNĐ.',
+            'budget_max.gte' => 'Ngân sách tối đa phải lớn hơn hoặc bằng ngân sách tối thiểu.',
+            'notes.max' => 'Ghi chú không được vượt quá 1000 ký tự.',
         ];
     }
 }

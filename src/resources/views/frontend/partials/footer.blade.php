@@ -13,7 +13,7 @@
                     <h5 class="mb-0 fw-bold">SmartTutor</h5>
                 </div>
                 <p class="small mb-3" style="color: var(--gray-600); line-height: 1.75;">
-                    Connecting students with the best tutors worldwide using advanced AI matching technology.
+                    Kết nối học sinh với gia sư tốt nhất trên toàn thế giới sử dụng công nghệ AI ghép đôi tiên tiến.
                 </p>
                 <div class="d-flex gap-2">
                     <a href="#" class="d-flex align-items-center justify-content-center rounded-circle text-decoration-none" 
@@ -37,34 +37,34 @@
 
             {{-- Learn Column --}}
             <div class="col-md-3">
-                <h6 class="fw-bold mb-3">Learn</h6>
+                <h6 class="fw-bold mb-3">Học</h6>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Find a Tutor</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Online Courses</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">By Subject</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">By Location</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Tìm Gia Sư</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Khóa Học Trực Tuyến</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Theo Môn Học</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Theo Khu Vực</a></li>
                 </ul>
             </div>
 
             {{-- Teach Column --}}
             <div class="col-md-3">
-                <h6 class="fw-bold mb-3">Teach</h6>
+                <h6 class="fw-bold mb-3">Giảng Dạy</h6>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Become a Tutor</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Tutor Rules</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Success Stories</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Safety Center</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Trở Thành Gia Sư</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Quy Tắc Gia Sư</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Câu Chuyện Thành Công</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Trung Tâm An Toàn</a></li>
                 </ul>
             </div>
 
             {{-- Support Column --}}
             <div class="col-md-3">
-                <h6 class="fw-bold mb-3">Support</h6>
+                <h6 class="fw-bold mb-3">Hỗ Trợ</h6>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Help Center</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Contact Us</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Terms of Service</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Privacy Policy</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Trung Tâm Trợ Giúp</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Liên Hệ</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Điều Khoản Dịch Vụ</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Chính Sách Bảo Mật</a></li>
                 </ul>
             </div>
         </div>
@@ -72,11 +72,11 @@
         {{-- Footer Bottom --}}
         <div class="pt-4" style="border-top: 1px solid var(--gray-800);">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <p class="mb-0 small" style="color: #6b7280;">© 2023 SmartTutor Inc. All rights reserved.</p>
+                <p class="mb-0 small" style="color: #6b7280;">© 2024 SmartTutor Inc. Bản quyền thuộc về chúng tôi.</p>
                 <div class="d-flex gap-4 small" style="color: #6b7280;">
-                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Privacy</a>
-                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Terms</a>
-                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Sitemap</a>
+                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Bảo Mật</a>
+                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Điều Khoản</a>
+                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Sơ Đồ Trang</a>
                 </div>
             </div>
         </div>

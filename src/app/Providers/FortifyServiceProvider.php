@@ -53,6 +53,29 @@ class FortifyServiceProvider extends ServiceProvider
         Fortify::updateUserPasswordsUsing(UpdateUserPassword::class);
         Fortify::resetUserPasswordsUsing(ResetUserPassword::class);
 
+        // Customize authentication logic to check for banned users
+        Fortify::authenticateUsing(function (Request $request) {
+            $validated = $request->validate([
+                'email' => 'required|email',
+                'password' => 'required',
+            ]);
+
+            $user = \App\Models\User::where('email', $validated['email'])->first();
+
+            if ($user && \Illuminate\Support\Facades\Hash::check($validated['password'], $user->password)) {
+                // Check if user is banned
+                if ($user->isBanned()) {
+                    throw \Illuminate\Validation\ValidationException::withMessages([
+                        'email' => ['Your account has been banned. Please contact support.'],
+                    ]);
+                }
+                
+                return $user;
+            }
+
+            return null;
+        });
+
         // Register views
         Fortify::loginView(fn () => view('auth.login'));
         Fortify::registerView(fn () => view('auth.register'));

@@ -62,6 +62,6 @@ class StudentRequestController extends Controller
 
         return redirect()
             ->route('student.request.create')
-            ->with('success', 'Your learning request has been submitted successfully! Our AI will match you with the best tutors.');
+            ->with('success', 'Yêu cầu học tập của bạn đã được gửi thành công! Hệ thống AI sẽ ghép đôi bạn với gia sư phù hợp nhất.');
     }
 }

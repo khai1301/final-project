@@ -14,6 +14,9 @@
         "laravel/fortify": "^1.32",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1",
+        "league/flysystem-aws-s3-v3": "^3.0",
+        "phpoffice/phpword": "^1.1",
+        "smalot/pdfparser": "^2.12",
         "spatie/laravel-permission": "^6.23"
     },
     "require-dev": {

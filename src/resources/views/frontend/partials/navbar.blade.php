@@ -21,38 +21,41 @@
                 @auth
                     {{-- Common for all authenticated --}}
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">Home</a>
+                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.home') }}</a>
                     </li>
 
                     @if(auth()->user()->role === 'tutor')
                         <li class="nav-item">
-                            <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">Find Students</a>
+                            <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.find_students') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">My Classes</a>
+                            <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.my_classes') }}</a>
                         </li>
                     @elseif(auth()->user()->role === 'student')
                         <li class="nav-item">
-                            <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">Find Tutors</a>
+                            <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.find_tutors') }}</a>
                         </li>
                         <li class="nav-item">
-                            <a class="nav-link fw-medium" href="{{ route('student.request.create') }}" style="color: #4b5563 !important;">My Requests</a>
+                            <a href="{{ route('student.request.create') }}" class="btn btn-primary btn-sm fw-bold shadow-sm px-3" style="padding: 0.5rem 1rem;">
+                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">add</span>
+                                {{ __('ui.create_request') }}
+                            </a>
                         </li>
                     @elseif(auth()->user()->isAdmin())
                         <li class="nav-item">
-                            <a class="nav-link fw-medium" href="{{ route('admin.dashboard') }}" style="color: #4b5563 !important;">Admin Panel</a>
+                            <a class="nav-link fw-medium" href="{{ route('admin.dashboard') }}" style="color: #4b5563 !important;">{{ __('ui.admin_panel') }}</a>
                         </li>
                     @endif
                 @else
                     {{-- Guest Menu --}}
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">Find a Tutor</a>
+                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.find_tutors') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">Become a Tutor</a>
+                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('pages.become_tutor') }}</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">How it Works</a>
+                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('pages.how_it_works') }}</a>
                     </li>
                 @endauth
             </ul>
@@ -60,6 +63,54 @@
             {{-- Auth Buttons --}}
             <div class="d-flex gap-2 ms-lg-4 mt-3 mt-lg-0">
                 @auth
+                    {{-- Notification Bell --}}
+                    <div class="dropdown me-2">
+                        <a href="#" class="position-relative d-flex align-items-center justify-content-center text-decoration-none" id="notificationDropdown" data-bs-toggle="dropdown" style="color: #4b5563; width: 40px; height: 40px;">
+                            <span class="material-symbols-outlined">notifications</span>
+                            @php
+                                $unreadCount = auth()->user()->unreadNotificationsCount();
+                            @endphp
+                            @if($unreadCount > 0)
+                            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger" style="font-size: 10px;">
+                                {{ $unreadCount > 9 ? '9+' : $unreadCount }}
+                            </span>
+                            @endif
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" style="min-width: 300px;" aria-labelledby="notificationDropdown">
+                            <li class="dropdown-header d-flex justify-content-between align-items-center">
+                                <span>{{ __('ui.notifications') }}</span>
+                                @if($unreadCount > 0)
+                                <a href="{{ route('notifications.index') }}" class="text-primary small">{{ __('ui.view_all') }}</a>
+                                @endif
+                            </li>
+                            <li><hr class="dropdown-divider"></li>
+                            @php
+                                $recentNotifications = auth()->user()->notifications()->unread()->take(5)->get();
+                            @endphp
+                            @forelse($recentNotifications as $notification)
+                            <li>
+                                <a class="dropdown-item py-2 {{ !$notification->is_read ? 'bg-light' : '' }}" href="{{ route('notifications.index') }}">
+                                    <div class="d-flex align-items-start">
+                                        <span class="material-symbols-outlined text-primary me-2" style="font-size: 18px;">{{ $notification->type == 'connect_request' ? 'person_add' : ($notification->type == 'connect_accepted' ? 'check_circle' : 'cancel') }}</span>
+                                        <div class="flex-grow-1">
+                                            <div class="fw-bold small">{{ $notification->title }}</div>
+                                            <div class="text-muted" style="font-size: 12px;">{{ Str::limit($notification->message, 50) }}</div>
+                                            <div class="text-muted" style="font-size: 11px;">{{ $notification->created_at->diffForHumans() }}</div>
+                                        </div>
+                                    </div>
+                                </a>
+                            </li>
+                            @empty
+                            <li>
+                                <div class="dropdown-item text-center text-muted py-3">
+                                    <span class="material-symbols-outlined d-block mb-1">notifications_off</span>
+                                    {{ __('ui.no_data') }}
+                                </div>
+                            </li>
+                            @endforelse
+                        </ul>
+                    </div>
+                    
                     {{-- User Dropdown / Profile --}}
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: #4b5563;">
@@ -72,24 +123,26 @@
                             @if(auth()->user()->isAdmin())
                             <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Dashboard</a></li>
                             @elseif(auth()->user()->role === 'tutor')
-                            <li><a class="dropdown-item" href="{{ route('tutor.profile') }}">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="{{ route('tutor.profile') }}">Hồ Sơ</a></li>
+                            <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">Yêu Cầu Của Tôi</a></li>
+                            <li><a class="dropdown-item" href="#">Cài Đặt</a></li>
                             @else
-                            <li><a class="dropdown-item" href="#">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
+                            <li><a class="dropdown-item" href="#">Hồ Sơ</a></li>
+                            <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">Yêu Cầu Của Tôi</a></li>
+                            <li><a class="dropdown-item" href="#">Cài Đặt</a></li>
                             @endif
                             <li><hr class="dropdown-divider"></li>
                             <li>
                                 <form method="POST" action="{{ route('logout') }}">
                                     @csrf
-                                    <button type="submit" class="dropdown-item text-danger">Logout</button>
+                                    <button type="submit" class="dropdown-item text-danger">{{ __('auth.logout') }}</button>
                                 </form>
                             </li>
                         </ul>
                     </div>
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-sm fw-bold" style="color: var(--gray-600);">Log In</a>
-                    <a href="{{ route('register') }}" class="btn btn-sm btn-primary fw-bold shadow-sm">Sign Up</a>
+                    <a href="{{ route('login') }}" class="btn btn-sm fw-bold" style="color: var(--gray-600);">{{ __('auth.login') }}</a>
+                    <a href="{{ route('register') }}" class="btn btn-sm btn-primary fw-bold shadow-sm">{{ __('auth.register') }}</a>
                 @endauth
             </div>
         </div>

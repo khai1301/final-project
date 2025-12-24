@@ -2,7 +2,6 @@
 
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
-use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Admin\TutorController;
 use App\Http\Controllers\Admin\StudentController;
@@ -12,14 +11,15 @@ use App\Http\Controllers\Admin\EducationLevelController;
 use App\Http\Controllers\Admin\LearningModeController;
 use App\Http\Controllers\StudentRequestController;
 use App\Http\Controllers\TutorProfileController;
+use App\Http\Controllers\MatchingController;
+use App\Http\Controllers\NotificationController;
 
+// Public Routes
+Route::get('/tutors/{id}', [TutorProfileController::class, 'showPublic'])->name('tutor.show');
 
-// Auth Routes Override (using FormRequest) abc
-Route::post('/login', [AuthController::class, 'login'])
-    ->middleware(['guest', 'throttle:login']);
-Route::post('/register', [AuthController::class, 'register'])
-    ->middleware(['guest']);
-
+// NOTE: All auth routes (login, register, logout, password reset, email verification)
+// are automatically registered by Laravel Fortify.
+// See config/fortify.php and app/Providers/FortifyServiceProvider.php
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
 
@@ -35,6 +35,26 @@ Route::middleware(['auth', 'role:tutor'])->group(function () {
     Route::get('/tutor/profile/edit', [TutorProfileController::class, 'edit'])->name('tutor.profile.edit');
     Route::put('/tutor/profile', [TutorProfileController::class, 'update'])->name('tutor.profile.update');
     Route::delete('/tutor/certificates/{id}', [TutorProfileController::class, 'deleteCertificate'])->name('tutor.certificate.delete');
+});
+
+// Matching routes (for authenticated students and tutors)
+Route::middleware(['auth'])->group(function () {
+    Route::post('/matching/connect', [MatchingController::class, 'store'])->name('matching.connect');
+    Route::patch('/matching/{id}/accept', [MatchingController::class, 'accept'])->name('matching.accept');
+    Route::patch('/matching/{id}/decline', [MatchingController::class, 'decline'])->name('matching.decline');
+    Route::delete('/matching/{id}/cancel', [MatchingController::class, 'cancel'])->name('matching.cancel');
+    Route::get('/my-connections', [MatchingController::class, 'index'])->name('matching.index');
+    Route::get('/my-requests', [MatchingController::class, 'myRequests'])->name('matching.my-requests');
+    
+    // Notification routes
+    Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
+    Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
+    Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    
+    // Contact Unlock routes
+    Route::post('/contact/unlock/{matching}', [\App\Http\Controllers\ContactUnlockController::class, 'unlock'])->name('contact.unlock');
+    Route::get('/payment/callback', [\App\Http\Controllers\ContactUnlockController::class, 'paymentCallback'])->name('payment.callback');
+    Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
 });
 
 
@@ -66,6 +86,20 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::patch('/tutor-profiles/{id}/approve', [\App\Http\Controllers\Admin\TutorProfileController::class, 'approve'])->name('tutor-profiles.approve');
     Route::patch('/tutor-profiles/{id}/unapprove', [\App\Http\Controllers\Admin\TutorProfileController::class, 'unapprove'])->name('tutor-profiles.unapprove');
     Route::delete('/tutor-profiles/{id}', [\App\Http\Controllers\Admin\TutorProfileController::class, 'destroy'])->name('tutor-profiles.destroy');
+
+    // Settings Management
+    Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
+    Route::put('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
+    
+    // Matchings Management
+    Route::get('/matchings', [\App\Http\Controllers\Admin\MatchingController::class, 'index'])->name('matchings.index');
+    Route::get('/matchings/{id}', [\App\Http\Controllers\Admin\MatchingController::class, 'show'])->name('matchings.show');
+});
+
+// CV Parser routes (for tutors)
+Route::middleware(['auth', 'role:tutor'])->prefix('cv')->group(function () {
+    Route::post('/upload', [\App\Http\Controllers\CVParserController::class, 'upload'])->name('cv.upload');
+    Route::post('/apply', [\App\Http\Controllers\CVParserController::class, 'applyParsedData'])->name('cv.apply');
 });
 
 // Home route - redirects based on role after login
