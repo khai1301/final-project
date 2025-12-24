@@ -183,6 +183,47 @@ class TutorProfileController extends Controller
     }
 
     /**
+     * Browse all approved tutors with filters (public page)
+     */
+    public function browse()
+    {
+        $search = request('search');
+        $subjects = request('subjects', []);
+        $rateMin = request('rate_min');
+        $rateMax = request('rate_max');
+
+        $tutors = TutorProfile::with(['user', 'subjects'])
+            ->where('is_approved', true)
+            
+            // Search by tutor name
+            ->when($search, function($query) use ($search) {
+                $query->whereHas('user', function($q) use ($search) {
+                    $q->where('name', 'like', "%{$search}%");
+                });
+            })
+            
+            // Filter by subjects (OR logic - at least one subject matches)
+            ->when(!empty($subjects), function($query) use ($subjects) {
+                $query->whereHas('subjects', function($q) use ($subjects) {
+                    $q->whereIn('subjects.id', $subjects);
+                });
+            })
+            
+            // Filter by hourly rate range (using min/max fields)
+            ->when($rateMin, fn($q) => $q->where('hourly_rate_min', '>=', $rateMin))
+            ->when($rateMax, fn($q) => $q->where('hourly_rate_max', '<=', $rateMax))
+            
+            ->orderBy('created_at', 'desc')
+            ->paginate(12)
+            ->withQueryString();
+
+        // Get filter options
+        $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
+
+        return view('frontend.tutors.browse', compact('tutors', 'allSubjects'));
+    }
+
+    /**
      * Show public tutor profile (viewable by anyone)
      */
     public function showPublic($id)

@@ -10,7 +10,7 @@
             <div class="col-lg-6">
                 <div class="d-flex flex-column gap-4">
                     {{-- Badge --}}
-                    <div>
+                    <!-- <div>
                         <span class="home-badge">
                             <span class="home-badge-pulse">
                                 <span class="home-badge-pulse-dot"></span>
@@ -18,7 +18,7 @@
                             </span>
                             Mới: AI Ghép đôi V2.0 đã ra mắt
                         </span>
-                    </div>
+                    </div> -->
 
                     {{-- Title --}}
                     <h1 class="home-hero-title">
@@ -50,7 +50,7 @@
                     <div class="home-hero-image-overlay"></div>
                     
                     {{-- Search Card --}}
-                    <div class="home-search-card">
+                    <!-- <div class="home-search-card">
                         <h3 class="home-search-title">Bắt đầu Học</h3>
                         <form action="#" method="GET">
                             <div class="row g-3">
@@ -92,7 +92,7 @@
                                 </div>
                             </div>
                         </form>
-                    </div>
+                    </div> -->
                 </div>
             </div>
         </div>

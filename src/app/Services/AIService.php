@@ -27,14 +27,12 @@ class AIService
     public function parseCVFile(string $filePath): array
     {
         try {
-            // Step 1: Try to extract text from file
             $text = null;
             $useVision = false;
             
             try {
                 $text = $this->extractText($filePath);
             } catch (\Exception $e) {
-                // If text extraction fails, try vision API for PDFs
                 $extension = strtolower(pathinfo($filePath, PATHINFO_EXTENSION));
                 if ($extension === 'pdf') {
                     Log::info('Text extraction failed, falling back to Gemini Vision', [
@@ -47,7 +45,6 @@ class AIService
                 }
             }
 
-            // Step 2: Parse with AI
             if ($useVision) {
                 $parsedData = $this->parseWithVision($filePath);
             } else {
@@ -81,15 +78,12 @@ class AIService
                 throw new \Exception('Định dạng file không được hỗ trợ: ' . $extension);
             }
             
-            // Check if we got any text
             if (empty(trim($text))) {
                 throw new \Exception('Không thể trích xuất text từ CV. File có thể bị hỏng hoặc là hình ảnh scan. Vui lòng thử file khác hoặc nhập thông tin thủ công.');
             }
             
-            // Clean and ensure valid UTF-8
             $text = $this->sanitizeUTF8($text);
             
-            // Double check after sanitization
             if (empty(trim($text))) {
                 throw new \Exception('CV không chứa nội dung hợp lệ sau khi xử lý. Vui lòng thử file khác.');
             }
@@ -111,13 +105,10 @@ class AIService
      */
     private function sanitizeUTF8(string $text): string
     {
-        // Remove invalid UTF-8 characters
         $text = mb_convert_encoding($text, 'UTF-8', 'UTF-8');
         
-        // Remove null bytes and other control characters
         $text = preg_replace('/[\x00-\x08\x0B\x0C\x0E-\x1F\x7F]/u', '', $text);
         
-        // Normalize whitespace
         $text = preg_replace('/\s+/u', ' ', $text);
         
         return trim($text);
@@ -133,25 +124,21 @@ class AIService
             $pdf = $parser->parseFile($filePath);
             $text = $pdf->getText();
             
-            // Check if text was actually extracted
             if (empty(trim($text))) {
                 throw new \Exception('PDF không chứa text có thể đọc được. Có thể đây là PDF scan (hình ảnh). Vui lòng sử dụng PDF có text hoặc nhập thông tin thủ công.');
             }
             
-            // Remove non-printable characters and normalize
             $text = preg_replace('/[^\P{C}\n\r\t]/u', '', $text);
             $text = preg_replace('/\s+/', ' ', $text);
             
             return trim($text);
             
         } catch (\Exception $e) {
-            // Log detailed error
             Log::error('PDF text extraction failed', [
                 'file' => $filePath,
                 'error' => $e->getMessage()
             ]);
             
-            // Throw user-friendly error
             if (str_contains($e->getMessage(), 'PDF không chứa text')) {
                 throw $e;
             }
@@ -190,7 +177,7 @@ class AIService
             'Content-Type' => 'application/json',
             'Authorization' => 'Bearer ' . $this->openaiApiKey,
         ])->post($this->openaiEndpoint, [
-            'model' => 'gpt-4o-mini', // Fast and cheap
+            'model' => 'gpt-4o-mini',
             'messages' => [
                 [
                     'role' => 'system',
@@ -255,7 +242,6 @@ PROMPT;
      */
     private function parseAIResponse(string $response): array
     {
-        // Remove markdown code blocks if present
         $response = preg_replace('/```json\s*|\s*```/', '', $response);
         $response = trim($response);
 
@@ -277,7 +263,6 @@ PROMPT;
      */
     private function sanitizeData(array $data): array
     {
-        // Helper to clean UTF-8 strings
         $cleanString = function($str) {
             if (!is_string($str)) return $str;
             $str = mb_convert_encoding($str, 'UTF-8', 'UTF-8');
@@ -309,22 +294,19 @@ PROMPT;
     private function parseWithVision(string $filePath): array
     {
         try {
-            // Convert PDF first page to image
             $imageData = $this->convertPDFToImage($filePath);
             
             if (!$imageData) {
                 throw new \Exception('Không thể convert PDF sang hình ảnh. Vui lòng thử file khác.');
             }
 
-            // Build vision prompt
             $prompt = $this->buildVisionPrompt();
 
-            // Call OpenAI Vision API
             $response = Http::withHeaders([
                 'Content-Type' => 'application/json',
                 'Authorization' => 'Bearer ' . $this->openaiApiKey,
             ])->post($this->openaiEndpoint, [
-                'model' => 'gpt-4o-mini', // gpt-4o supports vision
+                'model' => 'gpt-4o-mini',
                 'messages' => [
                     [
                         'role' => 'system',
@@ -374,19 +356,17 @@ PROMPT;
     private function convertPDFToImage(string $filePath): ?string
     {
         try {
-            // Check if Imagick is available
             if (!extension_loaded('imagick')) {
                 Log::warning('Imagick extension not available, cannot convert PDF to image');
                 return null;
             }
 
             $imagick = new \Imagick();
-            $imagick->setResolution(150, 150); // Good balance of quality and size
-            $imagick->readImage($filePath . '[0]'); // Read first page only
+            $imagick->setResolution(150, 150);
+            $imagick->readImage($filePath . '[0]');
             $imagick->setImageFormat('jpeg');
             $imagick->setImageCompressionQuality(85);
 
-            // Convert to base64
             $imageBlob = $imagick->getImageBlob();
             $base64 = base64_encode($imageBlob);
 

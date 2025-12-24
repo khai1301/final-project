@@ -10,7 +10,7 @@
     @include('frontend.partials.home.how-it-works')
     @include('frontend.partials.home.tutor-requests')
     @include('frontend.partials.home.testimonials')
-    @include('frontend.partials.home.cta-section')
+    <!-- @include('frontend.partials.home.cta-section') -->
 </div>
 
 <style>

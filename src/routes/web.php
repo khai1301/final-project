@@ -15,6 +15,7 @@ use App\Http\Controllers\MatchingController;
 use App\Http\Controllers\NotificationController;
 
 // Public Routes
+Route::get('/tutors', [TutorProfileController::class, 'browse'])->name('tutors.browse');
 Route::get('/tutors/{id}', [TutorProfileController::class, 'showPublic'])->name('tutor.show');
 
 // NOTE: All auth routes (login, register, logout, password reset, email verification)
