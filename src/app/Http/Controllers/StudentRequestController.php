@@ -34,10 +34,10 @@ class StudentRequestController extends Controller
             $skills = is_array($skillsData) ? $skillsData : null;
         }
 
-        // Lookup foreign keys
+        // Lookup foreign keys by ID (database-driven)
         $subject = Subject::where('name', $request->input('subject'))->first();
         $educationLevel = EducationLevel::where('name', $request->input('education_level'))->first();
-        $learningMode = LearningMode::where('name', $request->input('mode'))->first();
+        $learningMode = LearningMode::find($request->input('learning_mode_id'));
 
         // Create the learning request
         $learningRequest = LearningRequest::create([
@@ -49,9 +49,9 @@ class StudentRequestController extends Controller
             'education_level_id' => $educationLevel ? $educationLevel->id : null,
             'grade' => $request->input('education_level'),
             'skills' => $skills,
-            'mode' => $request->input('mode'),
+            'mode' => $learningMode ? $learningMode->name : null,
             'learning_mode_id' => $learningMode ? $learningMode->id : null,
-            'location_type' => $request->input('mode'),
+            'location_type' => $learningMode ? $learningMode->slug : null,
             'address' => $request->input('address'),
             'schedule' => $request->input('schedule'),
             'budget_min' => $request->input('budget_min'),

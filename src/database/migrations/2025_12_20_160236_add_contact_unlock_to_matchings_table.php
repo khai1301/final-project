@@ -12,12 +12,24 @@ return new class extends Migration
     public function up(): void
     {
         Schema::table('matchings', function (Blueprint $table) {
-            $table->boolean('contact_unlocked')->default(false)->after('status');
-            $table->timestamp('unlocked_at')->nullable()->after('contact_unlocked');
-            $table->decimal('unlock_fee', 10, 2)->nullable()->after('unlocked_at');
-            $table->string('payment_status')->nullable()->after('unlock_fee'); // pending, completed, failed
-            $table->string('payment_method')->nullable()->after('payment_status'); // vnpay, momo, etc
-            $table->string('transaction_id')->nullable()->after('payment_method');
+            if (!Schema::hasColumn('matchings', 'contact_unlocked')) {
+                $table->boolean('contact_unlocked')->default(false)->after('status');
+            }
+            if (!Schema::hasColumn('matchings', 'unlocked_at')) {
+                $table->timestamp('unlocked_at')->nullable()->after('contact_unlocked');
+            }
+            if (!Schema::hasColumn('matchings', 'unlock_fee')) {
+                $table->decimal('unlock_fee', 10, 2)->nullable()->after('unlocked_at');
+            }
+            if (!Schema::hasColumn('matchings', 'payment_status')) {
+                $table->string('payment_status')->nullable()->after('unlock_fee');
+            }
+            if (!Schema::hasColumn('matchings', 'payment_method')) {
+                $table->string('payment_method')->nullable()->after('payment_status');
+            }
+            if (!Schema::hasColumn('matchings', 'transaction_id')) {
+                $table->string('transaction_id')->nullable()->after('payment_method');
+            }
         });
     }
 

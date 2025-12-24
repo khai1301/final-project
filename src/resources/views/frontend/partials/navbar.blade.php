@@ -28,12 +28,12 @@
                     </li>
 
                     @if(auth()->user()->role === 'tutor')
-                        <li class="nav-item">
+                        <!-- <li class="nav-item">
                             <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.find_students') }}</a>
                         </li>
                         <li class="nav-item">
                             <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.my_classes') }}</a>
-                        </li>
+                        </li> -->
                     @elseif(auth()->user()->role === 'student')
                         <li class="nav-item">
                             <a class="nav-link fw-medium" href="{{ route('tutors.browse') }}" style="color: #4b5563 !important;">{{ __('ui.find_tutors') }}</a>

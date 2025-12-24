@@ -96,9 +96,9 @@
                                 <div class="row g-3">
                                     @foreach($learningModes as $index => $modeItem)
                                     <div class="col-{{ count($learningModes) <= 2 ? '6' : '4' }}">
-                                        <input type="radio" class="btn-check" name="mode" 
+                                        <input type="radio" class="btn-check" name="learning_mode_id" 
                                                id="mode{{ $modeItem->slug }}" 
-                                               value="{{ strtolower($modeItem->name) }}" 
+                                               value="{{ $modeItem->id }}" 
                                                {{ $index === 0 ? 'checked' : '' }}>
                                         <label class="btn btn-outline-primary w-100 mode-card" for="mode{{ $modeItem->slug }}">
                                             @if($modeItem->icon)

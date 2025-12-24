@@ -22,7 +22,7 @@ class StoreStudentRequest extends FormRequest
             'subject' => 'required|string|max:255',
             'education_level' => 'required|string|max:255',
             'skills' => 'nullable|string',
-            'mode' => 'required|string|max:255',
+            'learning_mode_id' => 'required|integer|exists:learning_modes,id',
             'address' => 'nullable|string|max:500',
             'schedule' => 'required|array|min:1',
             'schedule.*' => 'string',
@@ -32,18 +32,7 @@ class StoreStudentRequest extends FormRequest
         ];
     }
 
-    /**
-     * Configure the validator instance.
-     */
-    public function withValidator($validator)
-    {
-        $validator->after(function ($validator) {
-            // Require address for non-online modes
-            if ($this->filled('mode') && strtolower($this->mode) !== 'online' && !$this->filled('address')) {
-                $validator->errors()->add('address', 'Vui lòng nhập địa chỉ học cho các buổi học trực tiếp.');
-            }
-        });
-    }
+
 
     /**
      * Get custom validation messages.
@@ -54,8 +43,8 @@ class StoreStudentRequest extends FormRequest
             'subject.required' => 'Vui lòng nhập môn học bạn muốn học.',
             'education_level.required' => 'Vui lòng chọn trình độ học vấn của bạn.',
             'education_level.in' => 'Vui lòng chọn một trình độ học vấn hợp lệ.',
-            'mode.required' => 'Vui lòng chọn hình thức học.',
-            'mode.in' => 'Vui lòng chọn hình thức học trực tuyến hoặc trực tiếp.',
+            'learning_mode_id.required' => 'Vui lòng chọn hình thức học.',
+            'learning_mode_id.exists' => 'Hình thức học không hợp lệ.',
             'address.required_if' => 'Vui lòng nhập địa chỉ học cho các buổi học trực tiếp.',
             'address.max' => 'Địa chỉ không được vượt quá 500 ký tự.',
             'schedule.required' => 'Vui lòng chọn ít nhất một lịch học ưa thích.',

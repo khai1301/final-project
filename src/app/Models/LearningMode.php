@@ -12,6 +12,7 @@ class LearningMode extends Model
     protected $fillable = [
         'name',
         'slug',
+        'value',
         'icon',
         'is_active',
     ];
