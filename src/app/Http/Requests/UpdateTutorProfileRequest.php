@@ -11,7 +11,7 @@ class UpdateTutorProfileRequest extends FormRequest
      */
     public function authorize(): bool
     {
-        return auth()->check() && auth()->user()->role === 'tutor';
+        return true;
     }
 
     /**
@@ -19,50 +19,48 @@ class UpdateTutorProfileRequest extends FormRequest
      */
     public function rules(): array
     {
+        // If user has base location (province_id), teaching areas are optional
+        // If no base location, at least 1 teaching area is required
+        $hasBaseLocation = $this->filled('province_id');
+        
         return [
-            // Basic Info - all optional for partial updates
-            'phone' => 'nullable|string|max:20',
-            'experience_years' => 'nullable|integer|min:0|max:50',
+            // User fields
+            'name' => ['required', 'string', 'max:255'],
+            'phone' => ['nullable', 'string', 'max:20'],
+            'province_id' => ['nullable', 'exists:provinces,id'],
+            'ward_id' => ['nullable', 'exists:wards,id'],
+            'address_detail' => ['nullable', 'string', 'max:500'],
             
-            // Teaching Info - optional for partial updates
-            'subjects' => 'nullable|array|min:1',
-            'subjects.*' => 'required_with:subjects|exists:subjects,id',
-            'education' => 'nullable|string|max:2000',
-            'bio' => 'nullable|string|max:1000',
+            // Profile fields
+            'education' => ['required', 'string', 'max:255'],
+            'experience_years' => ['required', 'integer', 'min:0', 'max:50'],
+            'hourly_rate_min' => ['required', 'numeric', 'min:0'],
+            'hourly_rate_max' => ['required', 'numeric', 'min:0', 'gte:hourly_rate_min'],
+            'bio' => ['nullable', 'string', 'max:2000'],
             
-            // Rates - optional for partial updates
-            'hourly_rate_min' => 'nullable|numeric|min:100000|max:5000000',
-            'hourly_rate_max' => 'nullable|numeric|min:100000|max:5000000|gte:hourly_rate_min',
+            // Subjects (required, at least one)
+            'subjects' => ['required', 'array', 'min:1'],
+            'subjects.*' => ['exists:subjects,id'],
             
-            // Teaching Areas - optional
-            'teaching_areas' => 'nullable|string',
+            // Skills
+            'skills' => ['nullable', 'string'],
             
-            // File Uploads - always optional
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:5120', // 5MB
-            'cv' => 'nullable|file|mimes:pdf,doc,docx|max:10240', // 10MB
-            'certificates' => 'nullable|array|max:10',
-            'certificates.*' => 'file|mimes:jpg,jpeg,png,pdf|max:10240', // 10MB each
+            // Teaching areas - conditional: optional if base location exists, required if not
+            'teaching_areas' => [$hasBaseLocation ? 'nullable' : 'required', 'array'],
+            'teaching_areas.*.province_id' => ['required', 'exists:provinces,id'],
+            'teaching_areas.*.ward_id' => ['nullable', 'exists:wards,id'],
             
-            // Availability - optional
-            'availability' => 'nullable|array',
-            'availability.*' => 'array',
+            // Available time slots
+            'time_slots' => ['nullable', 'array'],
+            'time_slots.*' => ['exists:time_slots,id'],
+            
+            // File uploads
+            'avatar' => ['nullable', 'image', 'max:5120'], // 5MB
+            'cv' => ['nullable', 'mimes:pdf,doc,docx', 'max:10240'], // 10MB
+            'certificates' => ['nullable', 'array'],
+            'certificates.*' => ['image', 'max:5120'], // 5MB per certificate
         ];
     }
-
-    /**
-     * Prepare data for validation.
-     */
-    protected function prepareForValidation()
-    {
-        // Keep teaching_areas as JSON string for validation
-        // Controller will parse it when saving
-        
-        if ($this->has('skills') && is_string($this->skills)) {
-            $skills = json_decode($this->skills, true);
-            $this->merge(['skills' => $skills ?: []]);
-        }
-    }
-
 
     /**
      * Get custom validation messages.
@@ -70,21 +68,13 @@ class UpdateTutorProfileRequest extends FormRequest
     public function messages(): array
     {
         return [
-            'subjects.required' => 'Vui lòng thêm ít nhất một môn học bạn dạy.',
-            'subjects.min' => 'Vui lòng thêm ít nhất một môn học bạn dạy.',
-            'experience_years.required' => 'Vui lòng chọn số năm kinh nghiệm của bạn.',
-            'hourly_rate_min.required' => 'Vui lòng nhập mức giá tối thiểu mỗi giờ.',
-            'hourly_rate_min.min' => 'Mức giá tối thiểu phải ít nhất 100.000 VNĐ.',
-            'hourly_rate_max.required' => 'Vui lòng nhập mức giá tối đa mỗi giờ.',
-            'hourly_rate_max.gte' => 'Mức giá tối đa phải lớn hơn hoặc bằng mức giá tối thiểu.',
-            'teaching_areas.required' => 'Vui lòng thêm ít nhất một khu vực/địa điểm dạy học.',
-            'teaching_areas.min' => 'Vui lòng thêm ít nhất một khu vực/địa điểm dạy học.',
-            'avatar.image' => 'Ảnh đại diện phải là một hình ảnh.',
-            'avatar.max' => 'Ảnh đại diện không được vượt quá 5MB.',
-            'cv.mimes' => 'CV phải là file PDF hoặc DOC.',
-            'cv.max' => 'File CV không được vượt quá 10MB.',
-            'certificates.*.max' => 'Mỗi file chứng chỉ không được vượt quá 10MB.',
-            'certificates.max' => 'Bạn có thể tải lên tối đa 10 chứng chỉ.',
+            'subjects.required' => 'Please select at least one subject you teach.',
+            'subjects.min' => 'Please select at least one subject you teach.',
+            'teaching_areas.required' => 'Please add at least one teaching area or set your base location above.',
+            'teaching_areas.*.province_id.required' => 'Province is required for each teaching area.',
+            'teaching_areas.*.province_id.exists' => 'Selected province is invalid.',
+            'teaching_areas.*.ward_id.exists' => 'Selected ward is invalid.',
+            'hourly_rate_max.gte' => 'Maximum rate must be greater than or equal to minimum rate.',
         ];
     }
 }

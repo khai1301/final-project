@@ -88,8 +88,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-    // Initialize chip inputs (subjects removed as they're now checkboxes)
-    const areasChip = new ChipInput('areasInput', 'areasChips', 'areasHidden');
+    // Initialize chip inputs for skills only
     const skillsChip = new ChipInput('skillsInput', 'skillsChips', 'skillsHidden');
 
     // File upload previews
@@ -130,44 +129,6 @@ document.addEventListener('DOMContentLoaded', function () {
                     profilePhotoPreview.src = e.target.result;
                 };
                 reader.readAsDataURL(this.files[0]);
-            }
-        });
-    }
-
-    // Form submission handler
-    const form = document.querySelector('.tutor-profile-form');
-    if (form) {
-        form.addEventListener('submit', function (e) {
-            // Validate subjects (now checkboxes)
-            const subjectCheckboxes = document.querySelectorAll('input[name="subjects[]"]:checked');
-            if (subjectCheckboxes.length === 0) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Missing Information',
-                    text: 'Please select at least one subject you teach.',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-                return false;
-            }
-
-            // Validate teaching areas (chip input)
-            const teachingAreas = document.getElementById('areasHidden');
-            if (teachingAreas && (!teachingAreas.value || teachingAreas.value === '[]')) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Missing Information',
-                    text: 'Please add at least one teaching area/location.',
-                    toast: true,
-                    position: 'top-end',
-                    showConfirmButton: false,
-                    timer: 3000
-                });
-                return false;
             }
         });
     }

@@ -21,12 +21,10 @@ class TutorProfile extends Model
         'is_approved',
         'rating_avg',
         'review_count',
-        'availability',
     ];
 
     protected $casts = [
         'teaching_areas' => 'array',
-        'availability' => 'array',
         'is_approved' => 'boolean',
         'hourly_rate_min' => 'decimal:2',
         'hourly_rate_max' => 'decimal:2',
@@ -60,5 +58,26 @@ class TutorProfile extends Model
             'tutor_profile_id',        // foreign key on pivot table for this model
             'subject_id'               // foreign key on pivot table for related model
         );
+    }
+
+    /**
+     * Teaching areas relationship
+     */
+    public function teachingAreas()
+    {
+        return $this->hasMany(TutorTeachingArea::class, 'tutor_profile_id');
+    }
+
+    /**
+     * Get available time slots for this tutor.
+     */
+    public function availableTimeSlots()
+    {
+        return $this->belongsToMany(
+            TimeSlot::class,
+            'tutor_availabilities',
+            'tutor_profile_id',
+            'time_slot_id'
+        )->withTimestamps();
     }
 }

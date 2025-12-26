@@ -36,7 +36,6 @@ class CVParserController extends Controller
                 ['user_id' => $user->id],
                 [
                     'teaching_areas' => [],
-                    'availability' => [],
                     'is_approved' => false,
                 ]
             );

@@ -9,6 +9,14 @@
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body class="auth-page">
+    {{-- Embed location data for JavaScript --}}
+    <script>
+        window.locationData = {
+            provinces: @json($provinces),
+            wards: @json($wards)
+        };
+    </script>
+    
     <header>
         <div class="logo-container">
             <div class="logo-icon">
@@ -30,7 +38,7 @@
                     @csrf
 
                     <div class="form-group">
-                        <label for="name">Họ và tên</label>
+                        <label for="name">Họ và tên <span class="text-danger">*</span></label>
                         <input type="text" id="name" name="name" 
                                value="{{ old('name') }}" 
                                placeholder="Nhập họ và tên" 
@@ -41,7 +49,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="email">Email</label>
+                        <label for="email">Email <span class="text-danger">*</span></label>
                         <input type="email" id="email" name="email" 
                                value="{{ old('email') }}" 
                                placeholder="Nhập email của bạn" 
@@ -57,6 +65,42 @@
                                value="{{ old('phone') }}" 
                                placeholder="Nhập số điện thoại">
                         @error('phone')
+                            <span class="text-danger small mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="province_id">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+                        <select id="province_id" name="province_id" required data-old-value="{{ old('province_id') }}">
+                            <option value="">Chọn tỉnh/thành phố</option>
+                            @foreach($provinces as $province)
+                                <option value="{{ $province->id }}" {{ old('province_id') == $province->id ? 'selected' : '' }}>
+                                    {{ $province->name }}
+                                </option>
+                            @endforeach
+                        </select>
+                        @error('province_id')
+                            <span class="text-danger small mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="ward_id">Phường/Xã (tùy chọn)</label>
+                        <select id="ward_id" name="ward_id" disabled data-old-value="{{ old('ward_id') }}">
+                            <option value="">Chọn phường/xã</option>
+                        </select>
+                        @error('ward_id')
+                            <span class="text-danger small mt-1">{{ $message }}</span>
+                        @enderror
+                    </div>
+
+                    <div class="form-group">
+                        <label for="address_detail">Địa chỉ chi tiết (tùy chọn)</label>
+                        <input type="text" id="address_detail" name="address_detail" 
+                               value="{{ old('address_detail') }}" 
+                               placeholder="Số nhà, tên đường, thôn/xóm...">
+                        <small class="text-muted">Ví dụ: Số 123, Đường Trần Hưng Đạo, Thôn 2</small>
+                        @error('address_detail')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                         @enderror
                     </div>
@@ -87,7 +131,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Mật khẩu</label>
+                        <label for="password">Mật khẩu <span class="text-danger">*</span></label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" 
                                    placeholder="Nhập mật khẩu" required>
@@ -102,7 +146,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="password_confirmation">Xác nhận mật khẩu</label>
+                        <label for="password_confirmation">Xác nhận mật khẩu <span class="text-danger">*</span></label>
                         <div class="input-wrapper">
                             <input type="password" id="password_confirmation" name="password_confirmation" 
                                    placeholder="Nhập lại mật khẩu" required>

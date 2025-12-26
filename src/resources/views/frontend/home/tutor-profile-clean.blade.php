@@ -1,14 +1,6 @@
 @extends('frontend.layouts.bootstrap')
 
 @section('content')
-{{-- Embed location data for JavaScript --}}
-<script>
-    window.locationData = {
-        provinces: @json($provinces),
-        wards: @json($wards)
-    };
-</script>
-
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -457,23 +449,7 @@
                         
                         <small class="text-muted d-block mb-3">Where are you willing to teach? Add provinces and specific wards/communes.</small>
                         
-                        @if($user->province_id)
-                            <div class="alert alert-info mb-3">
-                                <i class="bi bi-info-circle me-2"></i>
-                                <strong>Your base location</strong> ({{ $user->province?->name ?? 'Province' }}{{ $user->ward ? ', ' . $user->ward->name : '' }}) will always appear first in your teaching areas. You can add more areas below.
-                            </div>
-                        @else
-                            <div class="alert alert-warning mb-3">
-                                <i class="bi bi-exclamation-triangle me-2"></i>
-                                You haven't set your base location yet. Please add at least one teaching area below, or set your <strong>Province/City</strong> in the Basic Information section above.
-                            </div>
-                        @endif
-                        
-                        <div id="teachingAreasList" class="mb-3"
-                             data-user-province="{{ $user->province_id }}"
-                             data-user-ward="{{ $user->ward_id }}"
-                             data-province-name="{{ $user->province?->name ?? '' }}"
-                             data-ward-name="{{ $user->ward?->name ?? '' }}">
+                        <div id="teachingAreasList" class="mb-3">
                             @if(isset($profile->teachingAreas) && $profile->teachingAreas->count() > 0)
                                 @foreach($profile->teachingAreas as $index => $area)
                                     <div class="teaching-area-item card mb-3 p-3" data-index="{{ $index }}">
@@ -538,7 +514,41 @@
     </div>
 </div>
 
+<!-- AI Preview Modal -->
+<div class="modal fade" id="aiPreviewModal" tabindex="-1">
+    <div class="modal-dialog modal-xl">
+        <div class="modal-content">
+            <div class="modal-header bg-primary text-white">
+                <h5 class="modal-title">
+                    <span class="material-symbols-outlined me-2">auto_awesome</span>
+                    Kết quả phân tích CV bởi AI
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-info">
+                    <span class="material-symbols-outlined me-2">info</span>
+                    <strong>Hướng dẫn:</strong> Xem lại thông tin đã trích xuất, chỉnh sửa nếu cần, sau đó nhấn "Áp dụng" để điền vào form.
+                </div>
+                
+                <div class="row g-3" id="aiPreviewContent">
+                    <!-- Content will be populated by JavaScript -->
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Hủy</button>
+                <button type="button" class="btn btn-primary" id="applyAIDataBtn">
+                    <span class="material-symbols-outlined me-1" style="font-size: 18px;">check_circle</span>
+                    Áp dụng vào Form
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
 @if(session('success'))
 <div data-success-message="{{ session('success') }}" style="display: none;"></div>
 @endif
+
+
 @endsection

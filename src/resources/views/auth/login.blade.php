@@ -42,7 +42,7 @@
                     @csrf
 
                     <div class="form-group">
-                        <label for="email">Email</label>
+                    <label for="email">Email <span class="text-danger">*</span></label>
                         <input type="email" id="email" name="email" 
                                value="{{ old('email') }}" 
                                placeholder="Nhập email của bạn" 
@@ -53,7 +53,7 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Mật khẩu</label>
+                        <label for="password">Mật khẩu <span class="text-danger">*</span></label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" 
                                    placeholder="Nhập mật khẩu" required>

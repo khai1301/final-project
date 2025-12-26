@@ -3,6 +3,12 @@ import './auth/auth.js';
 import './admin/admin.js';
 import './admin/users.js';
 import './admin/dashboard.js';
+import './admin/crud.js';
+import './admin/requests.js'
 import './frontend/home.js';
 import './frontend/student-request.js';
 import './frontend/tutor-profile.js';
+import './frontend/teaching-areas.js';
+import './frontend/user-location.js';
+import './frontend/tutor-location.js';
+import './frontend/tutor-ai-autofill.js';

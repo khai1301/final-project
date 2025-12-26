@@ -9,15 +9,15 @@ class Request extends Model
     use HasFactory;
 
     protected $fillable = [
-        'student_id', 'title', 'subject', 'grade', 'education_level', 'skills',
-        'mode', 'schedule', 'budget_min', 'budget_max', 'description',
-        'status', 'location_type', 'address',
+        'student_id', 'title', 'skills',
+        'budget_min', 'budget_max', 'description',
+        'status', 'address',
         'subject_id', 'education_level_id', 'learning_mode_id',
+        'province_id', 'ward_id', 'address_detail',
     ];
 
     protected $casts = [
         'skills' => 'array',
-        'schedule' => 'array',
     ];
 
     /**
@@ -50,5 +50,34 @@ class Request extends Model
     public function learningModeRelation()
     {
         return $this->belongsTo(LearningMode::class, 'learning_mode_id');
+    }
+
+    /**
+     * Get the province for the request.
+     */
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    /**
+     * Get the ward for the request.
+     */
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
+    }
+
+    /**
+     * Get the time slots for this request.
+     */
+    public function timeSlots()
+    {
+        return $this->belongsToMany(
+            TimeSlot::class,
+            'student_request_schedules',
+            'request_id',
+            'time_slot_id'
+        )->withTimestamps();
     }
 }

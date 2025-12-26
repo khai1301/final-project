@@ -29,6 +29,9 @@ class CreateNewUser implements CreatesNewUsers
             'password' => Hash::make($input['password']),
             'role' => $input['role'],
             'phone' => $input['phone'] ?? null,
+            'province_id' => $input['province_id'] ?? null,
+            'ward_id' => $input['ward_id'] ?? null,
+            'address_detail' => $input['address_detail'] ?? null,
         ]);
 
         // Automatically create profile based on role

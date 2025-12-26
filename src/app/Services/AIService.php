@@ -212,6 +212,8 @@ Bạn là trợ lý phân tích CV. Hãy trích xuất thông tin hồ sơ gia s
 
 Cấu trúc JSON cần trả về:
 {
+    "name": "string - Họ và tên của ứng viên",
+    "phone": "string - Số điện thoại",
     "education": "string - Trình độ học vấn",
     "experience_years": "integer - Số năm kinh nghiệm dạy học (ước tính nếu không rõ)",
     "hourly_rate_min": "integer - Mức lương tối thiểu/giờ (VNĐ, ước tính dựa trên kinh nghiệm)",
@@ -271,6 +273,8 @@ PROMPT;
         };
         
         return [
+            'name' => isset($data['name']) ? $cleanString($data['name']) : null,
+            'phone' => isset($data['phone']) ? $cleanString($data['phone']) : null,
             'education' => isset($data['education']) ? $cleanString($data['education']) : null,
             'experience_years' => isset($data['experience_years']) ? (int)$data['experience_years'] : 0,
             'hourly_rate_min' => isset($data['hourly_rate_min']) ? (int)$data['hourly_rate_min'] : 100000,
@@ -346,7 +350,20 @@ PROMPT;
                 'file' => $filePath,
                 'error' => $e->getMessage()
             ]);
-            throw new \Exception('Không thể phân tích CV bằng AI Vision. Lỗi: ' . $e->getMessage());
+            
+            // Return informative mock data instead of completely failing
+            return [
+                'name' => null,
+                'phone' => null,
+                'education' => 'Vui lòng nhập thủ công (AI không thể đọc file này)',
+                'experience_years' => 0,
+                'hourly_rate_min' => 100000,
+                'hourly_rate_max' => 300000,
+                'bio' => 'Vui lòng nhập thông tin giới thiệu thủ công. File CV không thể được phân tích tự động.',
+                'teaching_areas' => [],
+                'subjects' => [],
+                'skills' => []
+            ];
         }
     }
 

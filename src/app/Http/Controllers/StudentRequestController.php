@@ -18,8 +18,13 @@ class StudentRequestController extends Controller
         $subjects = Subject::active()->orderBy('name')->get();
         $educationLevels = EducationLevel::active()->ordered()->get();
         $learningModes = LearningMode::active()->get();
+        $timeSlots = \App\Models\TimeSlot::active()->orderBy('day_of_week')->orderBy('start_time')->get();
         
-        return view('frontend.home.student', compact('subjects', 'educationLevels', 'learningModes'));
+        // Load location data for client-side filtering
+        $provinces = \App\Models\Province::orderBy('name')->get(['id', 'name', 'type', 'code']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'type', 'code', 'province_code']);
+        
+        return view('frontend.home.student', compact('subjects', 'educationLevels', 'learningModes', 'timeSlots', 'provinces', 'wards'));
     }
 
     /**
@@ -39,26 +44,32 @@ class StudentRequestController extends Controller
         $educationLevel = EducationLevel::where('name', $request->input('education_level'))->first();
         $learningMode = LearningMode::find($request->input('learning_mode_id'));
 
-        // Create the learning request
+        // Determine location: custom (if provided) OR user profile
+        $provinceId = $request->filled('province_id') ? $request->input('province_id') : auth()->user()->province_id;
+        $wardId = $request->filled('ward_id') ? $request->input('ward_id') : auth()->user()->ward_id;
+        $addressDetail = $request->filled('address_detail') ? $request->input('address_detail') : auth()->user()->address_detail;
+        
+        // Create the learning request (only FK columns + core data)
         $learningRequest = LearningRequest::create([
             'student_id' => Auth::id(),
             'title' => "Learning request for " . $request->input('subject'),
-            'subject' => $request->input('subject'),
             'subject_id' => $subject ? $subject->id : null,
-            'education_level' => $request->input('education_level'),
             'education_level_id' => $educationLevel ? $educationLevel->id : null,
-            'grade' => $request->input('education_level'),
-            'skills' => $skills,
-            'mode' => $learningMode ? $learningMode->name : null,
             'learning_mode_id' => $learningMode ? $learningMode->id : null,
-            'location_type' => $learningMode ? $learningMode->slug : null,
-            'address' => $request->input('address'),
-            'schedule' => $request->input('schedule'),
+            'skills' => $skills,
+            'province_id' => $provinceId,
+            'ward_id' => $wardId,
+            'address_detail' => $addressDetail,
             'budget_min' => $request->input('budget_min'),
             'budget_max' => $request->input('budget_max'),
             'description' => $request->input('notes'),
             'status' => 'open',
         ]);
+
+        // Attach time slots if provided
+        if ($request->filled('time_slots') && is_array($request->input('time_slots'))) {
+            $learningRequest->timeSlots()->attach($request->input('time_slots'));
+        }
 
         return redirect()
             ->route('student.request.create')

@@ -1,6 +1,14 @@
 @extends('frontend.layouts.bootstrap')
 
 @section('content')
+{{-- Embed location data for JavaScript --}}
+<script>
+    window.locationData = {
+        provinces: @json($provinces),
+        wards: @json($wards)
+    };
+</script>
+
 <div class="container py-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
@@ -115,52 +123,116 @@
                                 </div>
                             </div>
 
-                            <!-- Schedule -->
-                            <div class="col-md-6">
-                                <label class="form-label fw-medium">Lịch học ưu tiên</label>
-                                <div class="row g-2">
-                                    <div class="col-6">
-                                        <div class="form-check schedule-check">
-                                            <input class="form-check-input" type="checkbox" name="schedule[]" value="weekdays_am" id="schedWeekdaysAM">
-                                            <label class="form-check-label" for="schedWeekdaysAM">Weekdays (AM)</label>
+                            <!-- Time Slots -->
+                            <div class="col-md-12">
+                                <label class="form-label fw-medium mb-3">Lịch học ưu tiên</label>
+                                <small class="text-muted d-block mb-3">Chọn các khung giờ bạn có thể học (có thể chọn nhiều)</small>
+                                
+                                <div class="time-slots-grid">
+                                    @foreach($timeSlots->groupBy('day_of_week') as $dayNum => $slots)
+                                        <div class="day-slot-group mb-3">
+                                            <h6 class="fw-semibold text-primary mb-2">
+                                                <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">today</span>
+                                                {{ $slots->first()->getDayName() }}
+                                            </h6>
+                                            <div class="row g-2">
+                                                @foreach($slots as $slot)
+                                                    <div class="col-md-4 col-lg-3">
+                                                        <div class="form-check time-slot-check">
+                                                            <input class="form-check-input" type="checkbox" 
+                                                                   name="time_slots[]" 
+                                                                   value="{{ $slot->id }}" 
+                                                                   id="slot{{ $slot->id }}">
+                                                            <label class="form-check-label small" for="slot{{ $slot->id }}">
+                                                                {{ date('H:i', strtotime($slot->start_time)) }} - {{ date('H:i', strtotime($slot->end_time)) }}
+                                                            </label>
+                                                        </div>
+                                                    </div>
+                                                @endforeach
+                                            </div>
                                         </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check schedule-check">
-                                            <input class="form-check-input" type="checkbox" name="schedule[]" value="weekdays_pm" id="schedWeekdaysPM" checked>
-                                            <label class="form-check-label" for="schedWeekdaysPM">Weekdays (PM)</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check schedule-check">
-                                            <input class="form-check-input" type="checkbox" name="schedule[]" value="weekends" id="schedWeekends" checked>
-                                            <label class="form-check-label" for="schedWeekends">Weekends</label>
-                                        </div>
-                                    </div>
-                                    <div class="col-6">
-                                        <div class="form-check schedule-check">
-                                            <input class="form-check-input" type="checkbox" name="schedule[]" value="flexible" id="schedFlexible">
-                                            <label class="form-check-label" for="schedFlexible">Flexible</label>
-                                        </div>
-                                    </div>
+                                    @endforeach
                                 </div>
                             </div>
                         </div>
 
-                        <!-- Address Field (shown only for offline mode) -->
-                        <div class="mb-3 d-none" id="addressField">
-                            <label class="form-label fw-medium">
-                                Địa chỉ học
-                                <span class="text-danger">*</span>
-                            </label>
-                            <div class="input-group">
-                                <span class="input-group-text bg-white">
-                                    <span class="material-symbols-outlined text-muted">location_on</span>
-                                </span>
-                                <input type="text" name="address" id="addressInput" class="form-control form-control-lg" 
-                                       placeholder="Nhập địa điểm học ưa thích của bạn">
-                            </div>
-                            <small class="text-muted">Cung cấp địa chỉ nơi bạn muốn học trực tiếp</small>
+
+                        <!-- User Location Notice -->
+                        <div class="mb-3">
+                            <label class="form-label fw-medium">Địa điểm học</label>
+                            
+                            @if(auth()->user()->province_id)
+                                <!-- User has location - show and allow override -->
+                                <div class="alert alert-info d-flex align-items-start mb-3">
+                                    <span class="material-symbols-outlined me-2 mt-1">info</span>
+                                    <div class="flex-grow-1">
+                                        <strong>Địa chỉ hiện tại của bạn:</strong>
+                                        <div class="mt-2">
+                                            <i class="bi bi-geo-alt-fill text-primary"></i>
+                                            <strong>{{ auth()->user()->province->name ?? 'N/A' }}</strong>
+                                            @if(auth()->user()->ward_id)
+                                                → {{ auth()->user()->ward->name ?? '' }}
+                                            @endif
+                                            @if(auth()->user()->address_detail)
+                                                <br><small class="text-muted ms-4">{{ auth()->user()->address_detail }}</small>
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mb-3">
+                                    <input class="form-check-input" type="checkbox" id="use_different_location">
+                                    <label class="form-check-label" for="use_different_location">
+                                        Sử dụng địa chỉ khác cho yêu cầu này
+                                    </label>
+                                </div>
+                                
+                                <div id="custom_location_fields" class="d-none">
+                                    <div class="row g-3">
+                                        <div class="col-md-6">
+                                            <label for="request_province_id" class="form-label">Tỉnh/Thành phố</label>
+                                            <select id="request_province_id" name="province_id" class="form-select">
+                                                <option value="">Chọn tỉnh/thành phố</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <label for="request_ward_id" class="form-label">Phường/Xã</label>
+                                            <select id="request_ward_id" name="ward_id" class="form-select" disabled>
+                                                <option value="">Chọn phường/xã</option>
+                                            </select>
+                                        </div>
+                                        <div class="col-12">
+                                            <label for="request_address_detail" class="form-label">Địa chỉ chi tiết</label>
+                                            <input type="text" class="form-control" id="request_address_detail" name="address_detail" placeholder="Số nhà, tên đường...">
+                                        </div>
+                                    </div>
+                                </div>
+                            @else
+                                <!-- User has NO location - require input -->
+                                <div class="alert alert-warning mb-3">
+                                    <i class="bi bi-exclamation-triangle me-2"></i>
+                                    Bạn chưa cập nhật địa chỉ trong hồ sơ. Vui lòng nhập địa chỉ cho yêu cầu này.
+                                </div>
+                                
+                                <div class="row g-3">
+                                    <div class="col-md-6">
+                                        <label for="request_province_id" class="form-label">Tỉnh/Thành phố <span class="text-danger">*</span></label>
+                                        <select id="request_province_id" name="province_id" class="form-select" required>
+                                            <option value="">Chọn tỉnh/thành phố</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <label for="request_ward_id" class="form-label">Phường/Xã</label>
+                                        <select id="request_ward_id" name="ward_id" class="form-select" disabled>
+                                            <option value="">Chọn phường/xã</option>
+                                        </select>
+                                    </div>
+                                    <div class="col-12">
+                                        <label for="request_address_detail" class="form-label">Địa chỉ chi tiết</label>
+                                        <input type="text" class="form-control" id="request_address_detail" name="address_detail" placeholder="Số nhà, tên đường...">
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
 

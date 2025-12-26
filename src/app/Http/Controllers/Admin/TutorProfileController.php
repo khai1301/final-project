@@ -45,7 +45,7 @@ class TutorProfileController extends Controller
      */
     public function show($id)
     {
-        $profile = TutorProfile::with(['user', 'certificates'])->findOrFail($id);
+        $profile = TutorProfile::with(['user', 'certificates', 'subjects', 'availableTimeSlots'])->findOrFail($id);
         
         return view('admin.tutor-profiles.show', compact('profile'));
     }

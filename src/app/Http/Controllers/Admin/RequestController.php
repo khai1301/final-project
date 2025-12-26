@@ -12,17 +12,19 @@ class RequestController extends Controller
      */
     public function index(Request $request)
     {
-        $query = LearningRequest::with('student');
+        $query = LearningRequest::with(['student', 'student.province', 'student.ward', 'subjectRelation', 'educationLevelRelation', 'learningModeRelation', 'timeSlots']);
 
         // Search filter
         if ($request->filled('search')) {
             $search = $request->input('search');
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('subject', 'like', "%{$search}%")
                   ->orWhereHas('student', function ($subQuery) use ($search) {
                       $subQuery->where('name', 'like', "%{$search}%")
                                ->orWhere('email', 'like', "%{$search}%");
+                  })
+                  ->orWhereHas('subjectRelation', function ($subQuery) use ($search) {
+                      $subQuery->where('name', 'like', "%{$search}%");
                   });
             });
         }
@@ -32,14 +34,19 @@ class RequestController extends Controller
             $query->where('status', $request->input('status'));
         }
 
-        // Mode filter
-        if ($request->filled('mode')) {
-            $query->where('mode', $request->input('mode'));
+        // Learning mode filter
+        if ($request->filled('learning_mode_id')) {
+            $query->where('learning_mode_id', $request->input('learning_mode_id'));
         }
 
         // Education level filter
-        if ($request->filled('education_level')) {
-            $query->where('education_level', $request->input('education_level'));
+        if ($request->filled('education_level_id')) {
+            $query->where('education_level_id', $request->input('education_level_id'));
+        }
+        
+        // Subject filter
+        if ($request->filled('subject_id')) {
+            $query->where('subject_id', $request->input('subject_id'));
         }
 
         // Order by newest first
@@ -53,7 +60,7 @@ class RequestController extends Controller
      */
     public function show($id)
     {
-        $learningRequest = LearningRequest::with('student')->findOrFail($id);
+        $learningRequest = LearningRequest::with(['student', 'student.province', 'student.ward', 'subjectRelation', 'educationLevelRelation', 'learningModeRelation', 'timeSlots'])->findOrFail($id);
         
         return view('admin.requests.show', compact('learningRequest'));
     }

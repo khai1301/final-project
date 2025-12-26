@@ -81,90 +81,91 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     }
 
-    // Form validation
+    // Form submission - no custom validation needed, relying on Laravel FormRequest
     const form = document.querySelector('.student-request-form');
     if (form) {
-        form.addEventListener('submit', function (e) {
-            const scheduleCheckboxes = form.querySelectorAll('input[name="schedule[]"]:checked');
-            if (scheduleCheckboxes.length === 0) {
-                e.preventDefault();
-                Swal.fire({
-                    icon: 'warning',
-                    title: 'Schedule Required',
-                    text: 'Please select at least one preferred schedule.',
-                    confirmButtonColor: '#3780f6'
-                });
-                return false;
-            }
+        // Form will submit normally, no JS validation
+    }
 
-            // Validate address for non-online modes
-            const selectedMode = form.querySelector('input[name="mode"]:checked');
-            const addressInput = document.getElementById('addressInput');
-            if (selectedMode && addressInput) {
-                const modeValue = selectedMode.value.toLowerCase();
-                if (modeValue !== 'online' && !addressInput.value.trim()) {
-                    e.preventDefault();
-                    Swal.fire({
-                        icon: 'warning',
-                        title: 'Address Required',
-                        text: 'Please enter a learning location address for in-person sessions.',
-                        confirmButtonColor: '#3780f6'
-                    });
-                    addressInput.focus();
-                    return false;
-                }
+    // Handle custom location checkbox
+    const useDifferentLocation = document.getElementById('use_different_location');
+    const customLocationFields = document.getElementById('custom_location_fields');
+    const requestProvinceSelect = document.getElementById('request_province_id');
+    const requestWardSelect = document.getElementById('request_ward_id');
+
+    // Get location data from window (embedded in Blade)
+    const provincesData = window.locationData?.provinces || [];
+    const wardsData = window.locationData?.wards || [];
+
+    if (useDifferentLocation && customLocationFields) {
+        useDifferentLocation.addEventListener('change', function () {
+            if (this.checked) {
+                customLocationFields.classList.remove('d-none');
+                loadProvincesForRequest();
+            } else {
+                customLocationFields.classList.add('d-none');
+                requestProvinceSelect.value = '';
+                requestWardSelect.value = '';
+                requestWardSelect.disabled = true;
             }
         });
     }
 
-    // Toggle address field visibility based on learning mode
-    const modeRadios = document.querySelectorAll('input[name="mode"]');
-    const addressField = document.getElementById('addressField');
-    const addressInput = document.getElementById('addressInput');
-
-    if (modeRadios.length > 0 && addressField) {
-        function toggleAddressField() {
-            const selectedMode = document.querySelector('input[name="mode"]:checked');
-            if (selectedMode) {
-                const modeValue = selectedMode.value.toLowerCase();
-                if (modeValue !== 'online') {
-                    addressField.classList.remove('d-none');
-                    if (addressInput) addressInput.required = true;
-                } else {
-                    addressField.classList.add('d-none');
-                    if (addressInput) {
-                        addressInput.required = false;
-                        addressInput.value = '';
-                    }
-                }
-            }
-        }
-
-        modeRadios.forEach(radio => {
-            radio.addEventListener('change', toggleAddressField);
-        });
-
-        // Initial check
-        toggleAddressField();
+    // Load provinces for request (if user has no profile location OR checking "use different location")
+    if (requestProvinceSelect && !document.getElementById('use_different_location')) {
+        // User has no profile location - load provinces immediately
+        loadProvincesForRequest();
     }
 
-    // Handle success messages from server
-    const successMessage = document.querySelector('[data-success-message]');
-    if (successMessage) {
-        const message = successMessage.getAttribute('data-success-message');
-        Swal.fire({
-            icon: 'success',
-            title: 'Success!',
-            text: message,
-            toast: true,
-            position: 'top-end',
-            showConfirmButton: false,
-            timer: 5000,
-            timerProgressBar: true,
-            didOpen: (toast) => {
-                toast.addEventListener('mouseenter', Swal.stopTimer);
-                toast.addEventListener('mouseleave', Swal.resumeTimer);
+    function loadProvincesForRequest() {
+        if (!requestProvinceSelect) return;
+
+        requestProvinceSelect.innerHTML = '<option value="">Chọn tỉnh/thành phố</option>';
+        provincesData.forEach(province => {
+            const option = document.createElement('option');
+            option.value = province.id;
+            option.textContent = province.name;
+            requestProvinceSelect.appendChild(option);
+        });
+    }
+
+    // Province change -> load wards for request  
+    if (requestProvinceSelect) {
+        requestProvinceSelect.addEventListener('change', function () {
+            const provinceId = this.value;
+
+            if (!provinceId) {
+                requestWardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+                requestWardSelect.disabled = true;
+                return;
+            }
+
+            // Find province to get code
+            const selectedProvince = provincesData.find(p => p.id == provinceId);
+            if (selectedProvince) {
+                loadWardsForRequest(selectedProvince.code);
             }
         });
     }
+
+    function loadWardsForRequest(provinceCode) {
+        if (!requestWardSelect) return;
+
+        requestWardSelect.disabled = true;
+        requestWardSelect.innerHTML = '<option value="">Đang tải...</option>';
+
+        // Filter wards by province_code (client-side, instant)
+        const provinceWards = wardsData.filter(ward => ward.province_code === provinceCode);
+
+        requestWardSelect.innerHTML = '<option value="">Chọn phường/xã</option>';
+        provinceWards.forEach(ward => {
+            const option = document.createElement('option');
+            option.value = ward.id;
+            option.textContent = ward.name;
+            requestWardSelect.appendChild(option);
+        });
+
+        requestWardSelect.disabled = false;
+    }
+
 });

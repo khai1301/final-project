@@ -25,6 +25,9 @@ class User extends Authenticatable implements MustVerifyEmail
         'password',
         'role',
         'phone',
+        'province_id',
+        'ward_id',
+        'address_detail',
         'avatar',
         'banned_at',
     ];
@@ -65,6 +68,22 @@ class User extends Authenticatable implements MustVerifyEmail
     public function tutorProfile()
     {
         return $this->hasOne(TutorProfile::class);
+    }
+
+    /**
+     * Get the province that the user belongs to.
+     */
+    public function province()
+    {
+        return $this->belongsTo(Province::class);
+    }
+
+    /**
+     * Get the ward that the user belongs to.
+     */
+    public function ward()
+    {
+        return $this->belongsTo(Ward::class);
     }
 
     /**

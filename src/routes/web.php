@@ -56,6 +56,8 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/contact/unlock/{matching}', [\App\Http\Controllers\ContactUnlockController::class, 'unlock'])->name('contact.unlock');
     Route::get('/payment/callback', [\App\Http\Controllers\ContactUnlockController::class, 'paymentCallback'])->name('payment.callback');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
+    Route::get('/api/provinces', [\App\Http\Controllers\LocationController::class, 'getProvinces'])->name('api.provinces');
+    Route::get('/api/wards/{provinceId}', [\App\Http\Controllers\LocationController::class, 'getWardsByProvince'])->name('api.wards');
 });
 
 
@@ -92,9 +94,14 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     Route::get('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'index'])->name('settings.index');
     Route::put('/settings', [\App\Http\Controllers\Admin\SettingsController::class, 'update'])->name('settings.update');
     
+    
     // Matchings Management
     Route::get('/matchings', [\App\Http\Controllers\Admin\MatchingController::class, 'index'])->name('matchings.index');
     Route::get('/matchings/{id}', [\App\Http\Controllers\Admin\MatchingController::class, 'show'])->name('matchings.show');
+    
+    // Location Sync Management
+    Route::get('/location-sync', [\App\Http\Controllers\Admin\LocationSyncController::class, 'index'])->name('location-sync.index');
+    Route::post('/location-sync', [\App\Http\Controllers\Admin\LocationSyncController::class, 'sync'])->name('location-sync.sync');
 });
 
 // CV Parser routes (for tutors)

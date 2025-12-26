@@ -93,16 +93,57 @@
                     </div>
 
                     {{-- Teaching Areas --}}
-                    @if($profile->teaching_areas && count($profile->teaching_areas) > 0)
+                    @if($profile->teachingAreas && $profile->teachingAreas->count() > 0)
+                    <div class="mb-4">
+                        <h5 class="text-muted text-uppercase small fw-bold mb-3">Teaching Areas ({{ $profile->teachingAreas->count() }})</h5>
+                        @foreach($profile->teachingAreas->groupBy('province_id') as $provinceId => $areas)
+                            <div class="mb-3">
+                                <h6 class="text-primary small fw-semibold mb-2">
+                                    <i class="bi bi-map me-1"></i>
+                                    {{ $areas->first()->province->name ?? 'Unknown Province' }}
+                                </h6>
+                                <div class="d-flex flex-wrap gap-2 ms-3">
+                                    @foreach($areas as $area)
+                                        <span class="badge bg-light text-dark border px-3 py-2">
+                                            <i class="bi bi-geo-alt me-1"></i>
+                                            @if($area->ward)
+                                                {{ $area->ward->name }}
+                                            @else
+                                                <em>Entire province</em>
+                                            @endif
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    @else
                     <div class="mb-4">
                         <h5 class="text-muted text-uppercase small fw-bold mb-3">Teaching Areas</h5>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach($profile->teaching_areas as $area)
-                                <span class="badge bg-light text-dark border px-3 py-2">
-                                    <i class="bi bi-geo-alt me-1"></i>{{ $area }}
-                                </span>
-                            @endforeach
-                        </div>
+                        <p class="text-muted"><i class="bi bi-info-circle me-1"></i>No teaching areas specified</p>
+                    </div>
+                    @endif
+
+                    {{-- Availability Time Slots --}}
+                    @if($profile->availableTimeSlots && $profile->availableTimeSlots->count() > 0)
+                    <div class=\"mb-4\">
+                        <h5 class=\"text-muted text-uppercase small fw-bold mb-3\">Available Time Slots ({{ $profile->availableTimeSlots->count() }})</h5>
+                        @foreach($profile->availableTimeSlots->groupBy('day_of_week') as $dayNum => $slots)
+                            <div class=\"mb-3\">
+                                <h6 class=\"text-primary small fw-bold\">
+                                    <i class=\"bi bi-calendar-day me-1\"></i>
+                                    {{ $slots->first()->getDayName() }}
+                                </h6>
+                                <div class=\"d-flex flex-wrap gap-2\">
+                                    @foreach($slots as $slot)
+                                        <span class=\"badge bg-light text-dark border px-3 py-2\">
+                                            <i class=\"bi bi-clock me-1\"></i>
+                                            {{ date('H:i', strtotime($slot->start_time)) }} - {{ date('H:i', strtotime($slot->end_time)) }}
+                                        </span>
+                                    @endforeach
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
                     @endif
 

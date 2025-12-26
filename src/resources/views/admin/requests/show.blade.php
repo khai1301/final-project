@@ -52,11 +52,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="fw-bold text-muted small">Subject</label>
-                                <div class="fw-medium">{{ $learningRequest->subject }}</div>
+                                <div class="fw-medium">{{ $learningRequest->subjectRelation->name ?? 'N/A' }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="fw-bold text-muted small">Education Level</label>
-                                <div class="fw-medium">{{ $learningRequest->education_level }}</div>
+                                <div class="fw-medium">{{ $learningRequest->educationLevelRelation->name ?? 'N/A' }}</div>
                             </div>
                         </div>
                     </div>
@@ -82,39 +82,59 @@
                             <div class="col-md-6">
                                 <label class="fw-bold text-muted small">Learning Mode</label>
                                 <div>
-                                    @if($learningRequest->mode === 'online')
+                                    @if($learningRequest->learningModeRelation)
                                         <span class="badge bg-info-light text-info">
-                                            <i class="bi bi-laptop me-1"></i>Online
+                                            <i class="bi {{ $learningRequest->learningModeRelation->icon ?? 'bi-book' }} me-1"></i>
+                                            {{ $learningRequest->learningModeRelation->name }}
                                         </span>
                                     @else
-                                        <span class="badge bg-success-light text-success">
-                                            <i class="bi bi-geo-alt me-1"></i>In-Person
-                                        </span>
+                                        <span class="text-muted">N/A</span>
                                     @endif
                                 </div>
                             </div>
-                            @if($learningRequest->mode === 'offline' && $learningRequest->address)
                             <div class="col-md-6">
-                                <label class="fw-bold text-muted small">Location</label>
+                                <label class="fw-bold text-muted small">Student Location</label>
                                 <div class="fw-medium">
                                     <i class="bi bi-geo-alt-fill text-muted me-1"></i>
-                                    {{ $learningRequest->address }}
+                                    @if($learningRequest->student->province_id)
+                                        {{ $learningRequest->student->province->name ?? 'N/A' }}
+                                        @if($learningRequest->student->ward_id)
+                                            → {{ $learningRequest->student->ward->name ?? '' }}
+                                        @endif
+                                        @if($learningRequest->student->address_detail)
+                                            <br><small class="text-muted ms-4">{{ $learningRequest->student->address_detail }}</small>
+                                        @endif
+                                    @else
+                                        <span class="text-muted">Not specified</span>
+                                    @endif
                                 </div>
                             </div>
-                            @endif
                         </div>
                     </div>
 
-                    <!-- Schedule -->
+                    <!-- Time Slots -->
                     <div class="mb-4">
                         <h5 class="text-muted text-uppercase small fw-bold mb-3">Preferred Schedule</h5>
-                        <div class="d-flex flex-wrap gap-2">
-                            @foreach($learningRequest->schedule as $time)
-                                <span class="badge bg-light text-dark border px-3 py-2">
-                                    <i class="bi bi-clock me-1"></i>{{ ucwords(str_replace('_', ' ', $time)) }}
-                                </span>
+                        @if($learningRequest->timeSlots && $learningRequest->timeSlots->count() > 0)
+                            @foreach($learningRequest->timeSlots->groupBy('day_of_week') as $dayNum => $slots)
+                                <div class="mb-3">
+                                    <h6 class="text-primary small fw-bold">
+                                        <i class="bi bi-calendar-day me-1"></i>
+                                        {{ $slots->first()->getDayName() }}
+                                    </h6>
+                                    <div class="d-flex flex-wrap gap-2">
+                                        @foreach($slots as $slot)
+                                            <span class="badge bg-light text-dark border px-3 py-2">
+                                                <i class="bi bi-clock me-1"></i>
+                                                {{ date('H:i', strtotime($slot->start_time)) }} - {{ date('H:i', strtotime($slot->end_time)) }}
+                                            </span>
+                                        @endforeach
+                                    </div>
+                                </div>
                             @endforeach
-                        </div>
+                        @else
+                            <p class="text-muted mb-0">No time slots selected</p>
+                        @endif
                     </div>
 
                     <!-- Budget -->

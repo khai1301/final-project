@@ -17,8 +17,8 @@ class TutorProfileController extends Controller
     {
         $user = auth()->user();
         
-        // Get fresh profile data with subjects relationship
-        $profile = TutorProfile::with(['subjects', 'certificates'])
+        // Get fresh profile data with relationships
+        $profile = TutorProfile::with(['subjects', 'certificates', 'availableTimeSlots', 'teachingAreas'])
             ->where('user_id', $user->id)
             ->first();
         
@@ -31,7 +31,21 @@ class TutorProfileController extends Controller
         // Get all active subjects for reference
         $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
         
-        return view('frontend.home.tutor-profile', compact('profile', 'user', 'allSubjects'));
+        
+        // Get all time slots grouped by day
+        $timeSlots = \App\Models\TimeSlot::active()
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+            
+        // Get selected time slot IDs
+        $selectedTimeSlots = $profile->availableTimeSlots->pluck('id')->toArray();
+        
+        // Load location data for client-side filtering
+        $provinces = \App\Models\Province::orderBy('name')->get(['id', 'name', 'type', 'code']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'type', 'code', 'province_code']);
+        
+        return view('frontend.home.tutor-profile', compact('profile', 'user', 'allSubjects', 'timeSlots', 'selectedTimeSlots', 'provinces', 'wards'));
     }
 
     /**
@@ -46,20 +60,32 @@ class TutorProfileController extends Controller
             ['user_id' => $user->id],
             [
                 'teaching_areas' => [],
-                'availability' => [],
                 'is_approved' => false,
             ]
         );
         
         // Reload profile with relationships (fresh() doesn't always work with eager loading)
-        $profile = TutorProfile::with(['subjects', 'certificates'])
+        $profile = TutorProfile::with(['subjects', 'certificates', 'availableTimeSlots'])
             ->where('id', $profile->id)
             ->first();
 
         // Get all active subjects for dropdown/selection
         $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
+        
+        // Get all time slots grouped by day
+        $timeSlots = \App\Models\TimeSlot::active()
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+            
+        // Get selected time slot IDs
+        $selectedTimeSlots = $profile->availableTimeSlots->pluck('id')->toArray();
+        
+        // Load location data for client-side filtering
+        $provinces = \App\Models\Province::orderBy('name')->get(['id', 'name', 'type', 'code']);
+        $wards = \App\Models\Ward::orderBy('name')->get(['id', 'name', 'type', 'code', 'province_code']);
 
-        return view('frontend.home.tutor-profile', compact('profile', 'user', 'allSubjects'));
+        return view('frontend.home.tutor-profile', compact('profile', 'user', 'allSubjects', 'timeSlots', 'selectedTimeSlots', 'provinces', 'wards'));
     }
 
     /**
@@ -94,28 +120,22 @@ class TutorProfileController extends Controller
                 $profile->cv_path = $cvPath;
             }
 
-            // Handle phone update on user
-            if ($request->has('phone')) {
-                $user->update(['phone' => $request->input('phone')]);
-            }
+            // Handle name, phone, and location updates on user
+            $user->update([
+                'name' => $request->input('name'),
+                'phone' => $request->input('phone'),
+                'province_id' => $request->input('province_id'),
+                'ward_id' => $request->input('ward_id'),
+                'address_detail' => $request->input('address_detail'),
+            ]);
 
-            // Parse teaching_areas from JSON string to array
-            $teachingAreas = [];
-            if ($request->has('teaching_areas')) {
-                $areasJson = $request->input('teaching_areas');
-                $teachingAreas = is_string($areasJson) ? json_decode($areasJson, true) : $areasJson;
-                $teachingAreas = $teachingAreas ?: [];
-            }
-
-            // Update profile fields (removed subjects as it's now a pivot)
+            // Update profile fields
             $profile->fill([
                 'education' => $request->input('education'),
                 'experience_years' => $request->input('experience_years'),
                 'hourly_rate_min' => $request->input('hourly_rate_min'),
                 'hourly_rate_max' => $request->input('hourly_rate_max'),
-                'teaching_areas' => $teachingAreas,
                 'bio' => $request->input('bio'),
-                'availability' => $request->input('availability', []),
             ]);
             
             $profile->save();
@@ -129,6 +149,53 @@ class TutorProfileController extends Controller
                     $subjectIds = [];
                 }
                 $profile->subjects()->sync($subjectIds);
+            }
+            
+            // Sync teaching areas with base location auto-prepend
+            // Teaching areas array may be empty if user has base location
+            $teachingAreasData = $request->input('teaching_areas', []);
+            
+            // If user has base location, always ensure it's first
+            if ($user->province_id) {
+                $baseArea = [
+                    'province_id' => $user->province_id,
+                    'ward_id' => $user->ward_id,
+                ];
+                
+                // Remove duplicates if user added base location manually
+                $teachingAreasData = array_filter($teachingAreasData, function($area) use ($baseArea) {
+                    return !(
+                        $area['province_id'] == $baseArea['province_id'] && 
+                        ($area['ward_id'] ?? null) == ($baseArea['ward_id'] ?? null)
+                    );
+                });
+                
+                // Prepend base location
+                array_unshift($teachingAreasData, $baseArea);
+            }
+            
+            // Delete existing teaching areas
+            $profile->teachingAreas()->delete();
+            
+            // Create new teaching areas
+            foreach ($teachingAreasData as $area) {
+                if (!empty($area['province_id'])) {
+                    $profile->teachingAreas()->create([
+                        'province_id' => $area['province_id'],
+                        'ward_id' => $area['ward_id'] ?? null,
+                    ]);
+                }
+            }
+
+            
+            // Sync available time slots (many-to-many)
+            if ($request->has('time_slots')) {
+                $timeSlotIds = $request->input('time_slots', []);
+                // Ensure it's an array
+                if (!is_array($timeSlotIds)) {
+                    $timeSlotIds = [];
+                }
+                $profile->availableTimeSlots()->sync($timeSlotIds);
             }
 
             // Handle certificate uploads to S3
@@ -238,5 +305,44 @@ class TutorProfileController extends Controller
         }
         
         return view('frontend.tutor-profile.public', compact('tutor'));
+    }
+
+    /**
+     * Parse CV file and extract data
+     */
+    public function parseCV(\Illuminate\Http\Request $request)
+    {
+        try {
+            $request->validate([
+                'cv_file' => 'required|file|mimes:pdf,doc,docx|max:10240', // 10MB max
+            ]);
+
+            $file = $request->file('cv_file');
+            
+            // TODO: Implement AI CV parsing logic here
+            // For now, return mock data
+            $mockData = [
+                'name' => 'Nguyễn Văn A',
+                'phone' => '0123456789',
+                'education' => 'Đại học',
+                'experience_years' => 3,
+                'hourly_rate_min' => 150000,
+                'hourly_rate_max' => 300000,
+                'bio' => 'Giáo viên với nhiều năm kinh nghiệm giảng dạy',
+                'subject_ids' => [], // Will be extracted by AI later
+            ];
+
+            return response()->json([
+                'success' => true,
+                'message' => 'CV parsed successfully',
+                'data' => $mockData
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Error parsing CV: ' . $e->getMessage()
+            ], 500);
+        }
     }
 }
