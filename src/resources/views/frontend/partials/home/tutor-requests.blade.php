@@ -21,6 +21,33 @@
             </div>
         </div>
 
+        {{-- AI Recommendations Section (For Tutors) --}}
+        @auth
+            @if(auth()->user()->isTutor() && isset($tutorProfileId) && $tutorProfileId)
+            <div class="mb-5">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="ai-icon-wrapper">
+                        <span class="material-symbols-outlined">psychology</span>
+                    </div>
+                    <div>
+                        <h3 class="mb-0 h5">Yêu Cầu Phù Hợp Với Bạn</h3>
+                        <small class="text-muted">AI đã phân tích profile của bạn và tìm những yêu cầu phù hợp nhất</small>
+                    </div>
+                </div>
+                
+                <div class="row g-4" 
+                     data-ai-requests 
+                     data-tutor-profile-id="{{ $tutorProfileId }}">
+                    {{-- AI will auto-load recommendations here --}}
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <p class="text-muted">Đang phân tích với AI để tìm yêu cầu phù hợp...</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+        @endauth
+
         {{-- Request Cards Grid --}}
         <div class="row g-4">
             @foreach($studentRequests as $request)

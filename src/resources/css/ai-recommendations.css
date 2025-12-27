@@ -1,0 +1,191 @@
+/* AI Match Info - Integration with existing cards */
+.ai-match-info {
+    background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+    padding: 12px;
+    border-radius: 8px;
+    border-left: 3px solid #667eea;
+}
+
+.ai-match-badge {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+    color: #667eea;
+}
+
+.ai-match-badge .material-symbols-outlined {
+    font-size: 18px;
+}
+
+.ai-match-badge strong {
+    font-size: 0.875rem;
+    font-weight: 700;
+}
+
+.ai-match-reason {
+    font-size: 0.8125rem;
+    line-height: 1.4;
+    color: #6c757d !important;
+}
+
+/* Recommendation Card */
+.recommendation-card {
+    transition: all 0.3s ease;
+    background: white;
+}
+
+.recommendation-card:hover {
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transform: translateY(-2px);
+}
+
+/* Rank Number */
+.rank-number {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: #667eea;
+    min-width: 40px;
+    text-align: center;
+}
+
+/* AI Recommend Button */
+.btn-ai-recommend {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    font-weight: 600;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(102, 126, 234, 0.3);
+}
+
+.btn-ai-recommend:hover {
+    background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.5);
+    color: white;
+}
+
+.btn-ai-recommend:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.btn-ai-recommend .material-symbols-outlined {
+    font-size: 20px;
+}
+
+/* Recommendations List */
+.recommendations-list {
+    max-height: 60vh;
+}
+
+/* Loading Animation */
+@keyframes pulse {
+
+    0%,
+    100% {
+        opacity: 1;
+    }
+
+    50% {
+        opacity: 0.5;
+    }
+}
+
+.ai-loading {
+    animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* AI Info Alert */
+.alert-info .material-symbols-outlined {
+    vertical-align: middle;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .match-badge {
+        top: 8px;
+        right: 8px;
+        font-size: 0.75rem;
+        padding: 4px 10px;
+    }
+
+    .rank-number {
+        font-size: 1.2rem;
+        min-width: 30px;
+    }
+
+    .recommendation-card {
+        padding: 12px !important;
+    }
+
+    .match-reason {
+        font-size: 0.8rem;
+        padding: 8px;
+    }
+}
+
+/* Icon styling */
+.ai-icon-wrapper {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-radius: 50%;
+    color: white;
+}
+
+.ai-icon-wrapper .material-symbols-outlined {
+    font-size: 18px;
+}
+
+/* Tab styling for AI recommendations */
+.nav-tabs .nav-link.ai-tab {
+    color: #667eea;
+    font-weight: 600;
+}
+
+.nav-tabs .nav-link.ai-tab:hover {
+    color: #764ba2;
+}
+
+.nav-tabs .nav-link.ai-tab.active {
+    color: #fff;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    border-color: transparent;
+}
+
+/* Modal styling */
+#aiRecommendationsModal .modal-header {
+    border-bottom: none;
+}
+
+#aiRecommendationsModal .modal-title {
+    display: flex;
+    align-items: center;
+}
+
+#aiRecommendationsModal .modal-body {
+    padding: 1.5rem;
+}
+
+/* Empty state */
+.ai-empty-state {
+    text-align: center;
+    padding: 3rem 1rem;
+    color: #6c757d;
+}
+
+.ai-empty-state .material-symbols-outlined {
+    font-size: 64px;
+    opacity: 0.5;
+    margin-bottom: 1rem;
+}

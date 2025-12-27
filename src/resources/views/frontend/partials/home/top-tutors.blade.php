@@ -17,6 +17,33 @@
             @endguest
         </div>
 
+        {{-- AI Recommendations Section (For Students with Requests) --}}
+        @auth
+            @if(auth()->user()->isStudent() && isset($latestRequestId) && $latestRequestId)
+            <div class="mb-5">
+                <div class="d-flex align-items-center gap-2 mb-3">
+                    <div class="ai-icon-wrapper">
+                        <span class="material-symbols-outlined">psychology</span>
+                    </div>
+                    <div>
+                        <h3 class="mb-0 h5">Gợi Ý Dành Riêng Cho Bạn</h3>
+                        <small class="text-muted">AI đã phân tích và tìm những gia sư phù hợp nhất</small>
+                    </div>
+                </div>
+                
+                <div class="row g-4" 
+                     data-ai-tutors 
+                     data-request-id="{{ $latestRequestId }}">
+                    {{-- AI will auto-load recommendations here --}}
+                    <div class="col-12 text-center py-5">
+                        <div class="spinner-border text-primary mb-3" role="status"></div>
+                        <p class="text-muted">Đang phân tích với AI để tìm gia sư phù hợp nhất...</p>
+                    </div>
+                </div>
+            </div>
+            @endif
+        @endauth
+
         {{-- Tutor Cards Grid --}}
         @if(isset($topTutors) && $topTutors->count() > 0)
         <div class="row g-4">

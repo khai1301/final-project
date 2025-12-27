@@ -298,7 +298,6 @@ class TutorProfileController extends Controller
         $tutor = \App\Models\User::with(['tutorProfile.subjects', 'tutorProfile.certificates'])
             ->where('role', 'tutor')
             ->findOrFail($id);
-        
         // Check if profile exists and is approved
         if (!$tutor->tutorProfile || !$tutor->tutorProfile->is_approved) {
             abort(404, 'Tutor profile not found or not approved');

@@ -13,6 +13,7 @@ use App\Http\Controllers\StudentRequestController;
 use App\Http\Controllers\TutorProfileController;
 use App\Http\Controllers\MatchingController;
 use App\Http\Controllers\NotificationController;
+use App\Http\Controllers\RecommendationController;
 
 // Public Routes
 Route::get('/tutors', [TutorProfileController::class, 'browse'])->name('tutors.browse');
@@ -51,6 +52,12 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    
+    // Recommendation routes
+    Route::get('/api/recommendations/tutors/{requestId}', [RecommendationController::class, 'getTutorRecommendations'])->name('api.recommendations.tutors');
+    Route::get('/api/recommendations/requests/{tutorProfileId}', [RecommendationController::class, 'getRequestRecommendations'])->name('api.recommendations.requests');
+    Route::get('/recommendations/tutors/{requestId}', [RecommendationController::class, 'showTutorRecommendations'])->name('recommendations.tutors');
+    Route::get('/recommendations/requests', [RecommendationController::class, 'showRequestRecommendations'])->name('recommendations.requests');
     
     // Contact Unlock routes
     Route::post('/contact/unlock/{matching}', [\App\Http\Controllers\ContactUnlockController::class, 'unlock'])->name('contact.unlock');

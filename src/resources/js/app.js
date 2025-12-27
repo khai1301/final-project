@@ -12,3 +12,4 @@ import './frontend/teaching-areas.js';
 import './frontend/user-location.js';
 import './frontend/tutor-location.js';
 import './frontend/tutor-ai-autofill.js';
+import './ai-recommendations.js';

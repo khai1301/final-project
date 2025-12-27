@@ -114,6 +114,22 @@ class HomeController extends Controller
             ->take(6)
             ->get();
         
+        // For AI recommendations
+        $latestRequestId = null;
+        $tutorProfileId = null;
+        
+        if ($user && $user->isStudent()) {
+            // Get student's latest open request for AI recommendations
+            $latestRequest = \App\Models\Request::where('student_id', $user->id)
+                ->where('status', 'open')
+                ->latest()
+                ->first();
+            $latestRequestId = $latestRequest->id ?? null;
+        } elseif ($user && $user->isTutor()) {
+            // Get tutor's profile ID for AI recommendations
+            $tutorProfileId = $user->tutorProfile->id ?? null;
+        }
+        
         return view('frontend.home.index', compact(
             'tutors', 
             'students', 
@@ -122,7 +138,9 @@ class HomeController extends Controller
             'userMatchings',
             'featuredTutors',
             'topTutors',
-            'studentRequests'
+            'studentRequests',
+            'latestRequestId',
+            'tutorProfileId'
         ));
     }
 }
