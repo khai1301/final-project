@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quên mật khẩu - SmartTutor</title>
+    <title>{{ __('ui.forgot_password_title') }} - SmartTutor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,15 +18,15 @@
             </div>
             <h2 class="logo-text">SmartTutor</h2>
         </div>
-        <a href="{{ route('login') }}" class="signup-btn">Đăng nhập</a>
+        <a href="{{ route('login') }}" class="signup-btn">{{ __('ui.login_button') }}</a>
     </header>
 
     <main>
         <div class="login-container">
             <div class="login-card">
-                <h1 class="login-title">Quên mật khẩu?</h1>
+                <h1 class="login-title">{{ __('ui.forgot_password_title') }}</h1>
                 <p class="text-center text-muted mb-4">
-                    Nhập email của bạn để nhận link đặt lại mật khẩu
+                    {{ __('ui.reset_link_instructions') }}
                 </p>
 
                 @if (session('status'))
@@ -42,19 +42,19 @@
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" 
                                value="{{ old('email') }}" 
-                               placeholder="Nhập email của bạn" 
+                               placeholder="{{ __('ui.enter_email') }}" 
                                required autofocus>
                         @error('email')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
-                    <button type="submit" class="login-btn">Gửi link đặt lại mật khẩu</button>
+                    <button type="submit" class="login-btn">{{ __('ui.send_reset_link_button') }}</button>
 
                     <div class="text-center mt-3">
                         <a href="{{ route('login') }}" class="forgot-link">
                             <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">arrow_back</span>
-                            Quay lại đăng nhập
+                            {{ __('ui.back_to_login') }}
                         </a>
                     </div>
                 </form>

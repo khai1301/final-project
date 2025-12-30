@@ -23,12 +23,12 @@ class ContactUnlockController extends Controller
         
         // Verify connection is accepted
         if ($matching->status !== 'accepted') {
-            return back()->withErrors(['error' => 'Kết nối phải được chấp nhận trước khi mở khóa thông tin.']);
+            return back()->withErrors(['error' => __('messages.connection_must_accepted')]);
         }
         
         // Check if already unlocked
         if ($matching->contact_unlocked) {
-            return back()->with('info', 'Thông tin liên hệ đã được mở khóa trước đó.');
+            return back()->with('info', __('messages.contact_already_unlocked'));
         }
 
         // Get unlock fee from settings
@@ -53,11 +53,11 @@ class ContactUnlockController extends Controller
 
                 DB::commit();
 
-                return back()->with('success', 'Đã mở khóa thông tin liên hệ thành công! (Chế độ phát triển - không thanh toán)');
+                return back()->with('success', __('messages.contact_unlocked_dev_mode'));
             }
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Lỗi khi mở khóa: ' . $e->getMessage()]);
+            return back()->withErrors(['error' => __('messages.unlock_error', ['error' => $e->getMessage()])]);
         }
     }
 
@@ -69,7 +69,7 @@ class ContactUnlockController extends Controller
         // TODO: Implement VNPay/MoMo integration
         // This is a placeholder for future payment gateway integration
         
-        return back()->with('info', 'Tính năng thanh toán đang được phát triển. Vui lòng liên hệ admin để bật chế độ dev.');
+        return back()->with('info', __('messages.payment_dev_mode'));
     }
 
     /**

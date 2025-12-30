@@ -246,7 +246,7 @@ class TutorProfileController extends Controller
 
         $certificate->delete();
 
-        return back()->with('success', 'Đã xóa chứng chỉ thành công!');
+        return back()->with('success', __('messages.certificate_deleted'));
     }
 
     /**

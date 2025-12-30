@@ -31,16 +31,18 @@
                     </p>
 
                     {{-- CTA Buttons --}}
+                    @guest
                     <div class="home-hero-buttons d-flex flex-wrap gap-3 pt-2">
-                        <button class="btn btn-dark">
+                        <a href="{{ route('register') }}?role=student" class="btn btn-dark">
                             <span class="material-symbols-outlined">school</span>
                             Tôi là Học sinh
-                        </button>
-                        <button class="btn btn-outline-dark">
+                        </a>
+                        <a href="{{ route('register') }}?role=tutor" class="btn btn-outline-dark">
                             <span class="material-symbols-outlined">cast_for_education</span>
                             Tôi là Gia sư
-                        </button>
+                        </a>
                     </div>
+                    @endguest
                 </div>
             </div>
 

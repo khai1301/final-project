@@ -4,13 +4,13 @@
         {{-- Section Header --}}
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
             <div>
-                <h2 class="home-section-title mb-2">Gia Sư Hàng Đầu</h2>
-                <p class="home-section-description mb-0">Học từ những gia sư được đánh giá cao nhất</p>
+                <h2 class="home-section-title mb-2">{{ __('ui.top_tutors') }}</h2>
+                <p class="home-section-description mb-0">{{ __('ui.learn_from_top_rated') }}</p>
             </div>
             @guest
             <div class="d-none d-md-block">
                 <a href="{{ route('login') }}" class="d-inline-flex align-items-center gap-1 text-decoration-none fw-bold" style="color: var(--primary);">
-                    Xem tất cả
+                    {{ __('ui.view_all') }}
                     <span class="material-symbols-outlined" style="font-size: 0.875rem;">arrow_forward</span>
                 </a>
             </div>
@@ -26,8 +26,8 @@
                         <span class="material-symbols-outlined">psychology</span>
                     </div>
                     <div>
-                        <h3 class="mb-0 h5">Gợi Ý Dành Riêng Cho Bạn</h3>
-                        <small class="text-muted">AI đã phân tích và tìm những gia sư phù hợp nhất</small>
+                        <h3 class="mb-0 h5">{{ __('ui.personalized_recommendations') }}</h3>
+                        <small class="text-muted">{{ __('ui.ai_analyzed_best_match') }}</small>
                     </div>
                 </div>
                 

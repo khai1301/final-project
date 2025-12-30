@@ -39,4 +39,7 @@ return [
         'api_key' => env('OPENAI_API_KEY'),
     ],
 
+    'kyc' => [
+        'api_key' => env('KYC_KEY'),
+    ],
 ];

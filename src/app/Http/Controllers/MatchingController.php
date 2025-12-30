@@ -64,11 +64,26 @@ class MatchingController extends Controller
             $tutorId = $request->tutor_id;
             $studentId = $user->id;
             
+            // CHECK: Tutor must be approved
+            $tutor = \App\Models\User::with('tutorProfile')->find($tutorId);
+            if (!$tutor || !$tutor->tutorProfile || !$tutor->tutorProfile->is_approved) {
+                return back()->withErrors([
+                    'error' => __('messages.tutor_not_approved')
+                ]);
+            }
+            
         } elseif ($user->isTutor()) {
             $request->validate([
                 'student_id' => 'required|exists:users,id',
                 'message' => 'nullable|string|max:500',
             ]);
+            
+            // CHECK: Tutor must be approved to send connections
+            if (!$user->tutorProfile || !$user->tutorProfile->is_approved) {
+                return back()->withErrors([
+                    'error' => __('messages.tutor_awaiting_approval')
+                ]);
+            }
             
             $studentId = $request->student_id;
             $tutorId = $user->id;
@@ -126,7 +141,7 @@ class MatchingController extends Controller
 
         // Verify user is the receiver
         if ($matching->sender_id == $user->id) {
-            return back()->withErrors(['error' => 'Bạn không thể chấp nhận yêu cầu của chính mình.']);
+            return back()->withErrors(['error' => __('messages.cannot_accept_own_request')]);
         }
 
         // Verify user is part of this matching
@@ -157,7 +172,7 @@ class MatchingController extends Controller
 
         // Verify user is the receiver
         if ($matching->sender_id == $user->id) {
-            return back()->withErrors(['error' => 'Bạn không thể từ chối yêu cầu của chính mình.']);
+            return back()->withErrors(['error' => __('messages.cannot_decline_own_request')]);
         }
 
         // Verify user is part of this matching
@@ -200,7 +215,7 @@ class MatchingController extends Controller
 
         // Verify user is the sender
         if ($matching->sender_id != $user->id) {
-            return back()->withErrors(['error' => 'Bạn chỉ có thể hủy các yêu cầu của mình.']);
+            return back()->withErrors(['error' => __('messages.can_only_cancel_own')]);
         }
 
         $matching->update([

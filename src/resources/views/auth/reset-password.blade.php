@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đặt lại mật khẩu - SmartTutor</title>
+    <title>{{ __('ui.reset_password_title') }} - SmartTutor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,15 +18,15 @@
             </div>
             <h2 class="logo-text">SmartTutor</h2>
         </div>
-        <a href="{{ route('login') }}" class="signup-btn">Đăng nhập</a>
+        <a href="{{ route('login') }}" class="signup-btn">{{ __('ui.login_button') }}</a>
     </header>
 
     <main>
         <div class="login-container">
             <div class="login-card">
-                <h1 class="login-title">Đặt lại mật khẩu</h1>
+                <h1 class="login-title">{{ __('ui.reset_password_title') }}</h1>
                 <p class="text-center text-muted mb-4">
-                    Nhập mật khẩu mới của bạn
+                    {{ __('ui.reset_password_instructions') }}
                 </p>
 
                 <form method="POST" action="{{ route('password.update') }}" class="auth-form">
@@ -37,7 +37,7 @@
                         <label for="email">Email</label>
                         <input type="email" id="email" name="email" 
                                value="{{ old('email', $request->email) }}" 
-                               placeholder="Nhập email của bạn" 
+                               placeholder="{{ __('ui.enter_email') }}" 
                                required autofocus>
                         @error('email')
                             <span class="text-danger small mt-1">{{ $message }}</span>
@@ -45,32 +45,32 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Mật khẩu mới</label>
+                        <label for="password">{{ __('ui.new_password') }}</label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" 
-                                   placeholder="Nhập mật khẩu mới" required>
+                                   placeholder="{{ __('ui.enter_new_password') }}" required>
                             <button type="button" class="eye-btn">
                                 <span class="material-symbols-outlined">visibility</span>
                             </button>
                         </div>
-                        <small class="text-muted">Tối thiểu 8 ký tự, có chữ số</small>
+                        <small class="text-muted">{{ __('ui.password_requirement') }}</small>
                         @error('password')
                             <span class="text-danger small mt-1">{{ $message }}</span>
                         @enderror
                     </div>
 
                     <div class="form-group">
-                        <label for="password_confirmation">Xác nhận mật khẩu</label>
+                        <label for="password_confirmation">{{ __('forms.confirm_password') }}</label>
                         <div class="input-wrapper">
                             <input type="password" id="password_confirmation" name="password_confirmation" 
-                                   placeholder="Nhập lại mật khẩu" required>
+                                   placeholder="{{ __('ui.reenter_password') }}" required>
                             <button type="button" class="eye-btn">
                                 <span class="material-symbols-outlined">visibility</span>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="login-btn">Đặt lại mật khẩu</button>
+                    <button type="submit" class="login-btn">{{ __('ui.reset_password_button') }}</button>
                 </form>
             </div>
         </div>

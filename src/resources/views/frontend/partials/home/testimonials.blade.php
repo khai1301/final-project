@@ -3,8 +3,8 @@
     <div class="container">
         {{-- Section Header --}}
         <div class="text-center mx-auto mb-5" style="max-width: 48rem;">
-            <h2 class="home-section-title">Loved by Students and Tutors</h2>
-            <p class="home-section-description">See why thousands of users trust SmartTutor</p>
+            <h2 class="home-section-title">{{ __('ui.testimonials_title') }}</h2>
+            <p class="home-section-description">{{ __('ui.why_users_trust') }}</p>
         </div>
 
         {{-- Testimonial Cards Grid --}}

@@ -3,8 +3,8 @@
     <div class="container">
         {{-- Section Header --}}
         <div class="text-center mx-auto mb-5" style="max-width: 48rem;">
-            <h2 class="home-section-title">SmartTutor Hoạt Động Như Thế Nào</h2>
-            <p class="home-section-description">Ba bước đơn giản để bắt đầu hành trình học tập của bạn</p>
+            <h2 class="home-section-title">{{ __('ui.how_it_works') }}</h2>
+            <p class="home-section-description">{{ __('ui.three_simple_steps') }}</p>
         </div>
 
         {{-- Process Steps --}}
@@ -19,9 +19,9 @@
                         <div class="home-process-icon-wrapper blue">
                             <span class="material-symbols-outlined">edit_note</span>
                         </div>
-                        <h3 class="home-process-title">1. Yêu Cầu Gia Sư</h3>
+                        <h3 class="home-process-title">{{ __('ui.step') }} 1. {{ __('ui.step_1_title') }}</h3>
                         <p class="home-process-description">
-                            Đăng yêu cầu học tập, ngân sách và lịch trình ưa thích của bạn.
+                            {{ __('ui.step_1_desc') }}
                         </p>
                     </div>
                 </div>
@@ -32,9 +32,9 @@
                         <div class="home-process-icon-wrapper purple">
                             <span class="material-symbols-outlined">auto_awesome</span>
                         </div>
-                        <h3 class="home-process-title">2. Được Ghép Đôi</h3>
+                        <h3 class="home-process-title">{{ __('ui.step') }} 2. {{ __('ui.step_2_title') }}</h3>
                         <p class="home-process-description">
-                            AI của chúng tôi ngay lập tức đề xuất các gia sư phù hợp nhất với hồ sơ của bạn.
+                            {{ __('ui.step_2_desc') }}
                         </p>
                     </div>
                 </div>
@@ -45,9 +45,9 @@
                         <div class="home-process-icon-wrapper green">
                             <span class="material-symbols-outlined">video_chat</span>
                         </div>
-                        <h3 class="home-process-title">3. Bắt Đầu Học</h3>
+                        <h3 class="home-process-title">{{ __('ui.step') }} 3. {{ __('ui.step_3_title') }}</h3>
                         <p class="home-process-description">
-                            Trò chuyện với gia sư, đặt buổi học và bắt đầu học qua lớp học trực tuyến của chúng tôi.
+                            {{ __('ui.step_3_desc') }}
                         </p>
                     </div>
                 </div>

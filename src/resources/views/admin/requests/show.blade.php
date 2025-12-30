@@ -52,11 +52,11 @@
                         <div class="row g-3">
                             <div class="col-md-6">
                                 <label class="fw-bold text-muted small">Subject</label>
-                                <div class="fw-medium">{{ $learningRequest->subjectRelation->name ?? 'N/A' }}</div>
+                                <div class="fw-medium">{{ $learningRequest->subject->name ?? 'N/A' }}</div>
                             </div>
                             <div class="col-md-6">
                                 <label class="fw-bold text-muted small">Education Level</label>
-                                <div class="fw-medium">{{ $learningRequest->educationLevelRelation->name ?? 'N/A' }}</div>
+                                <div class="fw-medium">{{ $learningRequest->educationLevel->name ?? 'N/A' }}</div>
                             </div>
                         </div>
                     </div>
@@ -82,10 +82,10 @@
                             <div class="col-md-6">
                                 <label class="fw-bold text-muted small">Learning Mode</label>
                                 <div>
-                                    @if($learningRequest->learningModeRelation)
+                                    @if($learningRequest->learningMode)
                                         <span class="badge bg-info-light text-info">
-                                            <i class="bi {{ $learningRequest->learningModeRelation->icon ?? 'bi-book' }} me-1"></i>
-                                            {{ $learningRequest->learningModeRelation->name }}
+                                            <i class="bi {{ $learningRequest->learningMode->icon ?? 'bi-book' }} me-1"></i>
+                                            {{ $learningRequest->learningMode->name }}
                                         </span>
                                     @else
                                         <span class="text-muted">N/A</span>

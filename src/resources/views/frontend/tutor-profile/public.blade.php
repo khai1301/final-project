@@ -157,17 +157,39 @@
                     </h3>
                 </div>
                 <div class="card-body">
-                    @if($tutor->email)
-                    <div class="mb-3">
-                        <span class="material-symbols-outlined align-middle me-2">email</span>
-                        <a href="mailto:{{ $tutor->email }}">{{ $tutor->email }}</a>
-                    </div>
-                    @endif
-                    @if($tutor->phone)
-                    <div>
-                        <span class="material-symbols-outlined align-middle me-2">phone</span>
-                        <a href="tel:{{ $tutor->phone }}">{{ $tutor->phone }}</a>
-                    </div>
+                    @php
+                        // Check if current user has unlocked contact with this tutor
+                        $hasUnlockedContact = false;
+                        if (auth()->check() && auth()->user()->isStudent()) {
+                            $matching = \App\Models\Matching::where('student_id', auth()->id())
+                                ->where('tutor_id', $tutor->id)
+                                ->where('contact_unlocked', true)
+                                ->first();
+                            $hasUnlockedContact = $matching !== null;
+                        }
+                    @endphp
+                    
+                    @if($hasUnlockedContact)
+                        {{-- Unlocked: Show real contact --}}
+                        @if($tutor->email)
+                        <div class="mb-3">
+                            <span class="material-symbols-outlined align-middle me-2">email</span>
+                            <a href="mailto:{{ $tutor->email }}">{{ $tutor->email }}</a>
+                        </div>
+                        @endif
+                        @if($tutor->phone)
+                        <div>
+                            <span class="material-symbols-outlined align-middle me-2">phone</span>
+                            <a href="tel:{{ $tutor->phone }}">{{ $tutor->phone }}</a>
+                        </div>
+                        @endif
+                    @else
+                        {{-- Locked: Hide contact info --}}
+                        <div class="text-center py-3">
+                            <span class="material-symbols-outlined text-muted d-block mb-2" style="font-size: 48px;">lock</span>
+                            <p class="text-muted mb-2">{{ __('ui.contact_locked') }}</p>
+                            <small class="text-muted">{{ __('ui.unlock_contact') }}</small>
+                        </div>
                     @endif
                 </div>
             </div>

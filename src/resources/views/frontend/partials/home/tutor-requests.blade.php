@@ -5,18 +5,18 @@
         {{-- Section Header --}}
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
             <div>
-                <h2 class="home-section-title mb-2">Yêu Cầu Từ Học Sinh</h2>
-                <p class="home-section-description mb-0">Xem những gì học sinh đang tìm kiếm ngay bây giờ</p>
+                <h2 class="home-section-title mb-2">{{ __('ui.student_requests_title') }}</h2>
+                <p class="home-section-description mb-0">{{ __('ui.see_what_students_need') }}</p>
             </div>
             <div>
                 @auth
                     @if(auth()->user()->isTutor())
-                        <a href="#" class="btn btn-outline-secondary">Xem Tất Cả</a>
+                        <a href="#" class="btn btn-outline-secondary">{{ __('ui.view_all') }}</a>
                     @else
-                        <a href="{{ route('student.request.create') }}" class="btn btn-primary">Đăng Yêu Cầu</a>
+                        <a href="{{ route('student.request.create') }}" class="btn btn-primary">{{ __('ui.post_request') }}</a>
                     @endif
                 @else
-                    <a href="{{ route('login') }}" class="btn btn-outline-secondary">Đăng Nhập</a>
+                    <a href="{{ route('login') }}" class="btn btn-outline-secondary">{{ __('ui.login_button') }}</a>
                 @endauth
             </div>
         </div>
@@ -30,8 +30,8 @@
                         <span class="material-symbols-outlined">psychology</span>
                     </div>
                     <div>
-                        <h3 class="mb-0 h5">Yêu Cầu Phù Hợp Với Bạn</h3>
-                        <small class="text-muted">AI đã phân tích profile của bạn và tìm những yêu cầu phù hợp nhất</small>
+                        <h3 class="mb-0 h5">{{ __('ui.requests_match_you') }}</h3>
+                        <small class="text-muted">{{ __('ui.ai_analyzed_profile_requests') }}</small>
                     </div>
                 </div>
                 
@@ -54,8 +54,8 @@
             <div class="col-md-6 col-lg-4">
                 <div class="home-request-card">
                     <div class="home-request-header">
-                        <span class="home-request-badge {{ strtolower($request->subjectRelation->name ?? 'other') }}">
-                            {{ $request->subjectRelation->name ?? 'Chung' }}
+                        <span class="home-request-badge {{ strtolower($request->subject->name ?? 'other') }}">
+                            {{ $request->subject->name ?? 'Chung' }}
                         </span>
                         <span class="home-request-time">
                             <span class="material-symbols-outlined">schedule</span> 
@@ -156,7 +156,7 @@
                                             <span class="material-symbols-outlined align-middle" style="font-size: 18px;">school</span>
                                             Môn học
                                         </h6>
-                                        <span class="badge bg-primary">{{ $request->subjectRelation->name ?? 'Chung' }}</span>
+                                        <span class="badge bg-primary">{{ $request->subject->name ?? 'Chung' }}</span>
                                     </div>
                                     @if($request->education_level)
                                     <div class="col-md-6">
@@ -165,8 +165,8 @@
                                             Trình độ
                                         </h6>
                                         <p>
-                                            @if(is_object($request->educationLevelRelation ?? null))
-                                                {{ $request->educationLevelRelation->name }}
+                                            @if(is_object($request->educationLevel ?? null))
+                                                {{ $request->educationLevel->name }}
                                             @elseif(is_string($request->education_level))
                                                 {{ $request->education_level }}
                                             @else

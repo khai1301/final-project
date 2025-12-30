@@ -12,7 +12,7 @@ class RequestController extends Controller
      */
     public function index(Request $request)
     {
-        $query = LearningRequest::with(['student', 'student.province', 'student.ward', 'subjectRelation', 'educationLevelRelation', 'learningModeRelation', 'timeSlots']);
+        $query = LearningRequest::with(['student', 'student.province', 'student.ward', 'subject', 'educationLevel', 'learningMode', 'timeSlots']);
 
         // Search filter
         if ($request->filled('search')) {
@@ -23,7 +23,7 @@ class RequestController extends Controller
                       $subQuery->where('name', 'like', "%{$search}%")
                                ->orWhere('email', 'like', "%{$search}%");
                   })
-                  ->orWhereHas('subjectRelation', function ($subQuery) use ($search) {
+                  ->orWhereHas('subject', function ($subQuery) use ($search) {
                       $subQuery->where('name', 'like', "%{$search}%");
                   });
             });
@@ -60,7 +60,7 @@ class RequestController extends Controller
      */
     public function show($id)
     {
-        $learningRequest = LearningRequest::with(['student', 'student.province', 'student.ward', 'subjectRelation', 'educationLevelRelation', 'learningModeRelation', 'timeSlots'])->findOrFail($id);
+        $learningRequest = LearningRequest::with(['student', 'student.province', 'student.ward', 'subject', 'educationLevel', 'learningMode', 'timeSlots'])->findOrFail($id);
         
         return view('admin.requests.show', compact('learningRequest'));
     }

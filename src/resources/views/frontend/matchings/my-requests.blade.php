@@ -4,19 +4,19 @@
 <div class="container py-4">
     <h2 class="mb-4">
         <span class="material-symbols-outlined align-middle me-2">swap_horiz</span>
-        My Connection Requests
+        {{ __('ui.my_connection_requests') }}
     </h2>
 
     {{-- Tabs --}}
     <ul class="nav nav-tabs mb-4" role="tablist">
         <li class="nav-item">
             <button class="nav-link active" data-bs-toggle="tab" data-bs-target="#sent" type="button">
-                Sent Requests
+                {{ __('ui.sent_requests') }}
             </button>
         </li>
         <li class="nav-item">
             <button class="nav-link" data-bs-toggle="tab" data-bs-target="#received" type="button">
-                Received Requests
+                {{ __('ui.received_requests') }}
             </button>
         </li>
     </ul>
@@ -47,34 +47,34 @@
                             @if($shouldHideEmail)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
-                                    Email bị khóa
+                                    {{ __('ui.email_locked') }}
                                 </p>
                             @else
                                 <p class="text-muted small mb-1">{{ $other->email }}</p>
                             @endif
                             @if($request->message)
-                            <p class="mb-0"><strong>Tin nhắn:</strong> {{ $request->message }}</p>
+                            <p class="mb-0"><strong>{{ __('ui.message') }}:</strong> {{ $request->message }}</p>
                             @endif
-                            <small class="text-muted">Gửi {{ $request->created_at->diffForHumans() }}</small>
+                            <small class="text-muted">{{ __('ui.sent') }} {{ $request->created_at->diffForHumans() }}</small>
                         </div>
                         <div class="col-md-2">
                             @if($request->status == 'pending')
-                                <span class="badge bg-warning">⏳ Pending</span>
+                                <span class="badge bg-warning">⏳ {{ __('ui.pending_status') }}</span>
                             @elseif($request->status == 'accepted')
-                                <span class="badge bg-success">✓ Accepted</span>
+                                <span class="badge bg-success">✓ {{ __('ui.accepted_status') }}</span>
                             @elseif($request->status == 'declined')
-                                <span class="badge bg-danger">✗ Declined</span>
+                                <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}
                                 @if($request->decline_reason)
-                                <p class="small mt-2 mb-0"><strong>Reason:</strong> {{ $request->decline_reason }}</p>
+                                <p class="small mt-2 mb-0"><strong>{{ __('ui.reason') }}:</strong> {{ $request->decline_reason }}</p>
                                 @endif
                             @elseif($request->status == 'cancelled')
-                                <span class="badge bg-secondary">Cancelled</span>
+                                <span class="badge bg-secondary">{{ __('ui.cancelled_status') }}</span>
                             @endif
                         </div>
                         <div class="col-md-2">
                             @if($request->status == 'pending')
                             <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $request->id }}">
-                                Hủy
+                                {{ __('ui.cancel') }}
                             </button>
                             @elseif($request->status == 'accepted')
                                 @php
@@ -85,14 +85,14 @@
                                     @if($request->contact_unlocked)
                                         <button class="btn btn-sm btn-success w-100" disabled>
                                             <span class="material-symbols-outlined" style="font-size: 14px;">lock_open</span>
-                                            Đã Mở Khóa
+                                            {{ __('ui.unlocked') }}
                                         </button>
                                     @else
                                         <form action="{{ route('contact.unlock', $request->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-primary w-100">
                                                 <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
-                                                Mở Khóa<br>
+                                                {{ __('ui.unlock') }}<br>
                                                 <small>({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 50000)) }}đ)</small>
                                             </button>
                                         </form>
@@ -112,16 +112,16 @@
                             @csrf
                             @method('DELETE')
                             <div class="modal-header">
-                                <h5 class="modal-title">Cancel Request</h5>
+                                <h5 class="modal-title">{{ __('ui.cancel_request') }}</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <p>Please provide a reason for cancelling this request:</p>
-                                <textarea name="reason" class="form-control" rows="3" required minlength="10" maxlength="500" placeholder="Your reason (minimum 10 characters)"></textarea>
+                                <p>{{ __('ui.provide_cancel_reason') }}</p>
+                                <textarea name="reason" class="form-control" rows="3" required minlength="10" maxlength="500" placeholder="{{ __('ui.reason_placeholder') }}"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-danger">Cancel Request</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('ui.close') }}</button>
+                                <button type="submit" class="btn btn-danger">{{ __('ui.cancel_request') }}</button>
                             </div>
                         </form>
                     </div>
@@ -130,7 +130,7 @@
             @empty
             <div class="alert alert-info">
                 <span class="material-symbols-outlined align-middle me-2">info</span>
-                You haven't sent any connection requests yet.
+                {{ __('ui.no_sent_requests') }}
             </div>
             @endforelse
         </div>
@@ -154,39 +154,39 @@
                             @if($request->status === 'accepted' && !$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
-                                    Email bị khóa
+                                    {{ __('ui.email_locked') }}
                                 </p>
                             @else
                                 <p class="text-muted small mb-1">{{ $request->sender->email }}</p>
                             @endif
                             @if($request->message)
-                            <p class="mb-0"><strong>Message:</strong> {{ Str::limit($request->message, 50) }}</p>
+                            <p class="mb-0"><strong>{{ __('ui.message_label') }}:</strong> {{ Str::limit($request->message, 50) }}</p>
                             @endif
-                            <small class="text-muted">Received {{ $request->created_at->diffForHumans() }}</small>
+                            <small class="text-muted">{{ __('ui.received') }} {{ $request->created_at->diffForHumans() }}</small>
                         </div>
                         <div class="col-md-2">
                             @if($request->status == 'pending')
-                                <span class="badge bg-warning">⏳ Đang Chờ</span>
+                                <span class="badge bg-warning">⏳ {{ __('ui.pending_status') }}</span>
                             @elseif($request->status == 'accepted')
-                                <span class="badge bg-success">✓ Đã Chấp Nhận</span>
+                                <span class="badge bg-success">✓ {{ __('ui.accepted_status') }}</span>
                             @elseif($request->status == 'declined')
-                                <span class="badge bg-danger">✗ Đã Từ Chối</span>
+                                <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
                             @endif
                         </div>
                         <div class="col-md-2">
                             <button class="btn btn-sm btn-outline-info mb-2 w-100" data-bs-toggle="modal" data-bs-target="#detailsModal{{ $request->id }}">
                                 <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span>
-                                Chi Tiết
+                                {{ __('ui.details') }}
                             </button>
                             @if($request->status == 'pending')
                             <div class="d-flex gap-2">
                                 <form action="{{ route('matching.accept', $request->id) }}" method="POST" class="flex-fill">
                                     @csrf
                                     @method('PATCH')
-                                    <button type="submit" class="btn btn-sm btn-success w-100">Chấp Nhận</button>
+                                    <button type="submit" class="btn btn-sm btn-success w-100">{{ __('ui.accept') }}</button>
                                 </form>
                                 <button class="btn btn-sm btn-outline-danger flex-fill" data-bs-toggle="modal" data-bs-target="#declineModal{{ $request->id }}">
-                                    Từ Chối
+                                    {{ __('ui.decline') }}
                                 </button>
                             </div>
                             @elseif($request->status == 'accepted' && auth()->user()->role === 'tutor')
@@ -194,14 +194,14 @@
                                 @if($request->contact_unlocked)
                                     <button class="btn btn-sm btn-success w-100" disabled>
                                         <span class="material-symbols-outlined" style="font-size: 16px;">lock_open</span>
-                                        Đã Mở Khóa
+                                        {{ __('ui.unlocked') }}
                                     </button>
                                 @else
                                     <form action="{{ route('contact.unlock', $request->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-primary w-100">
                                             <span class="material-symbols-outlined" style="font-size: 16px;">lock</span>
-                                            Mở Khóa ({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 50000)) }} đ)
+                                            {{ __('ui.unlock') }} ({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 50000)) }} đ)
                                         </button>
                                     </form>
                                 @endif
@@ -218,7 +218,7 @@
                         <div class="modal-header">
                             <h5 class="modal-title">
                                 <span class="material-symbols-outlined align-middle me-2">account_circle</span>
-                                Request Details
+                                {{ __('ui.request_details') }}
                             </h5>
                             <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                         </div>
@@ -245,7 +245,7 @@
                                     <div class="mb-3">
                                         <h6 class="fw-bold">
                                             <span class="material-symbols-outlined align-middle" style="font-size: 18px;">message</span>
-                                            Message
+                                            {{ __('ui.message_label') }}
                                         </h6>
                                         <p class="text-muted">{{ $request->message }}</p>
                                     </div>
@@ -260,7 +260,7 @@
                                         <div class="mb-3">
                                             <h6 class="fw-bold">
                                                 <span class="material-symbols-outlined align-middle" style="font-size: 18px;">info</span>
-                                                About
+                                                {{ __('ui.about') }}
                                             </h6>
                                             <p class="text-muted">{{ $tutorProfile->bio }}</p>
                                         </div>
@@ -271,7 +271,7 @@
                                         <div class="mb-3">
                                             <h6 class="fw-bold">
                                                 <span class="material-symbols-outlined align-middle" style="font-size: 18px;">school</span>
-                                                Education
+                                                {{ __('ui.education') }}
                                             </h6>
                                             <p class="text-muted">{{ $tutorProfile->education }}</p>
                                         </div>
@@ -279,14 +279,14 @@
                                         
                                         {{-- Experience & Rate --}}
                                         <div class="mb-3">
-                                            <h6 class="fw-bold">Professional Details</h6>
+                                           <h6 class="fw-bold">{{ __('ui.professional_details') }}</h6>
                                             <div class="row">
                                                 <div class="col-6">
-                                                    <p class="mb-1"><strong>Experience:</strong> {{ $tutorProfile->experience_years ?? 0 }} years</p>
+                                                    <p class="mb-1"><strong>{{ __('ui.experience') }}:</strong> {{ $tutorProfile->experience_years ?? 0 }} {{ __('ui.years') }}</p>
                                                 </div>
                                                 @if($tutorProfile->hourly_rate_min && $tutorProfile->hourly_rate_max)
                                                 <div class="col-6">
-                                                    <p class="mb-1"><strong>Rate:</strong> {{ number_format($tutorProfile->hourly_rate_min / 1000) }}k - {{ number_format($tutorProfile->hourly_rate_max / 1000) }}k ₫/hr</p>
+                                                    <p class="mb-1"><strong>{{ __('ui.rate') }}:</strong> {{ number_format($tutorProfile->hourly_rate_min / 1000) }}k - {{ number_format($tutorProfile->hourly_rate_max / 1000) }}k ₫/hr</p>
                                                 </div>
                                                 @endif
                                             </div>
@@ -297,7 +297,7 @@
                                         <div class="mb-3">
                                             <h6 class="fw-bold">
                                                 <span class="material-symbols-outlined align-middle" style="font-size: 18px;">school</span>
-                                                Subjects
+                                                {{ __('ui.subjects') }}
                                             </h6>
                                             <div class="d-flex flex-wrap gap-2">
                                                 @foreach($tutorProfile->subjects as $subject)
@@ -312,20 +312,20 @@
                                     <div class="mb-3">
                                         <h6 class="fw-bold">
                                             <span class="material-symbols-outlined align-middle" style="font-size: 18px;">contact_mail</span>
-                                            Thông Tin Liên Hệ
+                                            {{ __('ui.contact_information') }}
                                         </h6>
                                         @if($request->status === 'accepted' && !$request->contact_unlocked)
                                             {{-- Locked for both tutor and student --}}
                                             <div class="alert alert-warning">
                                                 <p class="mb-2">
                                                     <span class="material-symbols-outlined align-middle">lock</span>
-                                                    Thông tin liên hệ đã bị khóa
+                                                    {{ __('ui.contact_locked_info') }}
                                                 </p>
                                                 <p class="small text-muted mb-0">
                                                     @if(auth()->user()->role === 'tutor')
-                                                        Thanh toán phí mở khóa ({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 50000)) }} VNĐ) để xem email và số điện thoại của học sinh.
+                                                        {{ __('ui.tutor_unlock_fee_msg', ['fee' => number_format(\App\Models\Setting::get('contact_unlock_fee', 50000))]) }}
                                                     @else
-                                                        Chờ gia sư thanh toán phí mở khóa để xem thông tin liên hệ.
+                                                        {{ __('ui.student_wait_unlock') }}
                                                     @endif
                                                 </p>
                                             </div>
@@ -359,14 +359,14 @@
                             @if($request->status == 'pending')
                                 <button class="btn btn-outline-danger" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#declineModal{{ $request->id }}">
                                     <span class="material-symbols-outlined" style="font-size: 16px;">close</span>
-                                    Decline
+                                    {{ __('ui.decline') }}
                                 </button>
                                 <form action="{{ route('matching.accept', $request->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('PATCH')
                                     <button type="submit" class="btn btn-success">
                                         <span class="material-symbols-outlined" style="font-size: 16px;">check</span>
-                                        Accept Request
+                                        {{ __('ui.accept_request') }}
                                     </button>
                                 </form>
                             @endif
@@ -383,16 +383,16 @@
                             @csrf
                             @method('PATCH')
                             <div class="modal-header">
-                                <h5 class="modal-title">Decline Request</h5>
+                                <h5 class="modal-title">{{ __('ui.decline_request') }}</h5>
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
-                                <p>Please provide a reason for declining this request:</p>
-                                <textarea name="reason" class="form-control" rows="3" required minlength="10" maxlength="500" placeholder="Your reason (minimum 10 characters)"></textarea>
+                                <p>{{ __('ui.provide_decline_reason') }}</p>
+                                <textarea name="reason" class="form-control" rows="3" required minlength="10" maxlength="500" placeholder="{{ __('ui.reason_placeholder') }}"></textarea>
                             </div>
                             <div class="modal-footer">
-                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn btn-danger">Decline Request</button>
+                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('ui.close') }}</button>
+                                <button type="submit" class="btn btn-danger">{{ __('ui.decline_request') }}</button>
                             </div>
                         </form>
                     </div>
@@ -401,7 +401,7 @@
             @empty
             <div class="alert alert-info">
                 <span class="material-symbols-outlined align-middle me-2">info</span>
-                You haven't received any connection requests yet.
+                {{ __('ui.no_received_requests') }}
             </div>
             @endforelse
         </div>

@@ -13,7 +13,7 @@
                     <h5 class="mb-0 fw-bold">SmartTutor</h5>
                 </div>
                 <p class="small mb-3" style="color: var(--gray-600); line-height: 1.75;">
-                    Kết nối học sinh với gia sư tốt nhất trên toàn thế giới sử dụng công nghệ AI ghép đôi tiên tiến.
+                    {{ __('ui.footer_tagline') }}
                 </p>
                 <div class="d-flex gap-2">
                     <a href="#" class="d-flex align-items-center justify-content-center rounded-circle text-decoration-none" 
@@ -37,34 +37,34 @@
 
             {{-- Learn Column --}}
             <div class="col-md-3">
-                <h6 class="fw-bold mb-3">Học</h6>
+                <h6 class="fw-bold mb-3">{{ __('ui.learn_section') }}</h6>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Tìm Gia Sư</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Khóa Học Trực Tuyến</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Theo Môn Học</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Theo Khu Vực</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.find_tutors') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.online_courses') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.by_subject') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.by_area') }}</a></li>
                 </ul>
             </div>
 
             {{-- Teach Column --}}
             <div class="col-md-3">
-                <h6 class="fw-bold mb-3">Giảng Dạy</h6>
+                <h6 class="fw-bold mb-3">{{ __('ui.teach_section') }}</h6>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Trở Thành Gia Sư</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Quy Tắc Gia Sư</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Câu Chuyện Thành Công</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Trung Tâm An Toàn</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.become_tutor') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.tutor_rules') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.success_stories') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.safety_center') }}</a></li>
                 </ul>
             </div>
 
             {{-- Support Column --}}
             <div class="col-md-3">
-                <h6 class="fw-bold mb-3">Hỗ Trợ</h6>
+                <h6 class="fw-bold mb-3">{{ __('ui.support_section') }}</h6>
                 <ul class="list-unstyled">
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Trung Tâm Trợ Giúp</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Liên Hệ</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Điều Khoản Dịch Vụ</a></li>
-                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">Chính Sách Bảo Mật</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.help_center') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.contact') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.terms_of_service') }}</a></li>
+                    <li class="mb-2"><a href="#" class="text-decoration-none small" style="color: var(--gray-600);">{{ __('ui.privacy_policy') }}</a></li>
                 </ul>
             </div>
         </div>
@@ -72,11 +72,11 @@
         {{-- Footer Bottom --}}
         <div class="pt-4" style="border-top: 1px solid var(--gray-800);">
             <div class="d-flex flex-column flex-md-row justify-content-between align-items-center gap-3">
-                <p class="mb-0 small" style="color: #6b7280;">© 2024 SmartTutor Inc. Bản quyền thuộc về chúng tôi.</p>
+                <p class="mb-0 small" style="color: #6b7280;">{{ __('ui.copyright') }}</p>
                 <div class="d-flex gap-4 small" style="color: #6b7280;">
-                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Bảo Mật</a>
-                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Điều Khoản</a>
-                    <a href="#" class="text-decoration-none" style="color: #6b7280;">Sơ Đồ Trang</a>
+                    <a href="#" class="text-decoration-none" style="color: #6b7280;">{{ __('ui.privacy') }}</a>
+                    <a href="#" class="text-decoration-none" style="color: #6b7280;">{{ __('ui.terms') }}</a>
+                    <a href="#" class="text-decoration-none" style="color: #6b7280;">{{ __('ui.sitemap') }}</a>
                 </div>
             </div>
         </div>

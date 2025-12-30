@@ -35,7 +35,7 @@ class NotificationController extends Controller
 
         $notification->markAsRead();
 
-        return back()->with('success', 'Đã đánh dấu thông báo là đã đọc.');
+        return back()->with('success', __('messages.notification_marked_read'));
     }
 
     /**
@@ -48,7 +48,7 @@ class NotificationController extends Controller
             ->unread()
             ->update(['is_read' => true]);
 
-        return back()->with('success', 'Đã đánh dấu tất cả thông báo là đã đọc.');
+        return back()->with('success', __('messages.all_notifications_read'));
     }
 
     /**

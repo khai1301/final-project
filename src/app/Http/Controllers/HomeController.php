@@ -108,7 +108,7 @@ class HomeController extends Controller
             ->get();
         
         // Student Requests: Latest student requests (for tutor-requests.blade.php)
-        $studentRequests = \App\Models\Request::with(['student', 'subjectRelation', 'educationLevelRelation'])
+        $studentRequests = \App\Models\Request::with(['student', 'subject', 'educationLevel'])
             ->where('status', 'open')
             ->latest()
             ->take(6)

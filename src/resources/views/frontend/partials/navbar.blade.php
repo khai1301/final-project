@@ -28,6 +28,9 @@
                     </li>
 
                     @if(auth()->user()->role === 'tutor')
+                        <li class="nav-item">
+                            <a class="nav-link fw-medium" href="{{ route('requests.browse') }}" style="color: #4b5563 !important;">Yêu cầu học sinh</a>
+                        </li>
                         <!-- <li class="nav-item">
                             <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.find_students') }}</a>
                         </li>
@@ -124,15 +127,15 @@
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userDropdown">
                             @if(auth()->user()->isAdmin())
-                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">Dashboard</a></li>
+                            <li><a class="dropdown-item" href="{{ route('admin.dashboard') }}">{{ __('ui.dashboard') }}</a></li>
                             @elseif(auth()->user()->role === 'tutor')
-                            <li><a class="dropdown-item" href="{{ route('tutor.profile') }}">Hồ Sơ</a></li>
-                            <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">Yêu Cầu Của Tôi</a></li>
+                            <li><a class="dropdown-item" href="{{ route('tutor.profile') }}">{{ __('ui.profile') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">{{ __('ui.my_requests') }}</a></li>
                             <!-- <li><a class="dropdown-item" href="#">Cài Đặt</a></li> -->
                             @else
-                            <li><a class="dropdown-item" href="#">Hồ Sơ</a></li>
-                            <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">Yêu Cầu Của Tôi</a></li>
-                            <!-- <li><a class="dropdown-item" href="#">Cài Đặt</a></li> -->
+                            <li><a class="dropdown-item" href="{{ route('student.profile.edit') }}">{{ __('ui.profile') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">{{ __('ui.my_requests') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('password.edit') }}">{{ __('ui.change_password') }}</a></li>
                             @endif
                             <li><hr class="dropdown-divider"></li>
                             <li>

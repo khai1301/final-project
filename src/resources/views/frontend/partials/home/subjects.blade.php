@@ -27,5 +27,5 @@ $subjects = [
 </div>
 
 <div class="text-center mt-4">
-    <a href="#" class="btn btn-outline-primary">Xem tất cả môn học →</a>
+    <a href="#" class="btn btn-outline-primary">{{ __('ui.view_all_subjects') }} →</a>
 </div>

@@ -30,9 +30,9 @@ class MatchingService
         }
 
         $request = Request::with([
-            'subjectRelation',
-            'educationLevelRelation',
-            'learningModeRelation',
+            'subject',
+            'educationLevel',
+            'learningMode',
             'province',
             'ward',
             'timeSlots'
@@ -190,9 +190,9 @@ class MatchingService
             // Load relationships for AI analysis
             ->with([
                 'student',
-                'subjectRelation',
-                'educationLevelRelation',
-                'learningModeRelation',
+                'subject',
+                'educationLevel',
+                'learningMode',
                 'province',
                 'ward',
                 'timeSlots'
@@ -221,9 +221,9 @@ class MatchingService
 
             // Prepare request data for AI
             $requestData = [
-                'subject' => $request->subjectRelation->name ?? 'N/A',
-                'education_level' => $request->educationLevelRelation->name ?? 'N/A',
-                'learning_mode' => $request->learningModeRelation->name ?? 'N/A',
+                'subject' => $request->subject->name ?? 'N/A',
+                'education_level' => $request->educationLevel->name ?? 'N/A',
+                'learning_mode' => $request->learningMode->name ?? 'N/A',
                 'budget_range' => $request->budget_min . ' - ' . $request->budget_max . ' VNĐ/giờ',
                 'location' => ($request->ward->name ?? '') . ', ' . ($request->province->name ?? ''),
                 'description' => $request->description ?? '',
@@ -337,9 +337,9 @@ class MatchingService
                     'id' => $request->id,
                     'index' => $index,
                     'title' => $request->title ?? 'N/A',
-                    'subject' => $request->subjectRelation->name ?? 'N/A',
-                    'education_level' => $request->educationLevelRelation->name ?? 'N/A',
-                    'learning_mode' => $request->learningModeRelation->name ?? 'N/A',
+                    'subject' => $request->subject->name ?? 'N/A',
+                    'education_level' => $request->educationLevel->name ?? 'N/A',
+                    'learning_mode' => $request->learningMode->name ?? 'N/A',
                     'budget_range' => $request->budget_min . ' - ' . $request->budget_max . ' VNĐ/giờ',
                     'location' => ($request->ward->name ?? '') . ', ' . ($request->province->name ?? ''),
                     'description' => $request->description ?? '',
@@ -561,8 +561,8 @@ PROMPT;
                     $result[] = [
                         'request_id' => $request->id,
                         'title' => $request->title,
-                        'subject' => $request->subjectRelation->name ?? 'N/A',
-                        'education_level' => $request->educationLevelRelation->name ?? 'N/A',
+                        'subject' => $request->subject->name ?? 'N/A',
+                        'education_level' => $request->educationLevel->name ?? 'N/A',
                         'budget_min' => $request->budget_min,
                         'budget_max' => $request->budget_max,
                         'location' => ($request->ward->name ?? '') . ', ' . ($request->province->name ?? ''),
@@ -618,8 +618,8 @@ PROMPT;
             return [
                 'request_id' => $request->id,
                 'title' => $request->title,
-                'subject' => $request->subjectRelation->name ?? 'N/A',
-                'education_level' => $request->educationLevelRelation->name ?? 'N/A',
+                'subject' => $request->subject->name ?? 'N/A',
+                'education_level' => $request->educationLevel->name ?? 'N/A',
                 'budget_min' => $request->budget_min,
                 'budget_max' => $request->budget_max,
                 'location' => ($request->ward->name ?? '') . ', ' . ($request->province->name ?? ''),

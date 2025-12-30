@@ -24,6 +24,7 @@ Route::get('/tutors/{id}', [TutorProfileController::class, 'showPublic'])->name(
 // See config/fortify.php and app/Providers/FortifyServiceProvider.php
 
 Route::get('/', [HomeController::class, 'index'])->name('home.index');
+Route::get('/requests', [\App\Http\Controllers\RequestBrowseController::class, 'index'])->name('requests.browse');
 
 // Student Learning Request routes
 Route::middleware(['auth', 'role:student'])->group(function () {
@@ -65,6 +66,18 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
     Route::get('/api/provinces', [\App\Http\Controllers\LocationController::class, 'getProvinces'])->name('api.provinces');
     Route::get('/api/wards/{provinceId}', [\App\Http\Controllers\LocationController::class, 'getWardsByProvince'])->name('api.wards');
+    
+    // Student Profile routes
+    Route::get('/student/profile/edit', [\App\Http\Controllers\StudentProfileController::class, 'edit'])->name('student.profile.edit');
+    Route::put('/student/profile', [\App\Http\Controllers\StudentProfileController::class, 'update'])->name('student.profile.update');
+    
+    // Password change routes (for all roles)
+    Route::get('/profile/password/edit', [\App\Http\Controllers\PasswordController::class, 'edit'])->name('password.edit');
+    Route::put('/profile/password', [\App\Http\Controllers\PasswordController::class, 'update'])->name('password.updates');
+    
+    // CCCD Verification routes
+    Route::get('/profile/id-verification', [\App\Http\Controllers\VerificationController::class, 'show'])->name('id-verification.show');
+    Route::post('/profile/id-verification', [\App\Http\Controllers\VerificationController::class, 'verify'])->name('id-verification.verify');
 });
 
 
@@ -88,7 +101,7 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // System Configuration
     Route::resource('subjects', SubjectController::class)->except(['show']);
     Route::resource('education-levels', EducationLevelController::class)->except(['show']);
-    Route::resource('learning-modes', LearningModeController::class)->except([' show']);
+    Route::resource('learning-modes', LearningModeController::class)->except(['show']);
 
     // Tutor Profiles Management
     Route::get('/tutor-profiles', [\App\Http\Controllers\Admin\TutorProfileController::class, 'index'])->name('tutor-profiles.index');

@@ -2,33 +2,33 @@
 $benefits = [
     [
         'icon' => 'bi-patch-check',
-        'title' => 'Gia sư được xác minh',
-        'description' => 'Tất cả gia sư đều qua kiểm tra CCCD và chứng chỉ'
+        'title' => __('ui.verified_tutors'),
+        'description' => __('ui.verified_tutors_desc')
     ],
     [
         'icon' => 'bi-gift',
-        'title' => 'Học thử miễn phí',
-        'description' => 'Buổi học đầu tiên miễn phí để bạn trải nghiệm'
+        'title' => __('ui.free_trial'),
+        'description' => __('ui.free_trial_desc')
     ],
     [
         'icon' => 'bi-shield-check',
-        'title' => 'Thanh toán an toàn',
-        'description' => 'Hệ thống thanh toán được bảo mật tuyệt đối'
+        'title' => __('ui.secure_payment'),
+        'description' => __('ui.secure_payment_desc')
     ],
     [
         'icon' => 'bi-headset',
-        'title' => 'Hỗ trợ 24/7',
-        'description' => 'Đội ngũ hỗ trợ luôn sẵn sàng giúp đỡ bạn'
+        'title' => __('ui.support_247'),
+        'description' => __('ui.support_247_desc')
     ],
     [
         'icon' => 'bi-calendar-check',
-        'title' => 'Lịch học linh hoạt',
-        'description' => 'Tự do sắp xếp thời gian học phù hợp với bạn'
+        'title' => __('ui.flexible_schedule'),
+        'description' => __('ui.flexible_schedule_desc')
     ],
     [
         'icon' => 'bi-star',
-        'title' => 'Chất lượng đảm bảo',
-        'description' => 'Hoàn tiền 100% nếu không hài lòng'
+        'title' => __('ui.quality_guaranteed'),
+        'description' => __('ui.quality_guaranteed_desc')
     ],
 ];
 @endphp

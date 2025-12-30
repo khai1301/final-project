@@ -31,7 +31,7 @@ class Request extends Model
     /**
      * Get the subject for the request.
      */
-    public function subjectRelation()
+    public function subject()
     {
         return $this->belongsTo(Subject::class, 'subject_id');
     }
@@ -39,7 +39,7 @@ class Request extends Model
     /**
      * Get the education level for the request.
      */
-    public function educationLevelRelation()
+    public function educationLevel()
     {
         return $this->belongsTo(EducationLevel::class, 'education_level_id');
     }
@@ -47,7 +47,7 @@ class Request extends Model
     /**
      * Get the learning mode for the request.
      */
-    public function learningModeRelation()
+    public function learningMode()
     {
         return $this->belongsTo(LearningMode::class, 'learning_mode_id');
     }

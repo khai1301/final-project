@@ -535,6 +535,52 @@
                     </div>
                 </form>
             </div>
+
+            {{-- Password Change Link --}}
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <h5 class="card-title">{{ __('ui.security') }}</h5>
+                    <p class="text-muted mb-3">Thay đổi mật khẩu để bảo vệ tài khoản</p>
+                    <a href="{{ route('password.edit') }}" class="btn btn-outline-danger">
+                        <span class="material-symbols-outlined" style="font-size: 18px;">lock</span>
+                        {{ __('ui.change_password') }}
+                    </a>
+                </div>
+            </div>
+            
+            {{-- CCCD Verification Link --}}
+            <div class="card shadow-sm mt-4">
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                            <h5 class="card-title mb-1">
+                                <span class="material-symbols-outlined align-middle">verified_user</span>
+                                Xác thực CCCD
+                            </h5>
+                            @if(auth()->user()->is_verified)
+                                <p class="text-success mb-0">
+                                    <span class="material-symbols-outlined align-middle" style="font-size: 18px;">check_circle</span>
+                                    Đã xác thực
+                                </p>
+                            @else
+                                <p class="text-muted mb-0">Xác thực để tăng độ tin cậy</p>
+                            @endif
+                        </div>
+                        <div>
+                            <a href="{{ route('id-verification.show') }}" class="btn btn-outline-primary">
+                                @if(auth()->user()->is_verified)
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">verified</span>
+                                    Xem chi tiết
+                                @else
+                                    <span class="material-symbols-outlined" style="font-size: 18px;">badge</span>
+                                    Xác thực ngay
+                                @endif
+                            </a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </div>
 

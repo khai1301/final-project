@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Đăng nhập - SmartTutor</title>
+    <title>{{ __('ui.login_button') }} - SmartTutor</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet">
     @vite(['resources/css/app.css', 'resources/js/app.js'])
@@ -18,13 +18,13 @@
             </div>
             <h2 class="logo-text">SmartTutor</h2>
         </div>
-        <a href="{{ route('register') }}" class="signup-btn">Đăng ký</a>
+        <a href="{{ route('register') }}" class="signup-btn">{{ __('ui.signup_button') }}</a>
     </header>
 
     <main>
         <div class="login-container">
             <div class="login-card">
-                <h1 class="login-title">Đăng nhập vào tài khoản</h1>
+                <h1 class="login-title">{{ __('ui.login_title') }}</h1>
 
                 @if (session('status'))
                     <div class="alert alert-success">
@@ -45,7 +45,7 @@
                     <label for="email">Email <span class="text-danger">*</span></label>
                         <input type="email" id="email" name="email" 
                                value="{{ old('email') }}" 
-                               placeholder="Nhập email của bạn" 
+                               placeholder="{{ __('ui.enter_email') }}" 
                                required autofocus>
                         @error('email')
                             <span class="text-danger small mt-1">{{ $message }}</span>
@@ -53,10 +53,10 @@
                     </div>
 
                     <div class="form-group">
-                        <label for="password">Mật khẩu <span class="text-danger">*</span></label>
+                        <label for="password">{{ __('forms.password') }} <span class="text-danger">*</span></label>
                         <div class="input-wrapper">
                             <input type="password" id="password" name="password" 
-                                   placeholder="Nhập mật khẩu" required>
+                                   placeholder="{{ __('ui.enter_password') }}" required>
                             <button type="button" class="eye-btn">
                                 <span class="material-symbols-outlined">visibility</span>
                             </button>
@@ -69,16 +69,16 @@
                     <div class="form-row">
                         <div class="remember-me">
                             <input type="checkbox" id="remember" name="remember">
-                            <label for="remember">Ghi nhớ đăng nhập</label>
+                            <label for="remember">{{ __('ui.remember_me') }}</label>
                         </div>
-                        <a href="{{ route('password.request') }}" class="forgot-link">Quên mật khẩu?</a>
+                        <a href="{{ route('password.request') }}" class="forgot-link">{{ __('ui.forgot_password') }}</a>
                     </div>
 
-                    <button type="submit" class="login-btn">Đăng nhập</button>
+                    <button type="submit" class="login-btn">{{ __('ui.login_button') }}</button>
                 </form>
             </div>
             <p class="signup-text">
-                Chưa có tài khoản? <a href="{{ route('register') }}" class="signup-link">Đăng ký ngay</a>
+                {{ __('ui.no_account') }} <a href="{{ route('register') }}" class="signup-link">{{ __('ui.signup_now') }}</a>
             </p>
         </div>
     </main>

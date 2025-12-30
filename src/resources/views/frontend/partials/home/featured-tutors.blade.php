@@ -2,8 +2,8 @@
 <section class="featured-tutors py-5">
     <div class="container">
         <div class="text-center mb-4">
-            <h2 class="home-section-title">Gia Sư Mới Nhất</h2>
-            <p class="home-section-description">Khám phá những gia sư mới gia nhập nền tảng</p>
+            <h2 class="home-section-title">{{ __('ui.newest_tutors') }}</h2>
+            <p class="home-section-description">{{ __('ui.explore_new_tutors') }}</p>
         </div>
 
         @if(isset($featuredTutors) && $featuredTutors->count() > 0)
@@ -67,29 +67,29 @@
                                 @if($matching)
                                     @if($matching->status == 'accepted')
                                         <button class="home-tutor-view-btn" style="background: #10b981; cursor: not-allowed;" disabled>
-                                            ✓ Đã kết nối
+                                            ✓ {{ __('ui.connected') }}
                                         </button>
                                     @elseif($matching->status == 'declined')
                                         <button class="home-tutor-view-btn" style="background: #ef4444; cursor: not-allowed;" disabled>
-                                            ✗ Đã từ chối
+                                            ✗ {{ __('ui.declined_status') }}
                                         </button>
                                     @elseif($matching->status == 'pending')
                                         <button class="home-tutor-view-btn" style="background: #f59e0b; cursor: not-allowed;" disabled>
-                                            ⏳ Chờ xác nhận
+                                            ⏳ {{ __('ui.waiting_confirm') }}
                                         </button>
                                     @endif
                                 @else
                                     <form action="{{ route('matching.connect') }}" method="POST" class="w-100">
                                         @csrf
                                         <input type="hidden" name="tutor_id" value="{{ $tutor->id }}">
-                                        <button type="submit" class="home-tutor-view-btn">Kết nối ngay</button>
+                                        <button type="submit" class="home-tutor-view-btn">{{ __('ui.connect_now') }}</button>
                                     </form>
                                 @endif
                             @else
                                 <a href="{{ route('tutor.show', $tutor->id) }}" class="home-tutor-view-btn">Xem profile</a>
                             @endif
                         @else
-                            <button class="home-tutor-view-btn" onclick="window.location='{{ route('login') }}'">Xem profile</button>
+                            <button class="home-tutor-view-btn" onclick="window.location='{{ route('login') }}'">{{ __('ui.view_profile') }}</button>
                         @endauth
                     </div>
                 </div>
@@ -98,12 +98,12 @@
         </div>
 
         <div class="text-center mt-4">
-            <a href="{{ route('login') }}" class="btn btn-primary btn-lg">Xem tất cả gia sư →</a>
+            <a href="{{ route('login') }}" class="btn btn-primary btn-lg">{{ __('ui.view_all_tutors') }} →</a>
         </div>
         @else
         <div class="alert alert-info text-center">
             <span class="material-symbols-outlined align-middle me-2">info</span>
-            Chưa có gia sư mới nào. Vui lòng quay lại sau!
+            {{ __('ui.no_new_tutors') }}
         </div>
         @endif
     </div>
