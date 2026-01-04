@@ -51,6 +51,17 @@ class RequestBrowseController extends Controller
         $learningModes = \App\Models\LearningMode::active()->get();
         $provinces = \App\Models\Province::orderBy('name')->get();
         
+        // Add connection status for authenticated tutors
+        if (auth()->check() && auth()->user()->isTutor()) {
+            $requests->getCollection()->transform(function($request) {
+                $request->connection_status = \App\Models\Matching::getConnectionStatus(
+                    auth()->id(), 
+                    $request->id  // ← request ID, not student_id!
+                );
+                return $request;
+            });
+        }
+        
         return view('frontend.requests.browse', compact(
             'requests', 
             'subjects', 

@@ -114,6 +114,32 @@ class HomeController extends Controller
             ->take(6)
             ->get();
         
+        // Add connection status for students viewing tutors
+        if ($user && $user->isStudent()) {
+            $latestRequest = \App\Models\Request::where('student_id', $user->id)
+                ->where('status', 'open')
+                ->latest()
+                ->first();
+            
+            if ($latestRequest) {
+                // Add connection status to top tutors
+                foreach ($topTutors as $tutor) {
+                    $tutor->connection_status = \App\Models\Matching::getConnectionStatus(
+                        $tutor->id,
+                        $latestRequest->id
+                    );
+                }
+                
+                // Add connection status to featured tutors
+                foreach ($featuredTutors as $tutor) {
+                    $tutor->connection_status = \App\Models\Matching::getConnectionStatus(
+                        $tutor->id,
+                        $latestRequest->id
+                    );
+                }
+            }
+        }
+        
         // For AI recommendations
         $latestRequestId = null;
         $tutorProfileId = null;

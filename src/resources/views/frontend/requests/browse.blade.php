@@ -114,9 +114,15 @@
                                         <h5 class="card-title">{{ $req->title }}</h5>
                                         
                                         <div class="d-flex flex-wrap gap-2 mb-3">
+                                            @if($req->subject)
                                             <span class="badge bg-primary">{{ $req->subject->name }}</span>
+                                            @endif
+                                            @if($req->educationLevel)
                                             <span class="badge bg-info">{{ $req->educationLevel->name }}</span>
+                                            @endif
+                                            @if($req->learningMode)
                                             <span class="badge bg-success">{{ $req->learningMode->name }}</span>
+                                            @endif
                                         </div>
 
                                         <p class="text-muted mb-3">
@@ -127,7 +133,7 @@
                                             @if($req->province)
                                             <div>
                                                 <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
-                                                {{ $req->ward?->name }}, {{ $req->province->name }}
+                                                {{ $req->ward?->name }}{{ $req->ward ? ', ' : '' }}{{ $req->province->name }}
                                             </div>
                                             @endif
                                             <div>
@@ -147,14 +153,26 @@
 
                                         @auth
                                             @if(auth()->user()->isTutor())
-                                                <form action="{{ route('matching.connect') }}" method="POST">
-                                                    @csrf
-                                                    <input type="hidden" name="student_id" value="{{ $req->student_id }}">
-                                                    <button type="submit" class="btn btn-primary">
-                                                        <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
-                                                        {{ __('ui.send_request') }}
+                                                @if($req->connection_status === 'pending')
+                                                    <button class="btn btn-secondary" disabled>
+                                                        <span class="material-symbols-outlined" style="font-size: 18px;">pending</span>
+                                                        Đang chờ
                                                     </button>
-                                                </form>
+                                                @elseif($req->connection_status === 'accepted')
+                                                    <button class="btn btn-success" disabled>
+                                                        <span class="material-symbols-outlined" style="font-size: 18px;">check_circle</span>
+                                                        Đã kết nối
+                                                    </button>
+                                                @else
+                                                    <form action="{{ route('matching.connect') }}" method="POST">
+                                                        @csrf
+                                                        <input type="hidden" name="request_id" value="{{ $req->id }}">
+                                                        <button type="submit" class="btn btn-primary">
+                                                            <span class="material-symbols-outlined" style="font-size: 18px;">send</span>
+                                                            {{ __('ui.send_request') }}
+                                                        </button>
+                                                    </form>
+                                                @endif
                                             @endif
                                         @else
                                             <a href="{{ route('login') }}" class="btn btn-outline-primary">

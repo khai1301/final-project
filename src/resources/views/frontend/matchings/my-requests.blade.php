@@ -39,18 +39,16 @@
                         </div>
                         <div class="col-md-6">
                             <h5 class="mb-1">{{ $other->name }}</h5>
-                            @php
-                                // Hide email for all accepted connections that are not unlocked
-                                // Show email for pending/declined/cancelled (no privacy needed)
-                                $shouldHideEmail = in_array($request->status, ['accepted']) && !$request->contact_unlocked;
-                            @endphp
-                            @if($shouldHideEmail)
+                            @if(!$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
                                     {{ __('ui.email_locked') }}
                                 </p>
                             @else
                                 <p class="text-muted small mb-1">{{ $other->email }}</p>
+                                @if($other->phone)
+                                <p class="text-muted small mb-0">{{ $other->phone }}</p>
+                                @endif
                             @endif
                             @if($request->message)
                             <p class="mb-0"><strong>{{ __('ui.message') }}:</strong> {{ $request->message }}</p>
@@ -88,12 +86,12 @@
                                             {{ __('ui.unlocked') }}
                                         </button>
                                     @else
-                                        <form action="{{ route('contact.unlock', $request->id) }}" method="POST">
+                                        <form action="{{ route('payment.unlock', $request->id) }}" method="POST">
                                             @csrf
                                             <button type="submit" class="btn btn-sm btn-primary w-100">
-                                                <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">lock_open</span>
                                                 {{ __('ui.unlock') }}<br>
-                                                <small>({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 50000)) }}đ)</small>
+                                                <small>({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 10000)) }}đ)</small>
                                             </button>
                                         </form>
                                     @endif
@@ -151,13 +149,16 @@
                         </div>
                         <div class="col-md-6">
                             <h5 class="mb-1">{{ $request->sender->name }}</h5>
-                            @if($request->status === 'accepted' && !$request->contact_unlocked)
+                            @if(!$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
                                     {{ __('ui.email_locked') }}
                                 </p>
                             @else
                                 <p class="text-muted small mb-1">{{ $request->sender->email }}</p>
+                                @if($request->sender->phone)
+                                <p class="text-muted small mb-0">{{ $request->sender->phone }}</p>
+                                @endif
                             @endif
                             @if($request->message)
                             <p class="mb-0"><strong>{{ __('ui.message_label') }}:</strong> {{ Str::limit($request->message, 50) }}</p>
@@ -192,16 +193,16 @@
                             @elseif($request->status == 'accepted' && auth()->user()->role === 'tutor')
                                 {{-- Show unlock button for tutors --}}
                                 @if($request->contact_unlocked)
-                                    <button class="btn btn-sm btn-success w-100" disabled>
-                                        <span class="material-symbols-outlined" style="font-size: 16px;">lock_open</span>
+                                    <span class="badge bg-success">
+                                        <span class="material-symbols-outlined" style="font-size: 14px;">lock_open</span>
                                         {{ __('ui.unlocked') }}
-                                    </button>
+                                    </span>
                                 @else
-                                    <form action="{{ route('contact.unlock', $request->id) }}" method="POST">
+                                    <form action="{{ route('payment.unlock', $request->id) }}" method="POST">
                                         @csrf
                                         <button type="submit" class="btn btn-sm btn-primary w-100">
-                                            <span class="material-symbols-outlined" style="font-size: 16px;">lock</span>
-                                            {{ __('ui.unlock') }} ({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 50000)) }} đ)
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">lock_open</span>
+                                            Mở khóa ({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 10000)) }} đ)
                                         </button>
                                     </form>
                                 @endif
@@ -314,8 +315,8 @@
                                             <span class="material-symbols-outlined align-middle" style="font-size: 18px;">contact_mail</span>
                                             {{ __('ui.contact_information') }}
                                         </h6>
-                                        @if($request->status === 'accepted' && !$request->contact_unlocked)
-                                            {{-- Locked for both tutor and student --}}
+                                        @if(!$request->contact_unlocked)
+                                            {{-- ALWAYS LOCKED until tutor pays unlock fee --}}
                                             <div class="alert alert-warning">
                                                 <p class="mb-2">
                                                     <span class="material-symbols-outlined align-middle">lock</span>
@@ -323,14 +324,18 @@
                                                 </p>
                                                 <p class="small text-muted mb-0">
                                                     @if(auth()->user()->role === 'tutor')
-                                                        {{ __('ui.tutor_unlock_fee_msg', ['fee' => number_format(\App\Models\Setting::get('contact_unlock_fee', 50000))]) }}
+                                                        @if($request->status === 'accepted')
+                                                            {{ __('ui.tutor_unlock_fee_msg', ['fee' => number_format(\App\Models\Setting::get('contact_unlock_fee', 50000))]) }}
+                                                        @else
+                                                            Chấp nhận yêu cầu và thanh toán phí mở khóa để xem thông tin liên hệ
+                                                        @endif
                                                     @else
                                                         {{ __('ui.student_wait_unlock') }}
                                                     @endif
                                                 </p>
                                             </div>
                                         @else
-                                            {{-- Show contact info --}}
+                                            {{-- Show contact info ONLY after unlock --}}
                                             <p class="mb-1">
                                                 <span class="material-symbols-outlined align-middle" style="font-size: 16px;">email</span>
                                                 {{ $request->sender->email }}

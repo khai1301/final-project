@@ -61,8 +61,19 @@ class MatchingController extends Controller
                 'message' => 'nullable|string|max:500',
             ]);
             
+            // Get student's latest active request
+            $latestRequest = \App\Models\Request::where('student_id', $user->id)
+                ->where('status', 'open')
+                ->latest()
+                ->first();
+            
+            if (!$latestRequest) {
+                return back()->withErrors(['error' => 'Bạn cần tạo yêu cầu học trước khi kết nối với gia sư']);
+            }
+            
             $tutorId = $request->tutor_id;
             $studentId = $user->id;
+            $requestId = $latestRequest->id;
             
             // CHECK: Tutor must be approved
             $tutor = \App\Models\User::with('tutorProfile')->find($tutorId);
@@ -74,7 +85,7 @@ class MatchingController extends Controller
             
         } elseif ($user->isTutor()) {
             $request->validate([
-                'student_id' => 'required|exists:users,id',
+                'request_id' => 'required|exists:requests,id',
                 'message' => 'nullable|string|max:500',
             ]);
             
@@ -85,21 +96,28 @@ class MatchingController extends Controller
                 ]);
             }
             
-            $studentId = $request->student_id;
+            // Get student ID from the learning request
+            $learningRequest = \App\Models\Request::findOrFail($request->request_id);
+            $studentId = $learningRequest->student_id;
             $tutorId = $user->id;
+            $requestId = $request->request_id;
         } else {
             return back()->withErrors(['error' => 'Invalid user role.']);
         }
 
-        // Check for existing active request
-        if (Matching::hasActiveRequest($studentId, $tutorId)) {
-            return back()->withErrors(['error' => 'An active connection request already exists.']);
+        // Check for existing active request for this specific learning request
+        if (Matching::where('request_id', $requestId)
+                    ->where('tutor_id', $tutorId)
+                    ->whereIn('status', ['pending', 'accepted'])
+                    ->exists()) {
+            return back()->withErrors(['error' => 'You have already sent a connection request for this learning request.']);
         }
 
         DB::beginTransaction();
         try {
             // Create matching
             $matching = Matching::create([
+                'request_id' => $requestId,
                 'student_id' => $studentId,
                 'tutor_id' => $tutorId,
                 'sender_id' => $user->id,

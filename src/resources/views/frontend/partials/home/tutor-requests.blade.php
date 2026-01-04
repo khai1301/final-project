@@ -261,7 +261,7 @@
                                 @else
                                     <form action="{{ route('matching.connect') }}" method="POST" class="d-inline">
                                         @csrf
-                                        <input type="hidden" name="student_id" value="{{ $request->student_id }}">
+                                        <input type="hidden" name="request_id" value="{{ $request->id }}">
                                         <input type="hidden" name="message" value="Tôi quan tâm đến yêu cầu học của bạn: {{ $request->title }}">
                                         <button type="submit" class="btn btn-primary">
                                             <span class="material-symbols-outlined" style="font-size: 16px;">person_add</span>

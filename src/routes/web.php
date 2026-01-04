@@ -60,8 +60,15 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/recommendations/tutors/{requestId}', [RecommendationController::class, 'showTutorRecommendations'])->name('recommendations.tutors');
     Route::get('/recommendations/requests', [RecommendationController::class, 'showRequestRecommendations'])->name('recommendations.requests');
     
-    // Contact Unlock routes
-    Route::post('/contact/unlock/{matching}', [\App\Http\Controllers\ContactUnlockController::class, 'unlock'])->name('contact.unlock');
+    // Contact Unlock routes (Deprecated - now using PayOS)
+    // Route::post('/contact/unlock/{matching}', [\App\Http\Controllers\ContactUnlockController::class, 'unlock'])->name('contact.unlock');
+    
+    // PayOS Payment routes
+    Route::post('/payment/unlock/{matching}', [\App\Http\Controllers\PaymentController::class, 'createUnlockPayment'])
+        ->name('payment.unlock');
+    Route::get('/payment/return', [\App\Http\Controllers\PaymentController::class, 'paymentReturn'])
+        ->name('payment.return');
+    
     Route::get('/payment/callback', [\App\Http\Controllers\ContactUnlockController::class, 'paymentCallback'])->name('payment.callback');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
     Route::get('/api/provinces', [\App\Http\Controllers\LocationController::class, 'getProvinces'])->name('api.provinces');
@@ -80,6 +87,9 @@ Route::middleware(['auth'])->group(function () {
     Route::post('/profile/id-verification', [\App\Http\Controllers\VerificationController::class, 'verify'])->name('id-verification.verify');
 });
 
+// PayOS Webhook (no authentication required)
+Route::post('/payment/webhook', [\App\Http\Controllers\PaymentController::class, 'webhook'])
+    ->name('payment.webhook');
 
 
 

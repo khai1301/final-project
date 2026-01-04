@@ -9,6 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Matching extends Model
 {
     protected $fillable = [
+        'request_id',
         'student_id',
         'tutor_id',
         'sender_id',
@@ -52,11 +53,27 @@ class Matching extends Model
     }
 
     /**
-     * Get notifications related to this matching.
+     * Get the learning request this matching is for.
+     */
+    public function request(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Request::class, 'request_id');
+    }
+
+    /**
+     * Get all notifications for this matching
      */
     public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class);
+        return $this->hasMany(Notification::class, 'data->matching_id');
+    }
+
+    /**
+     * Get all payment attempts for this matching
+     */
+    public function payments(): HasMany
+    {
+        return $this->hasMany(Payment::class);
     }
 
     /**
@@ -168,6 +185,7 @@ class Matching extends Model
 
     /**
      * Check if there's an active request between two users.
+     * @deprecated Use getConnectionStatus instead
      */
     public static function hasActiveRequest($studentId, $tutorId): bool
     {
@@ -175,5 +193,19 @@ class Matching extends Model
             ->where('tutor_id', $tutorId)
             ->where('status', 'pending')
             ->exists();
+    }
+
+    /**
+     * Get connection status for a specific request and tutor
+     * Returns: null, 'pending', or 'accepted'
+     */
+    public static function getConnectionStatus($tutorId, $requestId): ?string
+    {
+        $matching = static::where('tutor_id', $tutorId)
+            ->where('request_id', $requestId)
+            ->whereIn('status', ['pending', 'accepted'])
+            ->first();
+
+        return $matching?->status;
     }
 }

@@ -98,33 +98,33 @@
                         @endif
 
                         @auth
-                            @if(auth()->user()->isStudent() && isset($userMatchings))
-                                @php
-                                    $matching = isset($userMatchings[$tutor->id]) ? $userMatchings[$tutor->id] : null;
-                                @endphp
-                                
-                                @if($matching)
-                                    @if($matching->status == 'accepted')
-                                        <button class="home-tutor-view-btn" style="background: #10b981; cursor: not-allowed;" disabled>
-                                            ✓ Đã kết nối
-                                        </button>
-                                    @elseif($matching->status == 'declined')
-                                        <button class="home-tutor-view-btn" style="background: #ef4444; cursor: not-allowed;" disabled>
-                                            ✗ Đã từ chối
-                                        </button>
-                                    @elseif($matching->status == 'pending')
-                                        <button class="home-tutor-view-btn" style="background: #f59e0b; cursor: not-allowed;" disabled>
-                                            ⏳ Chờ xác nhận
-                                        </button>
+                            @if(auth()->user()->isStudent())
+                                @if(isset($latestRequest) && $latestRequest)
+                                    {{-- Student has active request - show connection status --}}
+                                    @if(isset($tutor->connection_status))
+                                        @if($tutor->connection_status == 'accepted')
+                                            <button class="home-tutor-view-btn" style="background: #10b981; cursor: not-allowed;" disabled>
+                                                ✓ Đã kết nối
+                                            </button>
+                                        @elseif($tutor->connection_status == 'pending')
+                                            <button class="home-tutor-view-btn" style="background: #f59e0b; cursor: not-allowed;" disabled>
+                                                ⏳ Chờ xác nhận
+                                            </button>
+                                        @endif
+                                    @else
+                                        <form action="{{ route('matching.connect') }}" method="POST" class="w-100">
+                                            @csrf
+                                            <input type="hidden" name="tutor_id" value="{{ $tutor->id }}">
+                                            <button type="submit" class="home-tutor-view-btn">
+                                                Kết nối ngay
+                                            </button>
+                                        </form>
                                     @endif
                                 @else
-                                    <form action="{{ route('matching.connect') }}" method="POST" class="w-100">
-                                        @csrf
-                                        <input type="hidden" name="tutor_id" value="{{ $tutor->id }}">
-                                        <button type="submit" class="home-tutor-view-btn">
-                                            Kết nối ngay
-                                        </button>
-                                    </form>
+                                    {{-- Student has no active request --}}
+                                    <a href="{{ route('student.request.create') }}" class="home-tutor-view-btn">
+                                        Tạo yêu cầu học
+                                    </a>
                                 @endif
                             @else
                                 <a href="{{ route('tutor.show', $tutor->id) }}" class="home-tutor-view-btn">Xem profile</a>

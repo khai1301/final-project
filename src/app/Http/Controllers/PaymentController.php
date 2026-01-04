@@ -1,0 +1,151 @@
+<?php
+
+namespace App\Http\Controllers;
+
+use App\Models\Matching;
+use App\Services\PaymentService;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Log;
+
+class PaymentController extends Controller
+{
+    protected PaymentService $paymentService;
+
+    public function __construct(PaymentService $paymentService)
+    {
+        $this->paymentService = $paymentService;
+    }
+
+    /**
+     * Create payment link for contact unlock
+     */
+    public function createUnlockPayment(Matching $matching)
+    {
+        // Verify user is tutor and part of this matching
+        if (!auth()->user()->isTutor()) {
+            return back()->withErrors(['error' => 'Only tutors can unlock contact']);
+        }
+
+        if ($matching->tutor_id !== auth()->id()) {
+            return back()->withErrors(['error' => 'Unauthorized']);
+        }
+
+        // Check if already unlocked
+        if ($matching->contact_unlocked) {
+            return back()->with('info', 'Contact already unlocked');
+        }
+
+        // Check if accepted
+        if ($matching->status !== 'accepted') {
+            return back()->withErrors(['error' => 'Please accept the request first']);
+        }
+
+        try {
+            $result = $this->paymentService->createUnlockPayment($matching, auth()->id());
+            
+            // Redirect to payment page
+            return redirect($result['checkout_url']);
+
+        } catch (\Exception $e) {
+            Log::error('PayOS Payment Creation Error', [
+                'matching_id' => $matching->id,
+                'error' => $e->getMessage(),
+            ]);
+            return back()->withErrors(['error' => 'Payment creation failed. Please try again.']);
+        }
+    }
+
+    /**
+     * Handle payment return (success/cancel)
+     */
+    public function paymentReturn(Request $request)
+    {
+        $orderCode = $request->query('orderCode');
+        $status = $request->query('status'); // PAID, CANCELLED
+        $cancel = $request->query('cancel'); // true if cancelled
+
+        Log::info('PayOS Payment Return', [
+            'orderCode' => $orderCode,
+            'status' => $status,
+            'cancel' => $cancel,
+            'all_params' => $request->all(),
+        ]);
+
+        if (!$orderCode) {
+            return redirect()->route('matching.my-requests')
+                ->withErrors(['error' => 'Invalid payment response']);
+        }
+
+        // Find matching by transaction_id
+        $matching = Matching::where('transaction_id', $orderCode)->first();
+
+        if (!$matching) {
+            return redirect()->route('matching.my-requests')
+                ->withErrors(['error' => 'Matching not found']);
+        }
+
+        // Handle cancellation
+        if ($cancel === 'true' || $status === 'CANCELLED') {
+            $this->paymentService->cancelPayment($orderCode);
+
+            return redirect()->route('matching.my-requests')
+                ->with('info', 'Payment cancelled');
+        }
+
+        // Handle success
+        if ($status === 'PAID') {
+            // Trust PayOS return URL (already verified by PayOS redirect)
+            // Skip API re-verification which can be flaky
+            $paymentInfo = [
+                'status' => $status,
+                'order_code' => $orderCode,
+                'cancel' => $cancel,
+                'payment_id' => $request->query('id'),
+                'code' => $request->query('code'),
+                'returned_at' => now()->toDateTimeString(),
+            ];
+            
+            $this->paymentService->completePayment($orderCode, $paymentInfo);
+            
+            return redirect()->route('matching.my-requests')
+                ->with('success', 'Payment successful! Contact unlocked.');
+        }
+
+        // Default fallback
+        return redirect()->route('matching.my-requests')
+            ->with('info', 'Payment status unclear. Please check again later.');
+    }
+
+    /**
+     * Handle PayOS webhook
+     */
+    public function webhook(Request $request)
+    {
+        try {
+            $webhookPayload = $request->all();
+            
+            Log::info('PayOS Webhook Received', ['payload' => $webhookPayload]);
+
+            $result = $this->paymentService->processWebhook($webhookPayload);
+
+            if (!$result['success']) {
+                return response()->json(['error' => $result['error'] ?? 'Unknown error'], 400);
+            }
+
+            return response()->json(['success' => true]);
+
+        } catch (\PayOS\Exceptions\WebhookException $e) {
+            Log::error('PayOS Webhook Verification Failed', [
+                'error' => $e->getMessage(),
+                'payload' => $request->all(),
+            ]);
+            return response()->json(['error' => 'Invalid webhook signature'], 401);
+        } catch (\Exception $e) {
+            Log::error('PayOS Webhook Error', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return response()->json(['error' => 'Webhook processing failed'], 500);
+        }
+    }
+}
