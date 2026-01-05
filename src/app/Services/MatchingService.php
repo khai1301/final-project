@@ -21,12 +21,16 @@ class MatchingService
      */
     public function recommendTutorsForRequest(int $requestId, bool $forceRefresh = false): array
     {
+        $startTime = microtime(true);
         $cacheKey = "ai_recommendations_tutors_{$requestId}";
         $cacheDuration = 86400; // 24 hours
 
         // Return cached result if available and not forcing refresh
         if (!$forceRefresh && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            return \Illuminate\Support\Facades\Cache::get($cacheKey);
+            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
+            $cached['cached'] = true;
+            $cached['execution_time_ms'] = 0;
+            return $cached;
         }
 
         $request = Request::with([
@@ -39,28 +43,58 @@ class MatchingService
         ])->findOrFail($requestId);
 
         // Phase 1: Pre-filtering with database
+        $preFilterStart = microtime(true);
         $filteredTutors = $this->preFilterTutors($request);
+        $preFilterTime = round((microtime(true) - $preFilterStart) * 1000, 2);
 
         if ($filteredTutors->isEmpty()) {
+            $totalTime = round((microtime(true) - $startTime) * 1000, 2);
             $result = [
                 'success' => true,
                 'data' => [],
                 'message' => 'Không tìm thấy gia sư phù hợp với yêu cầu của bạn.',
-                'cached' => false
+                'cached' => false,
+                'execution_time_ms' => $totalTime,
+                'performance' => [
+                    'pre_filter_ms' => $preFilterTime,
+                    'ai_ranking_ms' => 0,
+                    'total_ms' => $totalTime
+                ]
             ];
             return $result;
         }
 
         // Phase 2: AI ranking
+        $aiStart = microtime(true);
         $rankedTutors = $this->rankTutorsWithAI($filteredTutors, $request);
+        $aiTime = round((microtime(true) - $aiStart) * 1000, 2);
+        
+        $totalTime = round((microtime(true) - $startTime) * 1000, 2);
 
         $result = [
             'success' => true,
             'data' => $rankedTutors,
             'message' => 'Tìm thấy ' . count($rankedTutors) . ' gia sư phù hợp.',
             'cached' => false,
-            'cache_expires_at' => now()->addSeconds($cacheDuration)->toIso8601String()
+            'cache_expires_at' => now()->addSeconds($cacheDuration)->toIso8601String(),
+            'execution_time_ms' => $totalTime,
+            'performance' => [
+                'pre_filter_ms' => $preFilterTime,
+                'ai_ranking_ms' => $aiTime,
+                'total_ms' => $totalTime,
+                'tutors_filtered' => $filteredTutors->count(),
+                'tutors_ranked' => count($rankedTutors)
+            ]
         ];
+
+        // Log performance for monitoring
+        Log::info('AI Matching Performance - Tutors for Request', [
+            'request_id' => $requestId,
+            'pre_filter_ms' => $preFilterTime,
+            'ai_ranking_ms' => $aiTime,
+            'total_ms' => $totalTime,
+            'tutors_count' => count($rankedTutors)
+        ]);
 
         // Cache the result
         \Illuminate\Support\Facades\Cache::put($cacheKey, $result, $cacheDuration);
@@ -78,12 +112,16 @@ class MatchingService
      */
     public function recommendRequestsForTutor(int $tutorProfileId, bool $forceRefresh = false): array
     {
+        $startTime = microtime(true);
         $cacheKey = "ai_recommendations_requests_{$tutorProfileId}";
         $cacheDuration = 86400; // 24 hours
 
         // Return cached result if available and not forcing refresh
         if (!$forceRefresh && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            return \Illuminate\Support\Facades\Cache::get($cacheKey);
+            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
+            $cached['cached'] = true;
+            $cached['execution_time_ms'] = 0;
+            return $cached;
         }
 
         $tutorProfile = TutorProfile::with([
@@ -94,28 +132,58 @@ class MatchingService
         ])->findOrFail($tutorProfileId);
 
         // Phase 1: Pre-filtering with database
+        $preFilterStart = microtime(true);
         $filteredRequests = $this->preFilterRequests($tutorProfile);
+        $preFilterTime = round((microtime(true) - $preFilterStart) * 1000, 2);
 
         if ($filteredRequests->isEmpty()) {
+            $totalTime = round((microtime(true) - $startTime) * 1000, 2);
             $result = [
                 'success' => true,
                 'data' => [],
                 'message' => 'Không tìm thấy yêu cầu nào phù hợp với profile của bạn.',
-                'cached' => false
+                'cached' => false,
+                'execution_time_ms' => $totalTime,
+                'performance' => [
+                    'pre_filter_ms' => $preFilterTime,
+                    'ai_ranking_ms' => 0,
+                    'total_ms' => $totalTime
+                ]
             ];
             return $result;
         }
 
         // Phase 2: AI ranking
+        $aiStart = microtime(true);
         $rankedRequests = $this->rankRequestsWithAI($filteredRequests, $tutorProfile);
+        $aiTime = round((microtime(true) - $aiStart) * 1000, 2);
+        
+        $totalTime = round((microtime(true) - $startTime) * 1000, 2);
 
         $result = [
             'success' => true,
             'data' => $rankedRequests,
             'message' => 'Tìm thấy ' . count($rankedRequests) . ' yêu cầu phù hợp.',
             'cached' => false,
-            'cache_expires_at' => now()->addSeconds($cacheDuration)->toIso8601String()
+            'cache_expires_at' => now()->addSeconds($cacheDuration)->toIso8601String(),
+            'execution_time_ms' => $totalTime,
+            'performance' => [
+                'pre_filter_ms' => $preFilterTime,
+                'ai_ranking_ms' => $aiTime,
+                'total_ms' => $totalTime,
+                'requests_filtered' => $filteredRequests->count(),
+                'requests_ranked' => count($rankedRequests)
+            ]
         ];
+
+        // Log performance for monitoring
+        Log::info('AI Matching Performance - Requests for Tutor', [
+            'tutor_profile_id' => $tutorProfileId,
+            'pre_filter_ms' => $preFilterTime,
+            'ai_ranking_ms' => $aiTime,
+            'total_ms' => $totalTime,
+            'requests_count' => count($rankedRequests)
+        ]);
 
         // Cache the result
         \Illuminate\Support\Facades\Cache::put($cacheKey, $result, $cacheDuration);
