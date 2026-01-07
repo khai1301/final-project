@@ -133,12 +133,7 @@
                     @forelse($incomingRequests as $request)
                     <div class="border rounded p-3 mb-3">
                         <div class="d-flex align-items-center mb-2">
-                            @php
-                                $avatarUrl = $request->sender->avatar 
-                                    ? \Storage::disk('s3')->url($request->sender->avatar) 
-                                    : 'https://ui-avatars.com/api/?name='.urlencode($request->sender->name).'&size=50';
-                            @endphp
-                            <img src="{{ $avatarUrl }}" class="rounded-circle me-2" width="50" height="50">
+                            <img src="{{ $request->sender->avatar_url }}" class="rounded-circle me-2" width="50" height="50">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 fw-bold">{{ $request->sender->name }}</h6>
                                 <small class="text-muted">{{ $request->sender->email }}</small>

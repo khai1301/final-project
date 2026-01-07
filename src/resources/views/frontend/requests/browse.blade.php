@@ -95,6 +95,33 @@
                 <span class="badge bg-light text-dark">{{ $requests->total() }} {{ __('ui.results') }}</span>
             </div>
 
+            {{-- AI Recommendations Section (For Tutors) --}}
+            @auth
+                @if(auth()->user()->isTutor() && isset($tutorProfileId) && $tutorProfileId)
+                <div class="mb-5">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="ai-icon-wrapper">
+                            <span class="material-symbols-outlined">psychology</span>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 h5">{{ __('ui.requests_match_you') }}</h3>
+                            <small class="text-muted">{{ __('ui.ai_analyzed_profile_requests') }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4" 
+                         data-ai-requests 
+                         data-tutor-profile-id="{{ $tutorProfileId }}">
+                        {{-- AI will auto-load recommendations here --}}
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p class="text-muted">Đang phân tích với AI để tìm yêu cầu phù hợp...</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            @endauth
+
             @if($requests->isEmpty())
                 <div class="card shadow-sm">
                     <div class="card-body text-center py-5">
@@ -111,7 +138,12 @@
                             <div class="card-body">
                                 <div class="row">
                                     <div class="col-md-8">
-                                        <h5 class="card-title">{{ $req->title }}</h5>
+                                        <h5 class="card-title">
+                                            {{ $req->title }}
+                                            @if($req->student && $req->student->is_verified)
+                                                <x-verified-badge :user="$req->student" class="ms-1" />
+                                            @endif
+                                        </h5>
                                         
                                         <div class="d-flex flex-wrap gap-2 mb-3">
                                             @if($req->subject)

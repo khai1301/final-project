@@ -117,12 +117,7 @@
                             <div class="modal-body">
                                 {{-- Student Info --}}
                                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                    @php
-                                        $studentAvatar = $request->student->avatar 
-                                            ? \Storage::disk('s3')->url($request->student->avatar) 
-                                            : 'https://ui-avatars.com/api/?name='.urlencode($request->student->name).'&size=80';
-                                    @endphp
-                                    <img src="{{ $studentAvatar }}" class="rounded-circle me-3" width="80" height="80">
+                                    <img src="{{ $request->student->avatar_url }}" class="rounded-circle me-3" width="80" height="80">
                                     <div>
                                         <h5 class="mb-1">{{ $request->student->name }}</h5>
                                         <p class="text-muted mb-0">

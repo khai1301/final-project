@@ -186,4 +186,17 @@ class User extends Authenticatable implements MustVerifyEmail
     {
         return $this->verification && $this->verification->blue_tick;
     }
+
+    /**
+     * Get the user's avatar URL with fallback to default.
+     */
+    public function getAvatarUrlAttribute()
+    {
+        if ($this->avatar && \Storage::disk('public')->exists($this->avatar)) {
+            return \Storage::url($this->avatar);
+        }
+        
+        // Default avatar using UI Avatars
+        return 'https://ui-avatars.com/api/?name=' . urlencode($this->name) . '&size=200&background=3780f6&color=fff';
+    }
 }

@@ -155,6 +155,7 @@ class Matching extends Model
             'type' => 'connect_accepted',
             'title' => 'Connection Accepted',
             'message' => $this->receiver->name . ' accepted your connection request.',
+            'action_url' => route('matching.index'),
         ]);
     }
 
@@ -172,6 +173,7 @@ class Matching extends Model
             'type' => 'connect_declined',
             'title' => 'Connection Declined',
             'message' => $this->receiver->name . ' declined your connection request.',
+            'action_url' => route('matching.my-requests'),
         ]);
     }
 

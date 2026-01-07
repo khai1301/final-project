@@ -39,7 +39,7 @@
                             @php
                                 $otherUser = $matching->getOtherUser(auth()->id());
                             @endphp
-                            <img src="{{ $otherUser->avatar ? Storage::disk('s3')->url($otherUser->avatar) : 'https://ui-avatars.com/api/?name='.urlencode($otherUser->name).'&size=60' }}" 
+                            <img src="{{ $otherUser->avatar_url }}" 
                                  alt="{{ $otherUser->name }}" class="rounded-circle" width="60" height="60">
                             <div>
                                 <h5 class="mb-1">{{ $otherUser->name }}</h5>
@@ -51,11 +51,11 @@
                         </div>
                         <div>
                             @if($matching->status == 'pending')
-                                <span class="badge bg-warning">Pending</span>
+                                <span class="badge bg-warning">{{ __('ui.pending_status') }}</span>
                             @elseif($matching->status == 'accepted')
                                 <span class="badge bg-success">Connected</span>
                             @elseif($matching->status == 'declined')
-                                <span class="badge bg-danger">Declined</span>
+                                <span class="badge bg-danger">{{ __('ui.declined_status') }}</span>
                             @else
                                 <span class="badge bg-secondary">{{ ucfirst($matching->status) }}</span>
                             @endif
@@ -79,8 +79,8 @@
                                 <form action="{{ route('matching.cancel', $matching->id) }}" method="POST" class="d-inline">
                                     @csrf
                                     @method('DELETE')
-                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Cancel this request?')">
-                                        Cancel
+                                    <button type="submit" class="btn btn-sm btn-outline-danger" onclick="return confirm('Hủy yêu cầu này?')">
+                                        {{ __('ui.cancel') }}
                                     </button>
                                 </form>
                             @else
@@ -89,12 +89,12 @@
                                     <form action="{{ route('matching.accept', $matching->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-success">Accept</button>
+                                        <button type="submit" class="btn btn-sm btn-success">{{ __('ui.accept') }}</button>
                                     </form>
                                     <form action="{{ route('matching.decline', $matching->id) }}" method="POST" class="d-inline">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-outline-danger">Decline</button>
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">{{ __('ui.decline') }}</button>
                                     </form>
                                 </div>
                             @endif

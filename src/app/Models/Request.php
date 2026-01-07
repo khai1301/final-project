@@ -14,11 +14,22 @@ class Request extends Model
         'status', 'address',
         'subject_id', 'education_level_id', 'learning_mode_id',
         'province_id', 'ward_id', 'address_detail',
+        'is_matched',
     ];
 
     protected $casts = [
         'skills' => 'array',
+        'is_matched' => 'boolean',
     ];
+
+    /**
+     * Scope to get only available (unmatched) requests
+     */
+    public function scopeAvailable($query)
+    {
+        return $query->where('status', 'open')
+                     ->where('is_matched', false);
+    }
 
     /**
      * Get the student that owns the request.
@@ -79,5 +90,13 @@ class Request extends Model
             'request_id',
             'time_slot_id'
         )->withTimestamps();
+    }
+
+    /**
+     * Get all matchings (connections) for this request.
+     */
+    public function matchings()
+    {
+        return $this->hasMany(\App\Models\Matching::class, 'request_id');
     }
 }

@@ -30,17 +30,18 @@
                 <!-- Header Section -->
                 <div class="card-header bg-gradient-primary text-white p-4 border-0">
                     <div class="d-flex align-items-center gap-3 mb-2">
-                        <span class="material-symbols-outlined fs-1">auto_awesome</span>
-                        <h1 class="h2 mb-0 fw-bold">Yêu Cầu Học Mới</h1>
+                        <span class="material-symbols-outlined fs-1">edit_note</span>
+                        <h1 class="h2 mb-0 fw-bold">Chỉnh Sửa Yêu Cầu</h1>
                     </div>
                     <p class="mb-0 text-white-50">
-                        Cho chúng tôi biết bạn muốn học gì. Hệ thống AI sẽ phân tích nhu cầu, lịch trình và phong cách học của bạn để tìm ra những gia sư phù hợp nhất cho bạn.
+                        Cập nhật thông tin yêu cầu học tập của bạn.
                     </p>
                 </div>
 
                 <!-- Form Body -->
-                <form method="POST" action="{{ route('student.request.store') }}" class="student-request-form">
+                <form method="POST" action="{{ route('student.request.update', $request->id) }}" class="student-request-form">
                     @csrf
+                    @method('PUT')
                     
                     <!-- Section 1: The Basics -->
                     <div class="p-4 pb-3">
@@ -53,9 +54,11 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Môn học</label>
                                 <select name="subject" class="form-select form-select-lg" required>
-                                    <option value="" disabled selected>Chọn môn học</option>
+                                    <option value="" disabled>Chọn môn học</option>
                                     @foreach($subjects as $subject)
-                                        <option value="{{ $subject->name }}">{{ $subject->name }}</option>
+                                        <option value="{{ $subject->name }}" {{ ($request->subject && $request->subject->name == $subject->name) ? 'selected' : '' }}>
+                                            {{ $subject->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -63,9 +66,11 @@
                             <div class="col-md-6">
                                 <label class="form-label fw-medium">Trình độ học vấn</label>
                                 <select name="education_level" class="form-select form-select-lg" required>
-                                    <option value="" disabled selected>Chọn trình độ</option>
+                                    <option value="" disabled>Chọn trình độ</option>
                                     @foreach($educationLevels as $level)
-                                        <option value="{{ $level->name }}">{{ $level->name }}</option>
+                                        <option value="{{ $level->name }}" {{ ($request->educationLevel && $request->educationLevel->name == $level->name) ? 'selected' : '' }}>
+                                            {{ $level->name }}
+                                        </option>
                                     @endforeach
                                 </select>
                             </div>
@@ -83,7 +88,7 @@
                                 <div id="skillsChips" class="skills-chips"></div>
                                 <input type="text" id="skillsInput" class="skills-input" 
                                        placeholder="Nhập chủ đề và nhấn enter (vd: Giới hạn, Đạo hàm)">
-                                <input type="hidden" name="skills" id="skillsHidden">
+                                <input type="hidden" name="skills" id="skillsHidden" value="{{ json_encode($request->skills ?? []) }}">
                             </div>
                         </div>
                     </div>
@@ -107,13 +112,13 @@
                                         <input type="radio" class="btn-check" name="learning_mode_id" 
                                                id="mode{{ $modeItem->slug }}" 
                                                value="{{ $modeItem->id }}" 
-                                               {{ $index === 0 ? 'checked' : '' }}>
+                                               {{ $request->learning_mode_id == $modeItem->id ? 'checked' : '' }}>
                                         <label class="btn btn-outline-primary w-100 mode-card" for="mode{{ $modeItem->slug }}">
                                             @if($modeItem->icon)
                                                 <i class="{{ $modeItem->icon }} fs-2 d-block mb-2"></i>
                                             @else
                                                 <span class="material-symbols-outlined fs-2 d-block mb-2">
-                                                    {{ $index === 0 ? 'laptop_chromebook' : 'person_pin_circle' }}
+                                                    @if($index === 0) laptop_chromebook @elseif($index === 1) person_pin_circle @else home @endif
                                                 </span>
                                             @endif
                                             <span class="d-block">{{ $modeItem->name }}</span>
@@ -129,6 +134,9 @@
                                 <small class="text-muted d-block mb-3">Chọn các khung giờ bạn có thể học (có thể chọn nhiều)</small>
                                 
                                 <div class="time-slots-grid">
+                                    @php
+                                        $selectedSlots = $request->timeSlots->pluck('id')->toArray();
+                                    @endphp
                                     @foreach($timeSlots->groupBy('day_of_week') as $dayNum => $slots)
                                         <div class="day-slot-group mb-3">
                                             <h6 class="fw-semibold text-primary mb-2">
@@ -142,7 +150,8 @@
                                                             <input class="form-check-input" type="checkbox" 
                                                                    name="time_slots[]" 
                                                                    value="{{ $slot->id }}" 
-                                                                   id="slot{{ $slot->id }}">
+                                                                   id="slot{{ $slot->id }}"
+                                                                   {{ in_array($slot->id, $selectedSlots) ? 'checked' : '' }}>
                                                             <label class="form-check-label small" for="slot{{ $slot->id }}">
                                                                 {{ date('H:i', strtotime($slot->start_time)) }} - {{ date('H:i', strtotime($slot->end_time)) }}
                                                             </label>
@@ -161,12 +170,23 @@
                         <div class="mb-3">
                             <label class="form-label fw-medium">Địa điểm học</label>
                             
+                            @php
+                                // Check if request location differs from user profile location
+                                $isDifferent = false;
+                                if (auth()->user()->province_id) {
+                                    if ($request->province_id != auth()->user()->province_id || 
+                                        $request->ward_id != auth()->user()->ward_id) {
+                                        $isDifferent = true;
+                                    }
+                                }
+                            @endphp
+
                             @if(auth()->user()->province_id)
                                 <!-- User has location - show and allow override -->
                                 <div class="alert alert-info d-flex align-items-start mb-3">
                                     <span class="material-symbols-outlined me-2 mt-1">info</span>
                                     <div class="flex-grow-1">
-                                        <strong>Địa chỉ hiện tại của bạn:</strong>
+                                        <strong>Địa chỉ trong hồ sơ của bạn:</strong>
                                         <div class="mt-2">
                                             <i class="bi bi-geo-alt-fill text-primary"></i>
                                             <strong>{{ auth()->user()->province->name ?? 'N/A' }}</strong>
@@ -181,18 +201,19 @@
                                 </div>
                                 
                                 <div class="form-check mb-3">
-                                    <input class="form-check-input" type="checkbox" id="use_different_location">
+                                    <input class="form-check-input" type="checkbox" id="use_different_location" {{ $isDifferent ? 'checked' : '' }}>
                                     <label class="form-check-label" for="use_different_location">
                                         Sử dụng địa chỉ khác cho yêu cầu này
                                     </label>
                                 </div>
                                 
-                                <div id="custom_location_fields" class="d-none">
+                                <div id="custom_location_fields" class="{{ $isDifferent ? '' : 'd-none' }}">
                                     <div class="row g-3">
                                         <div class="col-md-6">
                                             <label for="request_province_id" class="form-label">Tỉnh/Thành phố</label>
                                             <select id="request_province_id" name="province_id" class="form-select">
                                                 <option value="">Chọn tỉnh/thành phố</option>
+                                                <!-- Populate via JS if checked, but pre-fill via blade if active -->
                                             </select>
                                         </div>
                                         <div class="col-md-6">
@@ -203,9 +224,13 @@
                                         </div>
                                         <div class="col-12">
                                             <label for="request_address_detail" class="form-label">Địa chỉ chi tiết</label>
-                                            <input type="text" class="form-control" id="request_address_detail" name="address_detail" placeholder="Số nhà, tên đường...">
+                                            <input type="text" class="form-control" id="request_address_detail" name="address_detail" 
+                                                   placeholder="Số nhà, tên đường..." value="{{ $request->address_detail }}">
                                         </div>
                                     </div>
+                                    {{-- Hidden inputs to pass initial values to JS --}}
+                                    <input type="hidden" id="initial_province_id" value="{{ $request->province_id }}">
+                                    <input type="hidden" id="initial_ward_id" value="{{ $request->ward_id }}">
                                 </div>
                             @else
                                 <!-- User has NO location - require input -->
@@ -229,9 +254,12 @@
                                     </div>
                                     <div class="col-12">
                                         <label for="request_address_detail" class="form-label">Địa chỉ chi tiết</label>
-                                        <input type="text" class="form-control" id="request_address_detail" name="address_detail" placeholder="Số nhà, tên đường...">
+                                        <input type="text" class="form-control" id="request_address_detail" name="address_detail" 
+                                               placeholder="Số nhà, tên đường..." value="{{ $request->address_detail }}">
                                     </div>
                                 </div>
+                                <input type="hidden" id="initial_province_id" value="{{ $request->province_id }}">
+                                <input type="hidden" id="initial_ward_id" value="{{ $request->ward_id }}">
                             @endif
                         </div>
                     </div>
@@ -252,7 +280,7 @@
                                     <label class="form-label small text-muted">Giá tối thiểu</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control form-control-lg" name="budget_min" 
-                                               id="budgetMinInput" min="100000" max="5000000" value="500000" step="50000" required>
+                                               id="budgetMinInput" min="100000" max="5000000" value="{{ $request->budget_min }}" step="50000" required>
                                         <span class="input-group-text">VNĐ/giờ</span>
                                     </div>
                                 </div>
@@ -260,7 +288,7 @@
                                     <label class="form-label small text-muted">Giá tối đa</label>
                                     <div class="input-group">
                                         <input type="number" class="form-control form-control-lg" name="budget_max" 
-                                               id="budgetMaxInput" min="100000" max="5000000" value="600000" step="50000" required>
+                                               id="budgetMaxInput" min="100000" max="5000000" value="{{ $request->budget_max }}" step="50000" required>
                                         <span class="input-group-text">VNĐ/giờ</span>
                                     </div>
                                 </div>
@@ -272,20 +300,20 @@
                     <div class="px-4 pb-4">
                         <label class="form-label fw-medium">Ghi chú thêm</label>
                         <textarea name="notes" class="form-control" rows="4" 
-                                  placeholder="vd: Tôi đang chuẩn bị cho kỳ thi SAT vào tháng tới và cần giúp đỡ cụ thể về các bài toán Hình học."></textarea>
+                                  placeholder="vd: Tôi đang chuẩn bị cho kỳ thi SAT vào tháng tới và cần giúp đỡ cụ thể về các bài toán Hình học.">{{ $request->description }}</textarea>
                     </div>
 
                     <!-- Submit Area -->
                     <div class="card-footer bg-light p-4 border-0 d-flex flex-column flex-md-row align-items-center justify-content-between gap-3">
                         <div class="d-flex align-items-center gap-2 text-muted small">
                             <span class="material-symbols-outlined">info</span>
-                            <span>Yêu cầu thường được ghép đôi trong vòng 24 giờ.</span>
+                            <span>Yêu cầu sẽ được cập nhật ngay lập tức.</span>
                         </div>
                         <div class="d-flex gap-3">
-                            <!-- <button type="button" class="btn btn-outline-secondary px-4">Lưu Nháp</button> -->
+                            <a href="{{ route('student.requests.index') }}" class="btn btn-outline-secondary px-4">Hủy</a>
                             <button type="submit" class="btn btn-primary px-4">
-                                Tìm Gia Sư Phù Hợp
-                                <span class="material-symbols-outlined ms-1" style="font-size: 18px;">arrow_forward</span>
+                                Cập Nhật Yêu Cầu
+                                <span class="material-symbols-outlined ms-1" style="font-size: 18px;">save</span>
                             </button>
                         </div>
                     </div>
@@ -295,7 +323,16 @@
     </div>
 </div>
 
-@if(session('success'))
-<div data-success-message="{{ session('success') }}" style="display: none;"></div>
+@if(session('swal'))
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        Swal.fire({
+            icon: '{{ session('swal.type') }}',
+            title: '{{ session('swal.title') }}',
+            text: '{{ session('swal.text') }}',
+            confirmButtonColor: '#0a2647'
+        });
+    });
+</script>
 @endif
 @endsection

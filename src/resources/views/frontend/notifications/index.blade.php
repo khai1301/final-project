@@ -7,14 +7,14 @@
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h2 class="mb-0">
                     <span class="material-symbols-outlined align-middle me-2">notifications</span>
-                    Notifications
+                    {{ __('ui.notifications') }}
                 </h2>
                 @if($notifications->total() > 0)
                 <form action="{{ route('notifications.read-all') }}" method="POST">
                     @csrf
                     <button type="submit" class="btn btn-sm btn-outline-primary">
                         <span class="material-symbols-outlined align-middle" style="font-size: 18px;">done_all</span>
-                        Mark All as Read
+                        {{ __('ui.mark_all_read') }}
                     </button>
                 </form>
                 @endif
@@ -61,7 +61,7 @@
                                     <form action="{{ route('notifications.read', $notification->id) }}" method="POST" class="ms-2">
                                         @csrf
                                         @method('PATCH')
-                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="Mark as read">
+                                        <button type="submit" class="btn btn-sm btn-outline-secondary" title="{{ __('ui.mark_as_read') }}">
                                             <span class="material-symbols-outlined" style="font-size: 16px;">done</span>
                                         </button>
                                     </form>
@@ -73,7 +73,7 @@
                     @empty
                     <div class="list-group-item text-center py-5">
                         <span class="material-symbols-outlined fs-1 text-muted d-block mb-2">notifications_off</span>
-                        <p class="text-muted mb-0">No notifications yet</p>
+                        <p class="text-muted mb-0">{{ __('ui.no_notifications') }}</p>
                     </div>
                     @endforelse
                 </div>

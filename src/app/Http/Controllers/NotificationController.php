@@ -34,6 +34,11 @@ class NotificationController extends Controller
         }
 
         $notification->markAsRead();
+        
+        // Redirect to action URL if present
+        if ($notification->action_url) {
+            return redirect($notification->action_url);
+        }
 
         return back()->with('success', __('messages.notification_marked_read'));
     }

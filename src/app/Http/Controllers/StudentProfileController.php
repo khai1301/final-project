@@ -24,18 +24,10 @@ class StudentProfileController extends Controller
     /**
      * Update student profile
      */
-    public function update(Request $request)
+    public function update(\App\Http\Requests\UpdateStudentProfileRequest $request)
     {
         $user = auth()->user();
-        
-        $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'phone' => 'nullable|string|max:20',
-            'province_id' => 'nullable|exists:provinces,id',
-            'ward_id' => 'nullable|exists:wards,id',
-            'address_detail' => 'nullable|string|max:255',
-            'avatar' => 'nullable|image|mimes:jpg,jpeg,png|max:2048', // 2MB
-        ]);
+        $validated = $request->validated();
         
         try {
             // Handle avatar upload
@@ -52,12 +44,20 @@ class StudentProfileController extends Controller
             $user->update($validated);
             
             return redirect()->route('student.profile.edit')
-                ->with('success', __('messages.profile_updated'));
+                ->with('swal', [
+                    'type' => 'success',
+                    'title' => 'Thành công',
+                    'text' => 'Cập nhật hồ sơ thành công!'
+                ]);
                 
         } catch (\Exception $e) {
             return back()
                 ->withInput()
-                ->withErrors(['error' => 'Lỗi khi cập nhật: ' . $e->getMessage()]);
+                ->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Lỗi cập nhật',
+                    'text' => 'Có lỗi xảy ra: ' . $e->getMessage()
+                ]);
         }
     }
 }

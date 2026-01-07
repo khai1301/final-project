@@ -135,6 +135,7 @@
                             @else
                             <li><a class="dropdown-item" href="{{ route('student.profile.edit') }}">{{ __('ui.profile') }}</a></li>
                             <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">{{ __('ui.my_requests') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('student.requests.index') }}">Yêu cầu học tập của tôi</a></li>
                             <li><a class="dropdown-item" href="{{ route('password.edit') }}">{{ __('ui.change_password') }}</a></li>
                             @endif
                             <li><hr class="dropdown-divider"></li>

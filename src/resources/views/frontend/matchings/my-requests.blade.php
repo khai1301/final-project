@@ -31,14 +31,15 @@
                         <div class="col-md-2 text-center">
                             @php
                                 $other = $request->getOtherUser(auth()->id());
-                                $avatarUrl = $other->avatar 
-                                    ? \Storage::disk('s3')->url($other->avatar) 
-                                    : 'https://ui-avatars.com/api/?name='.urlencode($other->name).'&size=80';
+                                $avatarUrl = $other->avatar_url;
                             @endphp
                             <img src="{{ $avatarUrl }}" class="rounded-circle" width="80" height="80" alt="{{ $other->name }}">
                         </div>
                         <div class="col-md-6">
-                            <h5 class="mb-1">{{ $other->name }}</h5>
+                            <h5 class="mb-1">
+                                {{ $other->name }}
+                                <x-verified-badge :user="$other" class="ms-1" />
+                            </h5>
                             @if(!$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
@@ -141,14 +142,15 @@
                     <div class="row align-items-center">
                         <div class="col-md-2 text-center">
                             @php
-                                $avatarUrl = $request->sender->avatar 
-                                    ? \Storage::disk('s3')->url($request->sender->avatar) 
-                                    : 'https://ui-avatars.com/api/?name='.urlencode($request->sender->name).'&size=80';
+                                $avatarUrl = $request->sender->avatar_url;
                             @endphp
                             <img src="{{ $avatarUrl }}" class="rounded-circle" width="80" height="80" alt="{{ $request->sender->name }}">
                         </div>
                         <div class="col-md-6">
-                            <h5 class="mb-1">{{ $request->sender->name }}</h5>
+                            <h5 class="mb-1">
+                                {{ $request->sender->name }}
+                                <x-verified-badge :user="$request->sender" class="ms-1" />
+                            </h5>
                             @if(!$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>

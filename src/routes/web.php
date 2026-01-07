@@ -28,8 +28,17 @@ Route::get('/requests', [\App\Http\Controllers\RequestBrowseController::class, '
 
 // Student Learning Request routes
 Route::middleware(['auth', 'role:student'])->group(function () {
-    Route::get('/student/request/create', [StudentRequestController::class, 'create'])->name('student.request.create');
-    Route::post('/student/request', [StudentRequestController::class, 'store'])->name('student.request.store');
+    // View requests - NO verification needed
+    Route::get('/student/my-learning-requests', [StudentRequestController::class, 'index'])->name('student.requests.index');
+    
+    // Create/Store request - NEEDS verification
+    Route::get('/student/request/create', [StudentRequestController::class, 'create'])->name('student.request.create')->middleware('verified');
+    Route::post('/student/request', [StudentRequestController::class, 'store'])->name('student.request.store')->middleware('verified');
+    
+    // Edit/Update/Delete request - NEEDS verification
+    Route::get('/student/request/{id}/edit', [StudentRequestController::class, 'edit'])->name('student.request.edit')->middleware('verified');
+    Route::put('/student/request/{id}', [StudentRequestController::class, 'update'])->name('student.request.update')->middleware('verified');
+    Route::delete('/student/request/{id}', [StudentRequestController::class, 'destroy'])->name('student.request.destroy')->middleware('verified');
 });
 
 // Tutor Profile routes
@@ -42,19 +51,22 @@ Route::middleware(['auth', 'role:tutor'])->group(function () {
 
 // Matching routes (for authenticated students and tutors)
 Route::middleware(['auth'])->group(function () {
-    Route::post('/matching/connect', [MatchingController::class, 'store'])->name('matching.connect');
-    Route::patch('/matching/{id}/accept', [MatchingController::class, 'accept'])->name('matching.accept');
-    Route::patch('/matching/{id}/decline', [MatchingController::class, 'decline'])->name('matching.decline');
-    Route::delete('/matching/{id}/cancel', [MatchingController::class, 'cancel'])->name('matching.cancel');
+    // View routes - NO verification needed
     Route::get('/my-connections', [MatchingController::class, 'index'])->name('matching.index');
     Route::get('/my-requests', [MatchingController::class, 'myRequests'])->name('matching.my-requests');
     
-    // Notification routes
+    // Action routes - NEEDS verification
+    Route::post('/matching/connect', [MatchingController::class, 'store'])->name('matching.connect')->middleware('verified');
+    Route::patch('/matching/{id}/accept', [MatchingController::class, 'accept'])->name('matching.accept')->middleware('verified');
+    Route::patch('/matching/{id}/decline', [MatchingController::class, 'decline'])->name('matching.decline')->middleware('verified');
+    Route::delete('/matching/{id}/cancel', [MatchingController::class, 'cancel'])->name('matching.cancel');
+    
+    // Notification routes - NO verification needed
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
     
-    // Recommendation routes
+    // Recommendation routes - NO verification needed (just viewing)
     Route::get('/api/recommendations/tutors/{requestId}', [RecommendationController::class, 'getTutorRecommendations'])->name('api.recommendations.tutors');
     Route::get('/api/recommendations/requests/{tutorProfileId}', [RecommendationController::class, 'getRequestRecommendations'])->name('api.recommendations.requests');
     Route::get('/recommendations/tutors/{requestId}', [RecommendationController::class, 'showTutorRecommendations'])->name('recommendations.tutors');

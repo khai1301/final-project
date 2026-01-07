@@ -9,6 +9,23 @@ document.addEventListener('DOMContentLoaded', function () {
     const skillsHidden = document.getElementById('skillsHidden');
     let skills = [];
 
+    // Initialize skills from hidden input (for edit mode)
+    if (skillsHidden && skillsHidden.value) {
+        try {
+            const initialSkills = JSON.parse(skillsHidden.value);
+            if (Array.isArray(initialSkills)) {
+                initialSkills.forEach(skill => {
+                    if (skill && !skills.includes(skill)) {
+                        skills.push(skill);
+                        addSkillChip(skill);
+                    }
+                });
+            }
+        } catch (e) {
+            console.error('Failed to parse initial skills:', e);
+        }
+    }
+
     if (skillsInput) {
         skillsInput.addEventListener('keydown', function (e) {
             if (e.key === 'Enter') {

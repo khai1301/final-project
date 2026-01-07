@@ -216,7 +216,11 @@ class TutorProfileController extends Controller
             DB::commit();
 
             return redirect()->route('tutor.profile')
-                ->with('success', 'Cập nhật hồ sơ thành công!');
+                ->with('swal', [
+                    'type' => 'success',
+                    'title' => 'Thành công',
+                    'text' => 'Cập nhật hồ sơ thành công!'
+                ]);
 
         } catch (\Exception $e) {
             DB::rollBack();
@@ -246,7 +250,11 @@ class TutorProfileController extends Controller
 
         $certificate->delete();
 
-        return back()->with('success', __('messages.certificate_deleted'));
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Đã xóa',
+            'text' => 'Chứng chỉ đã được xóa'
+        ]);
     }
 
     /**
@@ -286,8 +294,18 @@ class TutorProfileController extends Controller
 
         // Get filter options
         $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
+        
+        // For AI recommendations: get latest request ID if student is logged in and verified
+        $latestRequestId = null;
+        if (auth()->check() && auth()->user()->isStudent() && auth()->user()->is_verified) {
+            $latestRequest = \App\Models\Request::where('student_id', auth()->id())
+                ->where('status', 'active')
+                ->latest()
+                ->first();
+            $latestRequestId = $latestRequest?->id;
+        }
 
-        return view('frontend.tutors.browse', compact('tutors', 'allSubjects'));
+        return view('frontend.tutors.browse', compact('tutors', 'allSubjects', 'latestRequestId'));
     }
 
     /**

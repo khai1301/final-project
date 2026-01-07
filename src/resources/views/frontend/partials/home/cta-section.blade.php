@@ -8,7 +8,7 @@
     <div class="container home-cta-content">
         <h2 class="home-cta-title">Ready to master a new skill?</h2>
         <p class="home-cta-description">
-            Join thousands of students and tutors on SmartTutor today. Whether you're learning or teaching, we have the perfect tools for you.
+            {{ __('ui.cta_description') }}
         </p>
         <div class="home-cta-buttons">
             <button class="btn home-cta-btn home-cta-btn-primary">
@@ -18,6 +18,6 @@
                 Become a Tutor
             </button>
         </div>
-        <p class="home-cta-note">No credit card required for sign up</p>
+        <p class="home-cta-note">{{ __('ui.no_credit_card') }}</p>
     </div>
 </section>

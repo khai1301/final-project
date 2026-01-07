@@ -7,6 +7,7 @@ import './admin/crud.js';
 import './admin/requests.js'
 import './frontend/home.js';
 import './frontend/student-request.js';
+import './frontend/student-profile.js';
 import './frontend/tutor-profile.js';
 import './frontend/teaching-areas.js';
 import './frontend/user-location.js';

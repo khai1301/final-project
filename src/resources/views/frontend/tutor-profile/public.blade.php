@@ -10,12 +10,7 @@
                 <div class="card-body p-4">
                     <div class="row align-items-center">
                         <div class="col-md-3 text-center mb-3 mb-md-0">
-                            @php
-                                $avatarUrl = $tutor->avatar 
-                                    ? \Storage::disk('s3')->url($tutor->avatar) 
-                                    : 'https://ui-avatars.com/api/?name='.urlencode($tutor->name).'&size=200';
-                            @endphp
-                            <img src="{{ $avatarUrl }}" alt="{{ $tutor->name }}" 
+                            <img src="{{ $tutor->avatar_url }}" alt="{{ $tutor->name }}" 
                                  class="rounded-circle" width="150" height="150" style="object-fit: cover;">
                         </div>
                         <div class="col-md-9">
@@ -24,25 +19,20 @@
                                 @if($tutor->tutorProfile->is_approved)
                                 <span class="badge bg-primary ms-2">
                                     <span class="material-symbols-outlined" style="font-size: 16px;">verified</span>
-                                    Verified
+                                    {{ __('ui.verified') }}
                                 </span>
                                 @endif
                             </h1>
                             <div class="d-flex align-items-center gap-3 mb-3">
                                 <div>
-                                    <span class="material-symbols-outlined text-warning">star</span>
-                                    <strong>{{ $tutor->tutorProfile->rating_avg ?? '5.0' }}</strong>
-                                    <span class="text-muted">({{ $tutor->tutorProfile->review_count ?? 0 }} reviews)</span>
-                                </div>
-                                <div>
                                     <span class="material-symbols-outlined">work</span>
-                                    <strong>{{ $tutor->tutorProfile->experience_years ?? 0 }}</strong> years exp
+                                    <strong>{{ $tutor->tutorProfile->experience_years ?? 0 }}</strong> năm kinh nghiệm
                                 </div>
                             </div>
                             
                             @if($tutor->tutorProfile->subjects && $tutor->tutorProfile->subjects->count() > 0)
                             <div class="mb-3">
-                                <strong class="d-block mb-2">Subjects:</strong>
+                                <strong class="d-block mb-2">{{ __('ui.subjects') }}:</strong>
                                 <div class="d-flex flex-wrap gap-2">
                                     @foreach($tutor->tutorProfile->subjects as $subject)
                                     <span class="badge bg-light text-dark">{{ $subject->name }}</span>
@@ -58,13 +48,13 @@
                                         <input type="hidden" name="tutor_id" value="{{ $tutor->id }}">
                                         <button type="submit" class="btn btn-primary">
                                             <span class="material-symbols-outlined" style="font-size: 18px;">person_add</span>
-                                            Connect with {{ $tutor->name }}
+                                            {{ __('ui.connect_with') }} {{ $tutor->name }}
                                         </button>
                                     </form>
                                 @endif
                             @else
                                 <a href="{{ route('login') }}" class="btn btn-primary mt-3">
-                                    Login to Connect
+                                    {{ __('ui.login_to_connect') }}
                                 </a>
                             @endauth
                         </div>
@@ -76,7 +66,7 @@
             @if($tutor->tutorProfile->bio)
             <div class="card shadow-sm border-0 mb-4">
                 <div class="card-header bg-white">
-                    <h3 class="h5 mb-0">About Me</h3>
+                    <h3 class="h5 mb-0">{{ __('ui.about_me') }}</h3>
                 </div>
                 <div class="card-body">
                     <p class="mb-0">{{ $tutor->tutorProfile->bio }}</p>
@@ -90,7 +80,7 @@
                 <div class="card-header bg-white">
                     <h3 class="h5 mb-0">
                         <span class="material-symbols-outlined align-middle me-2">school</span>
-                        Education
+                        {{ __('ui.education') }}
                     </h3>
                 </div>
                 <div class="card-body">
@@ -105,7 +95,7 @@
                 <div class="card-header bg-white">
                     <h3 class="h5 mb-0">
                         <span class="material-symbols-outlined align-middle me-2">workspace_premium</span>
-                        Certificates ({{ $tutor->tutorProfile->certificates->count() }})
+                        {{ __('ui.certificates') }} ({{ $tutor->tutorProfile->certificates->count() }})
                     </h3>
                 </div>
                 <div class="card-body">
@@ -134,7 +124,7 @@
                 <div class="card-header bg-white">
                     <h3 class="h5 mb-0">
                         <span class="material-symbols-outlined align-middle me-2">payments</span>
-                        Pricing
+                        {{ __('ui.pricing') }}
                     </h3>
                 </div>
                 <div class="card-body text-center">
@@ -153,7 +143,7 @@
                 <div class="card-header bg-white">
                     <h3 class="h5 mb-0">
                         <span class="material-symbols-outlined align-middle me-2">contact_mail</span>
-                        Contact
+                        {{ __('ui.contact') }}
                     </h3>
                 </div>
                 <div class="card-body">
@@ -200,7 +190,7 @@
                 <div class="card-header bg-white">
                     <h3 class="h5 mb-0">
                         <span class="material-symbols-outlined align-middle me-2">location_on</span>
-                        Teaching Locations
+                        {{ __('ui.teaching_locations') }}
                     </h3>
                 </div>
                 <div class="card-body">

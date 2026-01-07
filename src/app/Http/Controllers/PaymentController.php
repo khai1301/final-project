@@ -17,6 +17,32 @@ class PaymentController extends Controller
     }
 
     /**
+     * Display payment history for the authenticated user
+     */
+    public function history()
+    {
+        $payments = \App\Models\Payment::where('user_id', auth()->id())
+            ->with(['matching.student', 'matching.tutor', 'matching.request'])
+            ->latest()
+            ->paginate(20);
+        
+        $stats = [
+            'total_spent' => \App\Models\Payment::where('user_id', auth()->id())
+                ->where('status', 'completed')
+                ->sum('amount'),
+            'total_transactions' => \App\Models\Payment::where('user_id', auth()->id())
+                ->where('status', 'completed')
+                ->count(),
+            'pending_payments' => \App\Models\Payment::where('user_id', auth()->id())
+                ->where('status', 'pending')
+                ->count(),
+        ];
+        
+        return view('frontend.payment.history', compact('payments', 'stats'));
+    }
+
+
+    /**
      * Create payment link for contact unlock
      */
     public function createUnlockPayment(Matching $matching)
@@ -108,7 +134,11 @@ class PaymentController extends Controller
             $this->paymentService->completePayment($orderCode, $paymentInfo);
             
             return redirect()->route('matching.my-requests')
-                ->with('success', 'Payment successful! Contact unlocked.');
+                ->with('swal', [
+                    'type' => 'success',
+                    'title' => 'Thanh toán thành công',
+                    'text' => 'Thông tin liên hệ đã được mở khóa!'
+                ]);
         }
 
         // Default fallback

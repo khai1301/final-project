@@ -12,23 +12,15 @@
             <div class="col-md-6 col-lg-3">
                 <div class="home-tutor-card h-100">
                     <div class="home-tutor-header">
-                        <div class="home-tutor-avatar-wrapper">
-                            @php
-                                $avatarUrl = $tutor->avatar 
-                                    ? \Storage::disk('s3')->url($tutor->avatar) 
-                                    : 'https://ui-avatars.com/api/?name='.urlencode($tutor->name).'&size=100';
-                            @endphp
-                            <img src="{{ $avatarUrl }}" alt="{{ $tutor->name }}" class="home-tutor-avatar">
+                    <div class="home-tutor-avatar-wrapper">
+                            <img src="{{ $tutor->avatar_url }}" alt="{{ $tutor->name }}" class="home-tutor-avatar">
                             @if($tutor->tutorProfile && $tutor->tutorProfile->is_approved)
                             <div class="home-tutor-verified">
                                 <span class="material-symbols-outlined">check</span>
                             </div>
                             @endif
                         </div>
-                        <div class="home-tutor-rating">
-                            <span class="material-symbols-outlined">star</span>
-                            {{ $tutor->tutorProfile->rating_avg ?? '5.0' }}
-                        </div>
+
                     </div>
                     <div>
                         <h3 class="home-tutor-name">{{ $tutor->name }}</h3>

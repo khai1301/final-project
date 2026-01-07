@@ -19,7 +19,7 @@ class RequestBrowseController extends Controller
         $provinceId = $request->input('province_id');
         
         $requests = StudentRequest::with(['student', 'subject', 'educationLevel', 'learningMode', 'province', 'ward'])
-            ->where('status', 'open')
+            ->available()  // Use scope to filter only unmatched requests
             
             // Search by title or description
             ->when($search, function($query) use ($search) {
@@ -62,12 +62,20 @@ class RequestBrowseController extends Controller
             });
         }
         
+        // For AI recommendations: get tutor profile ID if tutor is logged in
+        $tutorProfileId = null;
+        if (auth()->check() && auth()->user()->isTutor()) {
+            $tutorProfile = \App\Models\TutorProfile::where('user_id', auth()->id())->first();
+            $tutorProfileId = $tutorProfile?->id;
+        }
+        
         return view('frontend.requests.browse', compact(
             'requests', 
             'subjects', 
             'educationLevels', 
             'learningModes',
-            'provinces'
+            'provinces',
+            'tutorProfileId'
         ));
     }
 }

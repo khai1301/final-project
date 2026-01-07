@@ -404,4 +404,20 @@ return [
     'enter_new_password' => 'Nhập mật khẩu mới',
     'reset_password_instructions' => 'Nhập mật khẩu mới của bạn',
     'reset_password_button' => 'Đặt lại mật khẩu',
+    
+    // Tutor Profile Page
+    'about_me' => 'Giới thiệu',
+    'certificates' => 'Chứng chỉ',
+    'pricing' => 'Học phí',
+    'teaching_locations' => 'Khu vực dạy',
+    'connect_with' => 'Kết nối với',
+    
+    // Notifications
+    'mark_all_read' => 'Đánh dấu tất cả đã đọc',
+    'mark_as_read' => 'Đánh dấu đã đọc',
+    'no_notifications' => 'Chưa có thông báo nào',
+    
+    // CTA Section
+    'cta_description' => 'Tham gia cùng hàng nghìn học sinh và gia sư trên SmartTutor ngay hôm nay. Dù bạn đang học hay dạy, chúng tôi đều có công cụ hoàn hảo cho bạn.',
+    'no_credit_card' => 'Không cần thẻ tín dụng để đăng ký',
 ];

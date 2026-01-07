@@ -17,9 +17,9 @@
             @endguest
         </div>
 
-        {{-- AI Recommendations Section (For Students with Requests) --}}
+        {{-- AI Recommendations Section (For Verified Students with Active Requests) --}}
         @auth
-            @if(auth()->user()->isStudent() && isset($latestRequestId) && $latestRequestId)
+            @if(auth()->user()->isStudent() && auth()->user()->is_verified && isset($latestRequestId) && $latestRequestId)
             <div class="mb-5">
                 <div class="d-flex align-items-center gap-2 mb-3">
                     <div class="ai-icon-wrapper">
@@ -52,22 +52,14 @@
                 <div class="home-tutor-card">
                     <div class="home-tutor-header">
                         <div class="home-tutor-avatar-wrapper">
-                            @php
-                                $avatarUrl = $tutor->avatar 
-                                    ? \Storage::disk('s3')->url($tutor->avatar) 
-                                    : 'https://ui-avatars.com/api/?name='.urlencode($tutor->name).'&size=100';
-                            @endphp
-                            <img src="{{ $avatarUrl }}" alt="{{ $tutor->name }}" class="home-tutor-avatar">
+                            <img src="{{ $tutor->avatar_url }}" alt="{{ $tutor->name }}" class="home-tutor-avatar">
                             @if($tutor->tutorProfile && $tutor->tutorProfile->is_approved)
                             <div class="home-tutor-verified">
                                 <span class="material-symbols-outlined">check</span>
                             </div>
                             @endif
                         </div>
-                        <div class="home-tutor-rating">
-                            <span class="material-symbols-outlined">star</span> 
-                            {{ $tutor->tutorProfile->rating_avg ?? '5.0' }}
-                        </div>
+
                     </div>
                     <div>
                         <h3 class="home-tutor-name">{{ $tutor->name }}</h3>
@@ -99,19 +91,18 @@
 
                         @auth
                             @if(auth()->user()->isStudent())
-                                @if(isset($latestRequest) && $latestRequest)
-                                    {{-- Student has active request - show connection status --}}
-                                    @if(isset($tutor->connection_status))
-                                        @if($tutor->connection_status == 'accepted')
-                                            <button class="home-tutor-view-btn" style="background: #10b981; cursor: not-allowed;" disabled>
-                                                ✓ Đã kết nối
-                                            </button>
-                                        @elseif($tutor->connection_status == 'pending')
-                                            <button class="home-tutor-view-btn" style="background: #f59e0b; cursor: not-allowed;" disabled>
-                                                ⏳ Chờ xác nhận
-                                            </button>
-                                        @endif
+                                {{-- Check connection status if student has request --}}
+                                @if(isset($tutor->connection_status))
+                                    @if($tutor->connection_status == 'accepted')
+                                        <button class="home-tutor-view-btn" style="background: #10b981; cursor: not-allowed;" disabled>
+                                            ✓ Đã kết nối
+                                        </button>
+                                    @elseif($tutor->connection_status == 'pending')
+                                        <button class="home-tutor-view-btn" style="background: #f59e0b; cursor: not-allowed;" disabled>
+                                            ⏳ Chờ xác nhận
+                                        </button>
                                     @else
+                                        {{-- No connection yet - show connect button --}}
                                         <form action="{{ route('matching.connect') }}" method="POST" class="w-100">
                                             @csrf
                                             <input type="hidden" name="tutor_id" value="{{ $tutor->id }}">
@@ -121,10 +112,14 @@
                                         </form>
                                     @endif
                                 @else
-                                    {{-- Student has no active request --}}
-                                    <a href="{{ route('student.request.create') }}" class="home-tutor-view-btn">
-                                        Tạo yêu cầu học
-                                    </a>
+                                    {{-- No connection status - show connect button (controller will validate) --}}
+                                    <form action="{{ route('matching.connect') }}" method="POST" class="w-100">
+                                        @csrf
+                                        <input type="hidden" name="tutor_id" value="{{ $tutor->id }}">
+                                        <button type="submit" class="home-tutor-view-btn">
+                                            Kết nối ngay
+                                        </button>
+                                    </form>
                                 @endif
                             @else
                                 <a href="{{ route('tutor.show', $tutor->id) }}" class="home-tutor-view-btn">Xem profile</a>

@@ -30,7 +30,7 @@
                     </div>
                     @endif
 
-                    <form action="{{ route('student.profile.update') }}" method="POST" enctype="multipart/form-data">
+                    <form action="{{ route('student.profile.update') }}" method="POST" enctype="multipart/form-data" id="profileForm">
                         @csrf
                         @method('PUT')
 
@@ -41,9 +41,12 @@
                                     ? Storage::disk('s3')->url($user->avatar) 
                                     : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=200';
                             @endphp
-                            <img src="{{ $avatarUrl }}" alt="Avatar" 
+                            <img id="avatarPreview" 
+                                 src="{{ $avatarUrl }}" 
+                                 alt="Avatar" 
                                  class="rounded-circle mb-3" 
-                                 width="150" height="150" 
+                                 width="150" 
+                                 height="150" 
                                  style="object-fit: cover;">
                             <div>
                                 <label for="avatar" class="btn btn-outline-primary btn-sm">
@@ -168,40 +171,9 @@
 
 @push('scripts')
 <script>
-// Location cascading dropdown
-const wardsData = @json($wards);
-const provinceSelect = document.getElementById('province_id');
-const wardSelect = document.getElementById('ward_id');
-
-provinceSelect.addEventListener('change', function() {
-    const selectedProvinceId = this.value;
-    const selectedProvince = @json($provinces).find(p => p.id == selectedProvinceId);
-    
-    // Clear wards
-    wardSelect.innerHTML = '<option value="">-- Chọn quận/huyện --</option>';
-    
-    if (selectedProvince) {
-        const filteredWards = wardsData.filter(w => w.province_code === selectedProvince.code);
-        filteredWards.forEach(ward => {
-            const option = document.createElement('option');
-            option.value = ward.id;
-            option.textContent = ward.name;
-            wardSelect.appendChild(option);
-        });
-    }
-});
-
-// Avatar preview
-document.getElementById('avatar').addEventListener('change', function(e) {
-    const file = e.target.files[0];
-    if (file) {
-        const reader = new FileReader();
-        reader.onload = function(e) {
-            document.querySelector('.rounded-circle').src = e.target.result;
-        };
-        reader.readAsDataURL(file);
-    }
-});
+// Pass data to JS module
+window.wardsData = @json($wards);
+window.provincesData = @json($provinces);
 </script>
 @endpush
 @endsection

@@ -46,12 +46,7 @@
                         <div class="row g-4 mb-4">
                             <div class="col-md-4 text-center">
                                 <div class="profile-photo-container">
-                                    @php
-                                        $avatarUrl = $user->avatar 
-                                            ? \Storage::disk('s3')->url($user->avatar) 
-                                            : 'https://ui-avatars.com/api/?name='.urlencode($user->name).'&size=150&background=0d6efd&color=fff';
-                                    @endphp
-                                    <img src="{{ $avatarUrl }}" 
+                                    <img src="{{ $user->avatar_url }}" 
                                          alt="Profile Photo" class="profile-photo mb-3" id="profilePhotoPreview">
                                     <input type="file" class="d-none" id="profilePhotoInput" name="avatar" accept="image/*">
                                     <label for="profilePhotoInput" class="btn btn-outline-primary btn-sm">

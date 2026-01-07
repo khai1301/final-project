@@ -68,7 +68,11 @@ class MatchingController extends Controller
                 ->first();
             
             if (!$latestRequest) {
-                return back()->withErrors(['error' => 'Bạn cần tạo yêu cầu học trước khi kết nối với gia sư']);
+                return back()->with('swal', [
+                    'type' => 'warning',
+                    'title' => 'Cần tạo yêu cầu học',
+                    'text' => 'Bạn cần tạo yêu cầu học trước khi kết nối với gia sư.'
+                ]);
             }
             
             $tutorId = $request->tutor_id;
@@ -91,8 +95,10 @@ class MatchingController extends Controller
             
             // CHECK: Tutor must be approved to send connections
             if (!$user->tutorProfile || !$user->tutorProfile->is_approved) {
-                return back()->withErrors([
-                    'error' => __('messages.tutor_awaiting_approval')
+                return back()->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Lỗi',
+                    'text' => __('messages.tutor_awaiting_approval')
                 ]);
             }
             
@@ -102,19 +108,47 @@ class MatchingController extends Controller
             $tutorId = $user->id;
             $requestId = $request->request_id;
         } else {
-            return back()->withErrors(['error' => 'Invalid user role.']);
+            return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Lỗi phân quyền',
+                'text' => 'Vai trò người dùng không hợp lệ.'
+            ]);
+        }
+
+        // NEW: Check for any active connection (pending or accepted)
+        $hasActiveConnection = Matching::where(function($q) use ($user) {
+                $q->where('student_id', $user->id)
+                  ->orWhere('tutor_id', $user->id);
+            })
+            ->whereIn('status', ['pending', 'accepted'])
+            ->exists();
+        
+        if ($hasActiveConnection) {
+            return back()->with('swal', [
+                'type' => 'warning',
+                'title' => 'Kết nối đang tồn tại',
+                'text' => 'Bạn đang có kết nối chưa hoàn thành. Vui lòng hoàn tất kết nối hiện tại trước khi tạo kết nối mới.'
+            ]);
         }
 
         // Check for existing active request for this specific learning request
-        if (Matching::where('request_id', $requestId)
-                    ->where('tutor_id', $tutorId)
-                    ->whereIn('status', ['pending', 'accepted'])
-                    ->exists()) {
-            return back()->withErrors(['error' => 'You have already sent a connection request for this learning request.']);
-        }
-
+        // Use lockForUpdate to prevent race condition
         DB::beginTransaction();
         try {
+            $existing = Matching::where('request_id', $requestId)
+                        ->where('tutor_id', $tutorId)
+                        ->lockForUpdate()
+                        ->first();
+            
+            if ($existing && in_array($existing->status, ['pending', 'accepted'])) {
+                DB::rollBack();
+                return back()->with('swal', [
+                    'type' => 'info',
+                    'title' => 'Kết nối đã tồn tại',
+                    'text' => 'Bạn đã gửi yêu cầu kết nối cho yêu cầu học tập này rồi.'
+                ]);
+            }
+
             // Create matching
             $matching = Matching::create([
                 'request_id' => $requestId,
@@ -133,6 +167,7 @@ class MatchingController extends Controller
                 'type' => 'connect_request',
                 'title' => 'New Connection Request',
                 'message' => $user->name . ' wants to connect with you.',
+                'action_url' => route('matching.my-requests'),
             ]);
 
             DB::commit();
@@ -145,7 +180,14 @@ class MatchingController extends Controller
             
         } catch (\Exception $e) {
             DB::rollBack();
-            return back()->withErrors(['error' => 'Failed to send request: ' . $e->getMessage()]);
+            \Log::error('Matching creation failed', [
+                'user_id' => $user->id,
+                'request_id' => $requestId,
+                'error' => $e->getMessage()
+            ]);
+            return back()->withErrors([
+                'error' => 'Không thể tạo kết nối. Vui lòng thử lại sau.'
+            ]);
         }
     }
 
@@ -157,17 +199,27 @@ class MatchingController extends Controller
         $matching = Matching::findOrFail($id);
         $user = auth()->user();
 
-        // Verify user is the receiver
+        // Verify user is the receiver (not the sender)
         if ($matching->sender_id == $user->id) {
             return back()->withErrors(['error' => __('messages.cannot_accept_own_request')]);
         }
 
         // Verify user is part of this matching
         if ($matching->student_id != $user->id && $matching->tutor_id != $user->id) {
-            abort(403);
+            abort(403, 'Bạn không có quyền thực hiện hành động này');
+        }
+
+        // NEW: Check matching status - only pending can be accepted
+        if ($matching->status !== 'pending') {
+            return back()->withErrors([
+                'error' => 'Yêu cầu này không còn ở trạng thái chờ và không thể chấp nhận'
+            ]);
         }
 
         $matching->accept();
+
+        // NEW: Mark the request as matched
+        $matching->request->update(['is_matched' => true]);
 
         return back()->with('swal', [
             'type' => 'success',
@@ -188,14 +240,21 @@ class MatchingController extends Controller
         $matching = Matching::findOrFail($id);
         $user = auth()->user();
 
-        // Verify user is the receiver
+        // Verify user is the receiver (not the sender)
         if ($matching->sender_id == $user->id) {
             return back()->withErrors(['error' => __('messages.cannot_decline_own_request')]);
         }
 
         // Verify user is part of this matching
         if ($matching->student_id != $user->id && $matching->tutor_id != $user->id) {
-            abort(403);
+            abort(403, 'Bạn không có quyền thực hiện hành động này');
+        }
+
+        // NEW: Check matching status - only pending can be declined
+        if ($matching->status !== 'pending') {
+            return back()->withErrors([
+                'error' => 'Yêu cầu này không còn ở trạng thái chờ và không thể từ chối'
+            ]);
         }
 
         $matching->update([
@@ -210,6 +269,7 @@ class MatchingController extends Controller
             'type' => 'connect_declined',
             'title' => 'Yêu cầu bị từ chối',
             'message' => $matching->receiver->name . ' đã từ chối yêu cầu của bạn. Lý do: ' . $request->reason,
+            'action_url' => route('matching.my-requests'),
         ]);
 
         return back()->with('swal', [
@@ -236,6 +296,13 @@ class MatchingController extends Controller
             return back()->withErrors(['error' => __('messages.can_only_cancel_own')]);
         }
 
+        // NEW: Check matching status - only pending can be cancelled
+        if ($matching->status !== 'pending') {
+            return back()->withErrors([
+                'error' => 'Chỉ có thể hủy yêu cầu đang ở trạng thái chờ'
+            ]);
+        }
+
         $matching->update([
             'status' => 'cancelled',
             'cancel_reason' => $request->reason
@@ -249,6 +316,7 @@ class MatchingController extends Controller
             'type' => 'connect_cancelled',
             'title' => 'Yêu cầu đã bị hủy',
             'message' => $user->name . ' đã hủy yêu cầu kết nối. Lý do: ' . $request->reason,
+            'action_url' => route('matching.my-requests'),
         ]);
 
         return back()->with('swal', [

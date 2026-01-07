@@ -15,10 +15,14 @@
     <div class="row">
         {{-- Filter Sidebar --}}
         <div class="col-lg-3 mb-4">
-            <div class="card border-0 shadow-sm">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white">
+                    <h5 class="mb-0">
+                        <span class="material-symbols-outlined align-middle">filter_list</span>
+                        {{ __('ui.filters') }}
+                    </h5>
+                </div>
                 <div class="card-body">
-                    <h5 class="fw-bold mb-3">{{ __('ui.filter_section') }}</h5>
-                    
                     <form action="{{ route('tutors.browse') }}" method="GET" id="filterForm">
                         {{-- Search --}}
                         <div class="mb-3">
@@ -61,10 +65,11 @@
                         {{-- Buttons --}}
                         <div class="d-grid gap-2">
                             <button type="submit" class="btn btn-primary">
-                                <i class="bi bi-search"></i> {{ __('forms.search') }}
+                                <span class="material-symbols-outlined" style="font-size: 18px;">search</span>
+                                {{ __('forms.search') }}
                             </button>
-                            <a href="{{ route('tutors.browse') }}" class="btn btn-outline-secondary">
-                                <i class="bi bi-arrow-clockwise"></i> {{ __('ui.reset') }}
+                            <a href="{{ route('tutors.browse') }}" class="btn btn-outline-secondary btn-sm">
+                                {{ __('ui.reset') }}
                             </a>
                         </div>
                     </form>
@@ -80,6 +85,33 @@
                     {{ __('ui.found_tutors', ['count' => $tutors->total()]) }}
                 </p>
             </div>
+
+            {{-- AI Recommendations Section (For Verified Students with Active Requests) --}}
+            @auth
+                @if(auth()->user()->isStudent() && auth()->user()->is_verified && isset($latestRequestId) && $latestRequestId)
+                <div class="mb-5">
+                    <div class="d-flex align-items-center gap-2 mb-3">
+                        <div class="ai-icon-wrapper">
+                            <span class="material-symbols-outlined">psychology</span>
+                        </div>
+                        <div>
+                            <h3 class="mb-0 h5">{{ __('ui.personalized_recommendations') }}</h3>
+                            <small class="text-muted">{{ __('ui.ai_analyzed_best_match') }}</small>
+                        </div>
+                    </div>
+                    
+                    <div class="row g-4" 
+                         data-ai-tutors 
+                         data-request-id="{{ $latestRequestId }}">
+                        {{-- AI will auto-load recommendations here --}}
+                        <div class="col-12 text-center py-5">
+                            <div class="spinner-border text-primary mb-3" role="status"></div>
+                            <p class="text-muted">Đang phân tích với AI để tìm gia sư phù hợp nhất...</p>
+                        </div>
+                    </div>
+                </div>
+                @endif
+            @endauth
 
             @if($tutors->count() > 0)
                 <div class="row g-4">
