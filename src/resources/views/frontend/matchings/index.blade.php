@@ -43,7 +43,17 @@
                                  alt="{{ $otherUser->name }}" class="rounded-circle" width="60" height="60">
                             <div>
                                 <h5 class="mb-1">{{ $otherUser->name }}</h5>
-                                <p class="text-muted small mb-0">{{ $otherUser->email }}</p>
+                                @if($matching->contact_unlocked)
+                                    <p class="text-muted small mb-0">{{ $otherUser->email }}</p>
+                                    @if($otherUser->phone)
+                                        <p class="text-muted small mb-0">{{ $otherUser->phone }}</p>
+                                    @endif
+                                @else
+                                    <p class="text-muted small mb-0">
+                                        <span class="material-symbols-outlined align-middle" style="font-size: 14px;">lock</span>
+                                        {{ __('ui.email_locked') }}
+                                    </p>
+                                @endif
                                 <span class="badge bg-{{ $otherUser->isStudent() ? 'info' : 'success' }}-subtle text-{{ $otherUser->isStudent() ? 'info' : 'success' }}">
                                     {{ $otherUser->isStudent() ? 'Student' : 'Tutor' }}
                                 </span>
