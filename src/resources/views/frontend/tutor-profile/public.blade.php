@@ -11,8 +11,8 @@
                         $avatarUrl = $tutor->avatar ? \Storage::disk('s3')->url($tutor->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($tutor->name) . '&size=200&background=3780f6&color=fff';
                     @endphp
                     <img src="{{ $avatarUrl }}" alt="{{ $tutor->name }}" 
-                         class="rounded-circle border" 
-                         width="120" height="120" style="object-fit: cover;">
+                         class="rounded-circle border avatar-img" 
+                         width="120" height="120" loading="lazy">
                 </div>
                 <div class="col-md">
                     <div class="d-flex align-items-center gap-2 mb-2">

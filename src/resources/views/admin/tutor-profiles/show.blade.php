@@ -27,13 +27,13 @@
             <div class="card border-0 shadow-sm mb-4">
                 <div class="card-header bg-white border-bottom">
                     <div class="d-flex justify-content-between align-items-center">
-                        <div class="d-flex align-items-center gap-2">
                             <div>
-                                <h4 class="mb-1">Hồ sơ: {{ $profile->user->name }}</h4>
+                                <h4 class="mb-1 d-flex align-items-center gap-2">
+                                    Hồ sơ: {{ $profile->user->name }}
+                                    <x-verified-badge :user="$profile->user" />
+                                </h4>
                                 <small class="text-muted">ID hồ sơ #{{ $profile->id }}</small>
                             </div>
-                            <x-verified-badge :user="$profile->user" />
-                        </div>
                         @if($profile->is_approved)
                             <span class="badge bg-success">Đã duyệt</span>
                         @else
@@ -48,7 +48,7 @@
                         <h5 class="text-muted text-uppercase small fw-bold mb-3">Môn học</h5>
                         <div class="d-flex flex-wrap gap-2">
                             @foreach($profile->subjects as $subject)
-                                <span class="badge bg-primary-light text-primary px-3 py-2">{{ $subject }}</span>
+                                <span class="badge bg-primary-light text-primary px-3 py-2">{{ $subject->name }}</span>
                             @endforeach
                         </div>
                     </div>
@@ -227,7 +227,7 @@
                     <div class="text-center mb-3">
                         @if($profile->user->avatar)
                             <img src="{{ \Storage::disk('s3')->url($profile->user->avatar) }}" 
-                                 alt="Avatar" class="rounded-circle mb-2" width="80" height="80">
+                                 alt="Avatar" class="rounded-circle mb-2" width="80" height="80" style="object-fit: cover;">
                         @else
                             <img src="https://ui-avatars.com/api/?name={{ urlencode($profile->user->name) }}&size=80&background=3780f6&color=fff" 
                                  alt="Avatar" class="rounded-circle mb-2" width="80" height="80">

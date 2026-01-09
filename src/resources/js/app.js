@@ -15,3 +15,4 @@ import './frontend/user-location.js';
 import './frontend/tutor-location.js';
 import './frontend/tutor-ai-autofill.js';
 import './ai-recommendations.js';
+import './sweetalert-handler.js';

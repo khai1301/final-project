@@ -140,20 +140,24 @@
                                         </div>
                                         
                                         @if($showContact)
-                                            <p class="mb-0 text-success">
-                                                <i class="bi bi-envelope me-1"></i> {{ $request->student->email }}
-                                            </p>
-                                            @if($request->student->phone)
-                                                <p class="mb-0 text-success">
-                                                    <i class="bi bi-telephone me-1"></i> {{ $request->student->phone }}
+                                            <div class="mt-2 p-2 bg-success bg-opacity-10 rounded">
+                                                <p class="mb-1 text-success fw-medium">
+                                                    <i class="bi bi-envelope-fill me-2"></i>{{ $request->student->email }}
                                                 </p>
-                                            @endif
+                                                @if($request->student->phone)
+                                                    <p class="mb-0 text-success fw-medium">
+                                                        <i class="bi bi-telephone-fill me-2"></i>{{ $request->student->phone }}
+                                                    </p>
+                                                @endif
+                                            </div>
                                         @else
-                                            <p class="text-muted mb-0">
-                                                <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
-                                                Thông tin liên hệ bị khóa
-                                            </p>
-                                            <small class="text-muted">Kết nối và thanh toán để xem</small>
+                                            <div class="mt-2 p-2 bg-secondary bg-opacity-10 rounded text-center">
+                                                <p class="text-muted mb-1 fw-medium">
+                                                    <span class="material-symbols-outlined align-middle" style="font-size: 18px;">lock</span>
+                                                    Thông tin liên hệ bị khóa
+                                                </p>
+                                                <small class="text-muted d-block">Kết nối & mở khóa để xem</small>
+                                            </div>
                                         @endif
                                     </div>
                                 </div>

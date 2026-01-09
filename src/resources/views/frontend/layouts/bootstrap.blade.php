@@ -52,10 +52,6 @@
         .text-primary {
             color: var(--primary) !important;
         }
-        
-        .bg-primary {
-            background-color: var(--primary) !important;
-        }
     </style>
     
     @stack('styles')
@@ -64,7 +60,7 @@
     {{-- Navbar --}}
     @include('frontend.partials.navbar')
     
-    @yield('content')
+        @yield('content')
     
     {{-- Footer --}}
     @include('frontend.partials.footer')
@@ -74,41 +70,17 @@
     
     <!-- SweetAlert2 -->
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
-    <!-- SweetAlert Handler -->
-    @if(session('swal'))
+
     <script>
-        Swal.fire({
-            icon: '{{ session('swal.type') }}',
-            title: '{{ session('swal.title') }}',
-            text: '{{ session('swal.text') }}',
-            timer: 3000,
-            showConfirmButton: true
-        });
+        window.Laravel = {!! json_encode([
+            'csrfToken' => csrf_token(),
+            'flash' => [
+                'swal' => session('swal'),
+                'success' => session('success'),
+                'error' => session('error'),
+            ]
+        ]) !!};
     </script>
-    @endif
-    
-@if(session('success'))
-    <script>
-        Swal.fire({
-            icon: 'success',
-            title: 'Thành công!',
-            text: '{{ session('success') }}',
-            timer: 3000
-        });
-    </script>
-    @endif
-    
-    @if(session('error'))
-    <script>
-        Swal.fire({
-            icon: 'error',
-            title: 'Lỗi!',
-            text: '{{ session('error') }}',
-            timer: 3000
-        });
-    </script>
-    @endif
     
     @stack('scripts')
 </body>

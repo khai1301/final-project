@@ -148,6 +148,9 @@ Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->grou
     // Location Sync Management
     Route::get('/location-sync', [\App\Http\Controllers\Admin\LocationSyncController::class, 'index'])->name('location-sync.index');
     Route::post('/location-sync', [\App\Http\Controllers\Admin\LocationSyncController::class, 'sync'])->name('location-sync.sync');
+
+    // Payment Management
+    Route::resource('payments', \App\Http\Controllers\Admin\PaymentController::class)->only(['index', 'show']);
 });
 
 // CV Parser routes (for tutors)

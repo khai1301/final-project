@@ -65,7 +65,7 @@ class Matching extends Model
      */
     public function notifications(): HasMany
     {
-        return $this->hasMany(Notification::class, 'data->matching_id');
+        return $this->hasMany(Notification::class, 'matching_id');
     }
 
     /**

@@ -14,13 +14,15 @@
     </div>
 
     @if($requests->isEmpty())
-        <div class="card shadow-sm">
+        <div class="card shadow-sm border-0">
             <div class="card-body text-center py-5">
-                <span class="material-symbols-outlined d-block mb-3 text-muted" style="font-size: 64px;">assignment_late</span>
-                <h5>Bạn chưa có yêu cầu học tập nào</h5>
-                <p class="text-muted">Tạo yêu cầu học tập để tìm gia sư phù hợp với bạn</p>
-                <a href="{{ route('student.request.create') }}" class="btn btn-primary mt-3">
-                    <span class="material-symbols-outlined align-middle" style="font-size: 18px;">add</span>
+                <div class="mb-4 text-muted opacity-25">
+                    <span class="material-symbols-outlined" style="font-size: 80px;">assignment_add</span>
+                </div>
+                <h4 class="mb-2">Bạn chưa có yêu cầu học tập nào</h4>
+                <p class="text-muted mb-4">Tạo yêu cầu học tập để tìm gia sư phù hợp với bạn ngay hôm nay</p>
+                <a href="{{ route('student.request.create') }}" class="btn btn-primary px-4 py-2">
+                    <span class="material-symbols-outlined align-middle me-1" style="font-size: 20px;">add_circle</span>
                     Tạo yêu cầu đầu tiên
                 </a>
             </div>
@@ -29,7 +31,7 @@
         <div class="row g-4">
             @foreach($requests as $req)
             <div class="col-12">
-                <div class="card shadow-sm">
+                <div class="card card-hover shadow-sm">
                     <div class="card-body">
                         <div class="row">
                             <div class="col-md-8">

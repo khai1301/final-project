@@ -48,6 +48,18 @@
                 @endif
             </a>
         </div>
+        <div class="nav-item">
+            <a href="{{ route('admin.payments.index') }}" class="nav-link {{ request()->routeIs('admin.payments*') ? 'active' : '' }}">
+                <i class="bi bi-credit-card"></i>
+                <span>Thanh toán</span>
+                @php
+                    $pendingPayments = \App\Models\Payment::where('status', 'pending')->count();
+                @endphp
+                @if($pendingPayments > 0)
+                    <span class="badge bg-danger text-white ms-auto">{{ $pendingPayments }}</span>
+                @endif
+            </a>
+        </div>
         <!-- <div class="nav-item">
             <a href="#" class="nav-link">
                 <i class="bi bi-wallet2"></i>

@@ -92,8 +92,8 @@
                                 </td>
                                 <td>
                                     @if($profile->subjects && count($profile->subjects) > 0)
-                                        @foreach(array_slice($profile->subjects, 0, 2) as $subject)
-                                            <span class="badge bg-light text-dark">{{ $subject }}</span>
+                                        @foreach($profile->subjects->take(2) as $subject)
+                                            <span class="badge bg-light text-dark">{{ $subject->name }}</span>
                                         @endforeach
                                         @if(count($profile->subjects) > 2)
                                             <span class="badge bg-light text-muted">+{{ count($profile->subjects) - 2 }}</span>

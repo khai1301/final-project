@@ -7,6 +7,7 @@
 @import './frontend/student-request.css';
 @import './frontend/tutor-profile.css';
 @import './ai-recommendations.css';
+@import './premium-ui.css';
 
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
 @source '../../storage/framework/views/*.php';
