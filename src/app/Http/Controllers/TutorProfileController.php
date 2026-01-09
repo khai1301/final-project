@@ -22,6 +22,7 @@ class TutorProfileController extends Controller
             ->where('user_id', $user->id)
             ->first();
         
+        
         // If no profile exists, redirect to create one
         if (!$profile) {
             return redirect()->route('tutor.profile.edit')
@@ -30,7 +31,6 @@ class TutorProfileController extends Controller
         
         // Get all active subjects for reference
         $allSubjects = \App\Models\Subject::active()->orderBy('name')->get();
-        
         
         // Get all time slots grouped by day
         $timeSlots = \App\Models\TimeSlot::active()
@@ -250,11 +250,124 @@ class TutorProfileController extends Controller
 
         $certificate->delete();
 
+        // If request is AJAX, return JSON
+        if (request()->wantsJson()) {
+            return response()->json(['success' => true]);
+        }
+
         return back()->with('swal', [
             'type' => 'success',
             'title' => 'Đã xóa',
             'text' => 'Chứng chỉ đã được xóa'
         ]);
+    }
+
+    /**
+     * Add a new certificate (AJAX).
+     */
+    public function addCertificate(\Illuminate\Http\Request $request)
+    {
+        try {
+            $request->validate([
+                'cert_name' => 'required|string|max:255',
+                'cert_file' => 'required|file|mimes:jpeg,png,jpg,pdf,doc,docx|max:2048',
+            ]);
+
+            $user = auth()->user();
+            $profile = TutorProfile::firstOrCreate(['user_id' => $user->id]);
+
+            if ($request->hasFile('cert_file')) {
+                $file = $request->file('cert_file');
+                $path = $file->store('certificates', 's3');
+
+                $certificate = TutorCertificate::create([
+                    'tutor_profile_id' => $profile->id,
+                    'name' => $request->input('cert_name'),
+                    'file_path' => $path,
+                    'file_type' => $file->getMimeType(),
+                    'file_size' => $file->getSize(),
+                ]);
+
+                return response()->json([
+                    'success' => true,
+                    'message' => 'Chứng chỉ đã được thêm thành công',
+                    'certificate' => [
+                        'id' => $certificate->id,
+                        'name' => $certificate->name,
+                        'file_url' => $certificate->file_url,
+                        'file_type' => $certificate->file_type,
+                        'created_at' => $certificate->created_at->toISOString(),
+                    ]
+                ]);
+            }
+
+            return response()->json(['success' => false, 'message' => 'Vui lòng tải lên file chứng chỉ'], 422);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
+    }
+
+    /**
+     * Update an existing certificate (AJAX).
+     */
+    public function updateCertificate(\Illuminate\Http\Request $request)
+    {
+        try {
+            $request->validate([
+                'cert_id' => 'required|exists:tutor_certificates,id',
+                'cert_name' => 'required|string|max:255',
+                'cert_file' => 'nullable|file|mimes:jpeg,png,jpg,pdf,doc,docx|max:2048',
+            ]);
+
+            $certificate = TutorCertificate::findOrFail($request->input('cert_id'));
+
+            // Check ownership
+            if ($certificate->tutorProfile->user_id !== auth()->id()) {
+                return response()->json(['success' => false, 'message' => 'Unauthorized'], 403);
+            }
+
+            // Update name
+            $certificate->name = $request->input('cert_name');
+
+            // Handle file update if present
+            if ($request->hasFile('cert_file')) {
+                // Delete old file
+                if (Storage::disk('s3')->exists($certificate->file_path)) {
+                    Storage::disk('s3')->delete($certificate->file_path);
+                }
+
+                $file = $request->file('cert_file');
+                $path = $file->store('certificates', 's3');
+                
+                $certificate->file_path = $path;
+                $certificate->file_type = $file->getMimeType();
+                $certificate->file_size = $file->getSize();
+            }
+
+            $certificate->save();
+
+            return response()->json([
+                'success' => true, 
+                'message' => 'Chứng chỉ đã được cập nhật',
+                'certificate' => [
+                    'id' => $certificate->id,
+                    'name' => $certificate->name,
+                    'file_url' => $certificate->file_url,
+                    'file_type' => $certificate->file_type,
+                    'created_at' => $certificate->created_at->toISOString(),
+                ]
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false, 
+                'message' => 'Lỗi: ' . $e->getMessage()
+            ], 500);
+        }
     }
 
     /**
@@ -305,7 +418,18 @@ class TutorProfileController extends Controller
             $latestRequestId = $latestRequest?->id;
         }
 
-        return view('frontend.tutors.browse', compact('tutors', 'allSubjects', 'latestRequestId'));
+        // Get student's matching statuses with these tutors to display correct buttons
+        $matchingStatuses = [];
+        if (auth()->check() && auth()->user()->isStudent()) {
+            $matchingStatuses = \App\Models\Matching::where('student_id', auth()->id())
+                ->whereIn('tutor_id', $tutors->pluck('user_id'))
+                ->get()
+                ->mapWithKeys(function ($matching) {
+                    return [$matching->tutor_id => $matching->status];
+                });
+        }
+
+        return view('frontend.tutors.browse', compact('tutors', 'allSubjects', 'latestRequestId', 'matchingStatuses'));
     }
 
     /**

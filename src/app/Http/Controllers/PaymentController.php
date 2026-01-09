@@ -120,30 +120,51 @@ class PaymentController extends Controller
 
         // Handle success
         if ($status === 'PAID') {
-            // Trust PayOS return URL (already verified by PayOS redirect)
-            // Skip API re-verification which can be flaky
-            $paymentInfo = [
-                'status' => $status,
-                'order_code' => $orderCode,
-                'cancel' => $cancel,
-                'payment_id' => $request->query('id'),
-                'code' => $request->query('code'),
-                'returned_at' => now()->toDateTimeString(),
-            ];
+            // VERIFY payment with PayOS API to prevent spoofing
+            $verified = $this->paymentService->verifyAndCompletePayment($orderCode);
             
-            $this->paymentService->completePayment($orderCode, $paymentInfo);
-            
-            return redirect()->route('matching.my-requests')
-                ->with('swal', [
-                    'type' => 'success',
-                    'title' => 'Thanh toán thành công',
-                    'text' => 'Thông tin liên hệ đã được mở khóa!'
-                ]);
+            if ($verified) {
+                return redirect()->route('matching.my-requests')
+                    ->with('swal', [
+                        'type' => 'success',
+                        'title' => 'Thanh toán thành công',
+                        'text' => 'Thông tin liên hệ đã được mở khóa!'
+                    ]);
+            } else {
+                // Verification failed (API Error or Fake Request)
+                Log::warning('Payment verification failed for order: ' . $orderCode);
+                
+                return redirect()->route('matching.my-requests')
+                    ->with('swal', [
+                        'type' => 'warning',
+                        'title' => 'Đang xử lý thanh toán',
+                        'text' => 'Chúng tôi đã ghi nhận thanh toán nhưng chưa thể xác thực ngay lập tức. Hệ thống sẽ tự động cập nhật trong ít phút.'
+                    ]);
+            }
         }
 
         // Default fallback
         return redirect()->route('matching.my-requests')
-            ->with('info', 'Payment status unclear. Please check again later.');
+            ->withErrors(['error' => 'Trạng thái thanh toán không xác định.']);
+    }
+
+    /**
+     * Handle payment cancellation
+     */
+    public function paymentCancel(Request $request)
+    {
+        $orderCode = $request->query('orderCode');
+        
+        Log::info('PayOS Payment Cancelled via Dedicated Route', [
+            'orderCode' => $orderCode,
+        ]);
+
+        if ($orderCode) {
+            $this->paymentService->cancelPayment($orderCode);
+        }
+
+        return redirect()->route('matching.my-requests')
+            ->with('info', 'Bạn đã hủy thanh toán.');
     }
 
     /**

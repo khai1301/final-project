@@ -9,6 +9,7 @@ import './frontend/home.js';
 import './frontend/student-request.js';
 import './frontend/student-profile.js';
 import './frontend/tutor-profile.js';
+import './certificate-management.js';
 import './frontend/teaching-areas.js';
 import './frontend/user-location.js';
 import './frontend/tutor-location.js';

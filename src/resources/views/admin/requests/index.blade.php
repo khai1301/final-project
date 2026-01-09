@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Learning Requests Management')
-@section('subtitle', 'Manage student learning requests')
+@section('title', 'Quản lý yêu cầu tìm gia sư')
+@section('subtitle', 'Quản lý các yêu cầu học tập từ học viên')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -32,35 +32,36 @@
                         </div>
                         <div class="col-md-2">
                             <select name="status" class="form-select">
-                                <option value="">All Status</option>
-                                <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Open</option>
-                                <option value="locked" {{ request('status') == 'locked' ? 'selected' : '' }}>Locked</option>
-                                <option value="matched" {{ request('status') == 'matched' ? 'selected' : '' }}>Matched</option>
-                                <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Closed</option>
-                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Cancelled</option>
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="open" {{ request('status') == 'open' ? 'selected' : '' }}>Đang mở</option>
+                                <option value="locked" {{ request('status') == 'locked' ? 'selected' : '' }}>Đã khóa</option>
+                                <option value="matched" {{ request('status') == 'matched' ? 'selected' : '' }}>Đã ghép</option>
+                                <option value="closed" {{ request('status') == 'closed' ? 'selected' : '' }}>Đã đóng</option>
+                                <option value="cancelled" {{ request('status') == 'cancelled' ? 'selected' : '' }}>Đã hủy</option>
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <select name="mode" class="form-select">
-                                <option value="">All Modes</option>
-                                <option value="online" {{ request('mode') == 'online' ? 'selected' : '' }}>Online</option>
-                                <option value="offline" {{ request('mode') == 'offline' ? 'selected' : '' }}>In-Person</option>
+                            <select name="learning_mode_id" class="form-select">
+                                <option value="">Tất cả hình thức</option>
+                                @foreach($learningModes as $mode)
+                                    <option value="{{ $mode->id }}" {{ request('learning_mode_id') == $mode->id ? 'selected' : '' }}>
+                                        {{ $mode->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <select name="education_level" class="form-select">
-                                <option value="">All Education Levels</option>
-                                <option value="Elementary" {{ request('education_level') == 'Elementary' ? 'selected' : '' }}>Elementary</option>
-                                <option value="Middle School" {{ request('education_level') == 'Middle School' ? 'selected' : '' }}>Middle School</option>
-                                <option value="High School" {{ request('education_level') == 'High School' ? 'selected' : '' }}>High School</option>
-                                <option value="Undergraduate" {{ request('education_level') == 'Undergraduate' ? 'selected' : '' }}>Undergraduate</option>
-                                <option value="Postgraduate" {{ request('education_level') == 'Postgraduate' ? 'selected' : '' }}>Postgraduate</option>
-                                <option value="Professional Certification" {{ request('education_level') == 'Professional Certification' ? 'selected' : '' }}>Professional</option>
-                                <option value="Hobby / Casual" {{ request('education_level') == 'Hobby / Casual' ? 'selected' : '' }}>Hobby</option>
+                            <select name="education_level_id" class="form-select">
+                                <option value="">Tất cả trình độ</option>
+                                @foreach($educationLevels as $level)
+                                    <option value="{{ $level->id }}" {{ request('education_level_id') == $level->id ? 'selected' : '' }}>
+                                        {{ $level->name }}
+                                    </option>
+                                @endforeach
                             </select>
                         </div>
                         <div class="col-md-2">
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <button type="submit" class="btn btn-primary w-100">Lọc</button>
                         </div>
                     </form>
                 </div>
@@ -74,8 +75,8 @@
             <div class="data-table mb-4">
                 <div class="table-header d-flex justify-content-between align-items-center">
                     <div>
-                        <h3>Learning Requests</h3>
-                        <p>Total requests: {{ $requests->total() }}</p>
+                        <h3>Danh sách yêu cầu</h3>
+                        <p>Tổng số: {{ $requests->total() }}</p>
                     </div>
                 </div>
                 <div class="table-responsive">
@@ -83,14 +84,14 @@
                         <thead>
                             <tr>
                                 <th>ID</th>
-                                <th>Student</th>
-                                <th>Subject</th>
-                                <th>Education Level</th>
-                                <th>Mode</th>
-                                <th>Budget</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th class="text-end">Actions</th>
+                                <th>Học viên</th>
+                                <th>Môn học</th>
+                                <th>Trình độ</th>
+                                <th>Hình thức</th>
+                                <th>Học phí/h</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th class="text-end">Thao tác</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -99,16 +100,16 @@
                                 <td><span class="badge bg-light text-dark">#{{ $request->id }}</span></td>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($request->student->name) }}&background=random&color=fff" 
+                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($request->student->name ?? 'N/A') }}&background=3780f6&color=fff" 
                                              alt="Avatar" class="rounded-circle me-2" width="32" height="32">
                                         <div>
-                                            <div class="fw-medium text-dark">{{ $request->student->name }}</div>
-                                            <div class="text-muted small">{{ $request->student->email }}</div>
+                                            <div class="fw-medium text-dark">{{ $request->student->name ?? 'Không rõ' }}</div>
+                                            <div class="text-muted small">{{ $request->student->email ?? '' }}</div>
                                         </div>
                                     </div>
                                 </td>
                                 <td>
-                                    <div class="fw-medium">{{ $request->subject }}</div>
+                                    <div class="fw-medium">{{ $request->subject->name ?? 'N/A' }}</div>
                                     @if($request->skills && count($request->skills) > 0)
                                         <div class="text-muted small">
                                             {{ implode(', ', array_slice($request->skills, 0, 2)) }}
@@ -118,34 +119,34 @@
                                         </div>
                                     @endif
                                 </td>
-                                <td>{{ $request->education_level }}</td>
+                                <td>{{ $request->educationLevel->name ?? 'N/A' }}</td>
                                 <td>
-                                    @if($request->mode === 'online')
+                                    @if($request->learningMode && $request->learningMode->slug === 'online')
                                         <span class="badge bg-info-light text-info">
                                             <i class="bi bi-laptop me-1"></i>Online
                                         </span>
                                     @else
                                         <span class="badge bg-success-light text-success">
-                                            <i class="bi bi-geo-alt me-1"></i>In-Person
+                                            <i class="bi bi-geo-alt me-1"></i>Tại nhà
                                         </span>
                                     @endif
                                 </td>
                                 <td>
-                                    <div class="fw-medium text-success">${{ number_format($request->budget_min, 0) }} - ${{ number_format($request->budget_max, 0) }}</div>
-                                    <small class="text-muted">/hr</small>
+                                    <div class="fw-medium text-success">{{ number_format($request->budget_min, 0) }} - {{ number_format($request->budget_max, 0) }}</div>
                                 </td>
                                 <td>
                                     @php
                                         $statusClasses = [
-                                            'open' => 'status-badge status-pending',
-                                            'locked' => 'status-badge status-warning',
-                                            'matched' => 'status-badge status-approved',
-                                            'closed' => 'status-badge status-rejected',
-                                            'cancelled' => 'status-badge status-rejected'
+                                            'open' => ['status-badge status-pending', 'Đang mở'],
+                                            'locked' => ['status-badge status-warning', 'Đã khóa'],
+                                            'matched' => ['status-badge status-approved', 'Đã ghép'],
+                                            'closed' => ['status-badge status-rejected', 'Đã đóng'],
+                                            'cancelled' => ['status-badge status-rejected', 'Đã hủy']
                                         ];
+                                        $statusInfo = $statusClasses[$request->status] ?? ['badge bg-secondary', ucfirst($request->status)];
                                     @endphp
-                                    <span class="{{ $statusClasses[$request->status] ?? 'badge bg-secondary' }}">
-                                        {{ ucfirst($request->status) }}
+                                    <span class="{{ $statusInfo[0] }}">
+                                        {{ $statusInfo[1] }}
                                     </span>
                                 </td>
                                 <td>{{ $request->created_at->format('M d, Y') }}</td>
@@ -157,7 +158,7 @@
                                         <ul class="dropdown-menu dropdown-menu-end shadow border-0">
                                             <li>
                                                 <a href="{{ route('admin.requests.show', $request->id) }}" class="dropdown-item">
-                                                    <i class="bi bi-eye me-2 text-info"></i> View Details
+                                                    <i class="bi bi-eye me-2 text-info"></i> Xem chi tiết
                                                 </a>
                                             </li>
                                             <li><hr class="dropdown-divider"></li>
@@ -167,7 +168,7 @@
                                                     @csrf
                                                     @method('DELETE')
                                                     <button type="submit" class="dropdown-item text-danger">
-                                                        <i class="bi bi-trash me-2"></i> Delete
+                                                        <i class="bi bi-trash me-2"></i> Xóa
                                                     </button>
                                                 </form>
                                             </li>
@@ -179,7 +180,7 @@
                             <tr>
                                 <td colspan="9" class="text-center py-4 text-muted">
                                     <i class="bi bi-inbox display-6 d-block mb-2"></i>
-                                    No learning requests found matching your filters.
+                                    Không có yêu cầu nào phù hợp.
                                 </td>
                             </tr>
                             @endforelse

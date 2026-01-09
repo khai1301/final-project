@@ -115,16 +115,46 @@
                                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                             </div>
                             <div class="modal-body">
+                                {{-- Check if already connected --}}
+                                @php
+                                    $existingMatching = \App\Models\Matching::where(function($query) use ($request) {
+                                        $query->where('student_id', $request->student_id)
+                                              ->where('tutor_id', auth()->id());
+                                    })
+                                    ->whereIn('status', ['pending', 'accepted'])
+                                    ->first();
+                                    
+                                    $showContact = $existingMatching && $existingMatching->status === 'accepted' && $existingMatching->contact_unlocked;
+                                @endphp
+
                                 {{-- Student Info --}}
                                 <div class="d-flex align-items-center mb-3 pb-3 border-bottom">
-                                    <img src="{{ $request->student->avatar_url }}" class="rounded-circle me-3" width="80" height="80">
+                                    @php
+                                        $avatarUrl = $request->student && $request->student->avatar ? \Storage::disk('s3')->url($request->student->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($request->student->name ?? 'Student') . '&size=200&background=3780f6&color=fff';
+                                    @endphp
+                                    <img src="{{ $avatarUrl }}" class="rounded-circle me-3" width="80" height="80" style="object-fit: cover;">
                                     <div>
-                                        <h5 class="mb-1">{{ $request->student->name }}</h5>
-                                        <p class="text-muted mb-0">
-                                            <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
-                                            Thông tin liên hệ bị khóa
-                                        </p>
-                                        <small class="text-muted">Kết nối và thanh toán để xem</small>
+                                        <div class="d-flex align-items-center mb-1">
+                                            <h5 class="mb-0 me-1">{{ $request->student->name }}</h5>
+                                            <x-verified-badge :user="$request->student" />
+                                        </div>
+                                        
+                                        @if($showContact)
+                                            <p class="mb-0 text-success">
+                                                <i class="bi bi-envelope me-1"></i> {{ $request->student->email }}
+                                            </p>
+                                            @if($request->student->phone)
+                                                <p class="mb-0 text-success">
+                                                    <i class="bi bi-telephone me-1"></i> {{ $request->student->phone }}
+                                                </p>
+                                            @endif
+                                        @else
+                                            <p class="text-muted mb-0">
+                                                <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
+                                                Thông tin liên hệ bị khóa
+                                            </p>
+                                            <small class="text-muted">Kết nối và thanh toán để xem</small>
+                                        @endif
                                     </div>
                                 </div>
 
@@ -231,22 +261,21 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Đóng</button>
                                 
-                                {{-- Check if already connected or has pending request --}}
-                                @php
-                                    $existingMatching = \App\Models\Matching::where(function($query) use ($request) {
-                                        $query->where('student_id', $request->student_id)
-                                              ->where('tutor_id', auth()->id());
-                                    })
-                                    ->whereIn('status', ['pending', 'accepted'])
-                                    ->first();
-                                @endphp
-                                
                                 @if($existingMatching)
                                     @if($existingMatching->status === 'accepted')
                                         <button type="button" class="btn btn-success" disabled>
                                             <span class="material-symbols-outlined" style="font-size: 16px;">check_circle</span>
                                             Đã Kết Nối
                                         </button>
+                                        @if(!$existingMatching->contact_unlocked)
+                                            <form action="{{ route('payment.unlock', $existingMatching->id) }}" method="POST" class="d-inline">
+                                                @csrf
+                                                <button type="submit" class="btn btn-sm btn-primary">
+                                                    <span class="material-symbols-outlined" style="font-size: 16px;">lock_open</span>
+                                                    Mở khóa ({{ number_format(\App\Models\Setting::get('contact_unlock_fee', 10000)) }} đ)
+                                                </button>
+                                            </form>
+                                        @endif
                                     @else
                                         <button type="button" class="btn btn-warning" disabled>
                                             <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>

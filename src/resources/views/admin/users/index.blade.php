@@ -76,7 +76,7 @@
                             <tr>
                                 <td>
                                     <div class="d-flex align-items-center">
-                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=random&color=fff" 
+                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($user->name) }}&background=3780f6&color=fff" 
                                              alt="Avatar" class="rounded-circle me-2" width="40" height="40">
                                         <div>
                                             <div class="fw-bold text-dark">{{ $user->name }}</div>

@@ -115,8 +115,9 @@ class MatchingController extends Controller
             ]);
         }
 
-        // NEW: Check for any active connection (pending or accepted)
-        $hasActiveConnection = Matching::where(function($q) use ($user) {
+        // NEW: Check for any active connection FOR THIS REQUEST
+        $hasActiveConnection = Matching::where('request_id', $requestId)
+            ->where(function($q) use ($user) {
                 $q->where('student_id', $user->id)
                   ->orWhere('tutor_id', $user->id);
             })
@@ -127,7 +128,17 @@ class MatchingController extends Controller
             return back()->with('swal', [
                 'type' => 'warning',
                 'title' => 'Kết nối đang tồn tại',
-                'text' => 'Bạn đang có kết nối chưa hoàn thành. Vui lòng hoàn tất kết nối hiện tại trước khi tạo kết nối mới.'
+                'text' => 'Bạn đã có kết nối cho yêu cầu này. Vui lòng kiểm tra lại.'
+            ]);
+        }
+        
+        // CHECK: Request must be open and not matched
+        $targetRequest = \App\Models\Request::find($requestId);
+        if (!$targetRequest || $targetRequest->status !== 'open' || $targetRequest->is_matched) {
+             return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Yêu cầu không khả dụng',
+                'text' => 'Yêu cầu này đã được kết nối hoặc đã đóng.'
             ]);
         }
 
@@ -140,7 +151,7 @@ class MatchingController extends Controller
                         ->lockForUpdate()
                         ->first();
             
-            if ($existing && in_array($existing->status, ['pending', 'accepted'])) {
+            if ($existing) {
                 DB::rollBack();
                 return back()->with('swal', [
                     'type' => 'info',
@@ -213,6 +224,13 @@ class MatchingController extends Controller
         if ($matching->status !== 'pending') {
             return back()->withErrors([
                 'error' => 'Yêu cầu này không còn ở trạng thái chờ và không thể chấp nhận'
+            ]);
+        }
+
+        // CRITICAL: Check if request is already matched (prevent double acceptance)
+        if ($matching->request->is_matched) {
+            return back()->withErrors([
+                'error' => 'Yêu cầu này đã được kết nối với gia sư khác.'
             ]);
         }
 

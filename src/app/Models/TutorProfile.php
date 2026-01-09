@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 
 class TutorProfile extends Model
 {
@@ -19,8 +21,6 @@ class TutorProfile extends Model
         'bio',
         'cv_path',
         'is_approved',
-        'rating_avg',
-        'review_count',
     ];
 
     protected $casts = [
@@ -28,7 +28,6 @@ class TutorProfile extends Model
         'is_approved' => 'boolean',
         'hourly_rate_min' => 'decimal:2',
         'hourly_rate_max' => 'decimal:2',
-        'rating_avg' => 'decimal:2',
     ];
 
     /**
@@ -44,7 +43,7 @@ class TutorProfile extends Model
      */
     public function certificates()
     {
-        return $this->hasMany(TutorCertificate::class);
+        return $this->hasMany(TutorCertificate::class, 'tutor_profile_id');
     }
 
     /**

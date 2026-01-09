@@ -88,7 +88,16 @@
                                 </div>
 
                                 <div class="d-flex gap-2">
-                                    @if($req->status === 'active' || $req->status === 'open')
+                                    @if($req->accepted_connections > 0)
+                                        <button class="btn btn-sm btn-success" disabled>
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">verified</span>
+                                            Đã kết nối
+                                        </button>
+                                        <a href="{{ route('matching.my-requests') }}" class="btn btn-sm btn-outline-primary">
+                                            <span class="material-symbols-outlined" style="font-size: 16px;">visibility</span>
+                                            Xem chi tiết
+                                        </a>
+                                    @elseif($req->status === 'active' || $req->status === 'open')
                                     <a href="{{ route('student.request.edit', $req->id) }}" class="btn btn-sm btn-outline-secondary">
                                         <span class="material-symbols-outlined" style="font-size: 16px;">edit</span>
                                         Sửa

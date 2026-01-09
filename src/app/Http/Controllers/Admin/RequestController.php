@@ -2,6 +2,9 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Models\Request as LearningRequest;
+use App\Models\EducationLevel;
+use App\Models\LearningMode;
+use App\Models\Subject;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
 
@@ -52,7 +55,12 @@ class RequestController extends Controller
         // Order by newest first
         $requests = $query->latest()->paginate(15);
 
-        return view('admin.requests.index', compact('requests'));
+        // Fetch filter data
+        $educationLevels = EducationLevel::all();
+        $learningModes = LearningMode::all();
+        $subjects = Subject::all();
+
+        return view('admin.requests.index', compact('requests', 'educationLevels', 'learningModes', 'subjects'));
     }
 
     /**

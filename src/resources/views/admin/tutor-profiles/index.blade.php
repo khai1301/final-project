@@ -1,7 +1,7 @@
 @extends('admin.layouts.app')
 
-@section('title', 'Tutor Profiles Management')
-@section('subtitle', 'Manage and approve tutor profiles')
+@section('title', 'Quản lý Hồ sơ Gia sư')
+@section('subtitle', 'Quản lý và duyệt hồ sơ gia sư')
 
 @section('content')
 <div class="container-fluid py-4">
@@ -26,19 +26,19 @@
                                     <i class="bi bi-search text-muted"></i>
                                 </span>
                                 <input type="text" name="search" class="form-control border-start-0 ps-0" 
-                                       placeholder="Search by tutor name or email..." 
+                                       placeholder="Tìm kiếm theo tên hoặc email..." 
                                        value="{{ request('search') }}">
                             </div>
                         </div>
                         <div class="col-md-3">
                             <select name="status" class="form-select">
-                                <option value="">All Status</option>
-                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Pending Approval</option>
-                                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Approved</option>
+                                <option value="">Tất cả trạng thái</option>
+                                <option value="pending" {{ request('status') == 'pending' ? 'selected' : '' }}>Chờ duyệt</option>
+                                <option value="approved" {{ request('status') == 'approved' ? 'selected' : '' }}>Đã duyệt</option>
                             </select>
                         </div>
                         <div class="col-md-3">
-                            <button type="submit" class="btn btn-primary w-100">Filter</button>
+                            <button type="submit" class="btn btn-primary w-100">Lọc</button>
                         </div>
                     </form>
                 </div>
@@ -52,10 +52,10 @@
             <div class="data-table mb-4">
                 <div class="table-header d-flex justify-content-between align-items-center">
                     <div>
-                        <h3>Tutor Profiles</h3>
-                        <p>Total profiles: {{ $profiles->total() }} 
+                        <h3>Hồ sơ Gia sư</h3>
+                        <p>Tổng số hồ sơ: {{ $profiles->total() }} 
                             @if($pendingCount > 0)
-                            <span class="badge bg-warning text-dark ms-2">{{ $pendingCount }} Pending</span>
+                            <span class="badge bg-warning text-dark ms-2">{{ $pendingCount }} Chờ duyệt</span>
                             @endif
                         </p>
                     </div>
@@ -66,13 +66,13 @@
                         <thead class="table-light">
                             <tr>
                                 <th>ID</th>
-                                <th>Tutor</th>
-                                <th>Subjects</th>
-                                <th>Experience</th>
-                                <th>Hourly Rate</th>
-                                <th>Status</th>
-                                <th>Created</th>
-                                <th class="text-center">Actions</th>
+                                <th>Gia sư</th>
+                                <th>Môn học</th>
+                                <th>Kinh nghiệm</th>
+                                <th>Học phí/giờ</th>
+                                <th>Trạng thái</th>
+                                <th>Ngày tạo</th>
+                                <th class="text-center">Hành động</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -102,26 +102,26 @@
                                         <span class="text-muted">-</span>
                                     @endif
                                 </td>
-                                <td>{{ $profile->experience_years ?? 0 }} years</td>
+                                <td>{{ $profile->experience_years ?? 0 }} năm</td>
                                 <td>
                                     @if($profile->hourly_rate_min && $profile->hourly_rate_max)
-                                        {{ number_format($profile->hourly_rate_min, 0) }} - {{ number_format($profile->hourly_rate_max, 0) }} VNĐ
+                                        {{ number_format($profile->hourly_rate_min, 0, ',', '.') }} - {{ number_format($profile->hourly_rate_max, 0, ',', '.') }}
                                     @else
-                                        <span class="text-muted">Not set</span>
+                                        <span class="text-muted">Chưa thiết lập</span>
                                     @endif
                                 </td>
                                 <td>
                                     @if($profile->is_approved)
-                                        <span class="badge bg-success">Approved</span>
+                                        <span class="badge bg-success">Đã duyệt</span>
                                     @else
-                                        <span class="badge bg-warning text-dark">Pending</span>
+                                        <span class="badge bg-warning text-dark">Chờ duyệt</span>
                                     @endif
                                 </td>
-                                <td class="text-muted">{{ $profile->created_at->format('M d, Y') }}</td>
+                                <td class="text-muted">{{ $profile->created_at->format('d/m/Y') }}</td>
                                 <td class="text-center">
                                     <div class="btn-group" role="group">
                                         <a href="{{ route('admin.tutor-profiles.show', $profile->id) }}" 
-                                           class="btn btn-sm btn-outline-primary" title="View Details">
+                                           class="btn btn-sm btn-outline-primary" title="Xem chi tiết">
                                             <i class="bi bi-eye"></i>
                                         </a>
                                         
@@ -130,7 +130,7 @@
                                               method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Approve">
+                                            <button type="submit" class="btn btn-sm btn-outline-success" title="Duyệt">
                                                 <i class="bi bi-check-circle"></i>
                                             </button>
                                         </form>
@@ -139,7 +139,7 @@
                                               method="POST" class="d-inline">
                                             @csrf
                                             @method('PATCH')
-                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Unapprove">
+                                            <button type="submit" class="btn btn-sm btn-outline-warning" title="Hủy duyệt">
                                                 <i class="bi bi-x-circle"></i>
                                             </button>
                                         </form>
@@ -149,7 +149,7 @@
                                               method="POST" class="delete-form d-inline">
                                             @csrf
                                             @method('DELETE')
-                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Delete">
+                                            <button type="submit" class="btn btn-sm btn-outline-danger" title="Xóa">
                                                 <i class="bi bi-trash"></i>
                                             </button>
                                         </form>
@@ -160,7 +160,7 @@
                             <tr>
                                 <td colspan="8" class="text-center text-muted py-4">
                                     <i class="bi bi-inbox fs-1 d-block mb-2"></i>
-                                    No tutor profiles found
+                                    Không tìm thấy hồ sơ nào
                                 </td>
                             </tr>
                             @endforelse

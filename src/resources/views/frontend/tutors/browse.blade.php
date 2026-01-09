@@ -121,11 +121,18 @@
                                 <div class="card-body">
                                     {{-- Avatar & Name --}}
                                     <div class="text-center mb-3">
-                                        <img src="https://ui-avatars.com/api/?name={{ urlencode($tutor->user->name) }}&background=random&color=fff" 
+                                        @php
+                                            $avatarUrl = $tutor->user->avatar ? \Storage::disk('s3')->url($tutor->user->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($tutor->user->name) . '&size=200&background=3780f6&color=fff';
+                                        @endphp
+                                        <img src="{{ $avatarUrl }}"
                                              class="rounded-circle mb-2" 
                                              width="80" height="80" 
+                                             style="object-fit: cover;"
                                              alt="{{ $tutor->user->name }}">
-                                        <h5 class="fw-bold mb-1">{{ $tutor->user->name }}</h5>
+                                        <div class="d-flex align-items-center justify-content-center gap-1">
+                                            <h5 class="fw-bold mb-1">{{ $tutor->user->name }}</h5>
+                                            <x-verified-badge :user="$tutor->user" size="18" />
+                                        </div>
                                         @if($tutor->education)
                                             <small class="text-muted">{{ $tutor->education }}</small>
                                         @endif
@@ -166,6 +173,33 @@
                                     </div>
 
                                     {{-- View Profile Button --}}
+                                    {{-- Connection Status Buttons --}}
+                                    @auth
+                                        @if(auth()->user()->isStudent())
+                                            @php
+                                                $status = $matchingStatuses[$tutor->user->id] ?? null;
+                                            @endphp
+
+                                            @if(!$status)
+                                                <form action="{{ route('matching.connect') }}" method="POST" class="mb-2">
+                                                    @csrf
+                                                    <input type="hidden" name="tutor_id" value="{{ $tutor->user->id }}">
+                                                    <button type="submit" class="btn btn-primary w-100">
+                                                        <i class="bi bi-person-plus"></i> Kết nối
+                                                    </button>
+                                                </form>
+                                            @elseif($status == 'pending')
+                                                <button class="btn btn-secondary w-100 mb-2" disabled>
+                                                    <i class="bi bi-hourglass-split"></i> Đang chờ
+                                                </button>
+                                            @elseif($status == 'declined')
+                                                <button class="btn btn-danger w-100 mb-2" disabled>
+                                                    <i class="bi bi-x-circle"></i> Đã từ chối
+                                                </button>
+                                            @endif
+                                        @endif
+                                    @endauth
+
                                     <a href="{{ route('tutor.show', $tutor->user->id) }}" 
                                        class="btn btn-outline-primary w-100">
                                         <i class="bi bi-eye"></i> {{ __('ui.view') }} chi tiết

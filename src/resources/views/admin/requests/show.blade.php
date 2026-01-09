@@ -189,7 +189,7 @@
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-3">
-                        <img src="https://ui-avatars.com/api/?name={{ urlencode($learningRequest->student->name) }}&size=80&background=random&color=fff" 
+                        <img src="https://ui-avatars.com/api/?name={{ urlencode($learningRequest->student->name) }}&size=80&background=3780f6&color=fff" 
                              alt="Avatar" class="rounded-circle mb-2" width="80" height="80">
                         <h5 class="fw-bold mb-1">{{ $learningRequest->student->name }}</h5>
                         <span class="badge bg-primary-light text-primary">Student</span>

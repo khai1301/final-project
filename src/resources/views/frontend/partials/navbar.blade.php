@@ -121,9 +121,16 @@
                     <div class="dropdown">
                         <a href="#" class="d-flex align-items-center text-decoration-none dropdown-toggle" id="userDropdown" data-bs-toggle="dropdown" aria-expanded="false" style="color: #4b5563;">
                             <span class="fw-bold me-2">{{ auth()->user()->name }}</span>
-                            <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 14px;">
-                                {{ substr(auth()->user()->name, 0, 1) }}
-                            </div>
+                            @if(auth()->user()->avatar)
+                                <img src="{{ \Storage::disk('s3')->url(auth()->user()->avatar) }}" 
+                                     alt="{{ auth()->user()->name }}" 
+                                     class="rounded-circle" 
+                                     style="width: 32px; height: 32px; object-fit: cover;">
+                            @else
+                                <div class="rounded-circle bg-primary text-white d-flex align-items-center justify-content-center" style="width: 32px; height: 32px; font-size: 14px;">
+                                    {{ substr(auth()->user()->name, 0, 1) }}
+                                </div>
+                            @endif
                         </a>
                         <ul class="dropdown-menu dropdown-menu-end shadow-sm border-0" aria-labelledby="userDropdown">
                             @if(auth()->user()->isAdmin())
@@ -131,6 +138,7 @@
                             @elseif(auth()->user()->role === 'tutor')
                             <li><a class="dropdown-item" href="{{ route('tutor.profile') }}">{{ __('ui.profile') }}</a></li>
                             <li><a class="dropdown-item" href="{{ route('matching.my-requests') }}">{{ __('ui.my_requests') }}</a></li>
+                            <li><a class="dropdown-item" href="{{ route('payment.history') }}">Lịch sử giao dịch</a></li>
                             <!-- <li><a class="dropdown-item" href="#">Cài Đặt</a></li> -->
                             @else
                             <li><a class="dropdown-item" href="{{ route('student.profile.edit') }}">{{ __('ui.profile') }}</a></li>

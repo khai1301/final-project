@@ -31,15 +31,15 @@
                         <div class="col-md-2 text-center">
                             @php
                                 $other = $request->getOtherUser(auth()->id());
-                                $avatarUrl = $other->avatar_url;
+                                    $avatarUrl = $other->avatar ? \Storage::disk('s3')->url($other->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($other->name) . '&size=200&background=3780f6&color=fff';
                             @endphp
-                            <img src="{{ $avatarUrl }}" class="rounded-circle" width="80" height="80" alt="{{ $other->name }}">
+                            <img src="{{ $avatarUrl }}" class="rounded-circle" width="80" height="80" alt="{{ $other->name }}" style="object-fit: cover;">
                         </div>
                         <div class="col-md-6">
-                            <h5 class="mb-1">
-                                {{ $other->name }}
-                                <x-verified-badge :user="$other" class="ms-1" />
-                            </h5>
+                            <div class="d-flex align-items-center mb-1">
+                                <h5 class="mb-0 me-1">{{ $other->name }}</h5>
+                                <x-verified-badge :user="$other" />
+                            </div>
                             @if(!$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
@@ -72,14 +72,18 @@
                         </div>
                         <div class="col-md-2">
                             @if($request->status == 'pending')
-                            <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $request->id }}">
-                                {{ __('ui.cancel') }}
-                            </button>
+                                <button class="btn btn-sm btn-outline-danger" data-bs-toggle="modal" data-bs-target="#cancelModal{{ $request->id }}">
+                                    {{ __('ui.cancel') }}
+                                </button>
                             @elseif($request->status == 'accepted')
                                 @php
                                     $isTutorViewingStudent = auth()->user()->role === 'tutor' && $other->role === 'student';
                                 @endphp
                                 @if($isTutorViewingStudent)
+                                    <button class="btn btn-sm btn-outline-info w-100 mb-2" data-bs-toggle="modal" data-bs-target="#sentDetailsModal{{ $request->id }}">
+                                        <i class="bi bi-eye"></i> Chi tiết
+                                    </button>
+
                                     {{-- Unlock button for tutors --}}
                                     @if($request->contact_unlocked)
                                         <button class="btn btn-sm btn-success w-100" disabled>
@@ -126,6 +130,108 @@
                     </div>
                 </div>
             </div>
+
+            {{-- Sent Details Modal (For Tutor viewing Student) --}}
+            @if(isset($isTutorViewingStudent) && $isTutorViewingStudent)
+            <div class="modal fade" id="sentDetailsModal{{ $request->id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <span class="material-symbols-outlined align-middle me-2">account_circle</span>
+                                Chi tiết học sinh
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center mb-3">
+                                    <img src="{{ $avatarUrl }}" class="rounded-circle mb-2" width="120" height="120" alt="{{ $other->name }}" style="object-fit: cover;">
+                                    <h5 class="d-flex align-items-center justify-content-center gap-1">
+                                        {{ $other->name }}
+                                        <x-verified-badge :user="$other" />
+                                    </h5>
+                                    <div class="mt-2">
+                                        <span class="badge bg-success">Student</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    {{-- Student Info --}}
+                                    @if($other->studentProfile)
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold"><i class="bi bi-mortarboard me-2"></i>Thông tin học tập</h6>
+                                            @if($other->studentProfile->grade)
+                                                <p class="mb-1"><strong>Lớp:</strong> {{ $other->studentProfile->grade }}</p>
+                                            @endif
+                                            @if($other->studentProfile->school)
+                                                <p class="mb-1"><strong>Trường:</strong> {{ $other->studentProfile->school }}</p>
+                                            @endif
+                                            @if($other->studentProfile->goals)
+                                                <div class="mt-2">
+                                                    <strong>Mục tiêu:</strong>
+                                                    <p class="text-muted">{{ $other->studentProfile->goals }}</p>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    {{-- Request Details (Address & Schedule) --}}
+                                    @if($request->request)
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Địa điểm & Lịch học</h6>
+                                            <p class="mb-1">
+                                                <strong>Địa chỉ:</strong> 
+                                                {{ $request->request->address_detail ?? '' }}
+                                                {{ $request->request->ward ? ', ' . $request->request->ward->full_name : '' }}
+                                                {{ $request->request->province ? ', ' . $request->request->province->name : '' }}
+                                            </p>
+                                            @if($request->request->timeSlots && $request->request->timeSlots->isNotEmpty())
+                                                <div class="mt-2">
+                                                    <strong>Lịch rảnh:</strong>
+                                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                                        @foreach($request->request->timeSlots as $slot)
+                                                            <span class="badge bg-light text-dark border">
+                                                                {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                                                            </span>
+                                                        @endforeach
+                                                    </div>
+                                                </div>
+                                            @endif
+                                        </div>
+                                    @endif
+
+                                    {{-- Contact Info --}}
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold"><i class="bi bi-person-lines-fill me-2"></i>{{ __('ui.contact_info') }}</h6>
+                                        @if(!$request->contact_unlocked)
+                                            <div class="alert alert-warning py-2">
+                                                <small><i class="bi bi-lock-fill me-1"></i> {{ __('ui.contact_locked_info') }}</small>
+                                            </div>
+                                        @else
+                                            <p class="mb-1"><i class="bi bi-envelope me-2"></i> {{ $other->email }}</p>
+                                            @if($other->phone)
+                                            <p class="mb-1"><i class="bi bi-telephone me-2"></i> {{ $other->phone }}</p>
+                                            @endif
+                                        @endif
+                                    </div>
+
+                                    @if($request->message)
+                                    <div class="border-top pt-3">
+                                        <strong>{{ __('ui.message') }}:</strong>
+                                        <p class="text-muted">{{ $request->message }}</p>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('ui.close') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
             @empty
             <div class="alert alert-info">
                 <span class="material-symbols-outlined align-middle me-2">info</span>
@@ -142,15 +248,15 @@
                     <div class="row align-items-center">
                         <div class="col-md-2 text-center">
                             @php
-                                $avatarUrl = $request->sender->avatar_url;
+                                    $avatarUrl = $request->sender->avatar ? \Storage::disk('s3')->url($request->sender->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($request->sender->name) . '&size=200&background=3780f6&color=fff';
                             @endphp
-                            <img src="{{ $avatarUrl }}" class="rounded-circle" width="80" height="80" alt="{{ $request->sender->name }}">
+                            <img src="{{ $avatarUrl }}" class="rounded-circle" width="80" height="80" alt="{{ $request->sender->name }}" style="object-fit: cover;">
                         </div>
                         <div class="col-md-6">
-                            <h5 class="mb-1">
-                                {{ $request->sender->name }}
-                                <x-verified-badge :user="$request->sender" class="ms-1" />
-                            </h5>
+                            <div class="d-flex align-items-center mb-1">
+                                <h5 class="mb-0 me-1">{{ $request->sender->name }}</h5>
+                                <x-verified-badge :user="$request->sender" />
+                            </div>
                             @if(!$request->contact_unlocked)
                                 <p class="text-muted small mb-1">
                                     <span class="material-symbols-outlined" style="font-size: 14px;">lock</span>
@@ -234,8 +340,11 @@
                                             ? \Storage::disk('s3')->url($request->sender->avatar) 
                                             : 'https://ui-avatars.com/api/?name='.urlencode($request->sender->name).'&size=150';
                                     @endphp
-                                    <img src="{{ $avatarUrl }}" class="rounded-circle mb-2" width="120" height="120" alt="{{ $request->sender->name }}">
-                                    <h5>{{ $request->sender->name }}</h5>
+                                    <img src="{{ $avatarUrl }}" class="rounded-circle mb-2" width="120" height="120" alt="{{ $request->sender->name }}" style="object-fit: cover;">
+                                    <h5 class="d-flex align-items-center justify-content-center gap-1">
+                                        {{ $request->sender->name }}
+                                        <x-verified-badge :user="$request->sender" />
+                                    </h5>
                                     <span class="badge bg-{{ $request->sender->role == 'tutor' ? 'primary' : 'success' }}">
                                         {{ ucfirst($request->sender->role) }}
                                     </span>
@@ -310,6 +419,51 @@
                                         </div>
                                         @endif
                                     @endif
+
+                                    {{-- Student-specific information (ADDED) --}}
+                                    @if($request->sender->role == 'student' && $request->sender->studentProfile)
+                                        @php $studentProfile = $request->sender->studentProfile; @endphp
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold"><i class="bi bi-mortarboard me-2"></i>Thông tin học tập</h6>
+                                            @if($studentProfile->grade)
+                                                <p class="mb-1"><strong>Lớp:</strong> {{ $studentProfile->grade }}</p>
+                                            @endif
+                                            @if($studentProfile->school)
+                                                <p class="mb-1"><strong>Trường:</strong> {{ $studentProfile->school }}</p>
+                                            @endif
+                                            @if($studentProfile->goals)
+                                                <div class="mt-2">
+                                                    <strong>Mục tiêu:</strong>
+                                                    <p class="text-muted">{{ $studentProfile->goals }}</p>
+                                                </div>
+                                            @endif
+                                        </div>
+
+                                        {{-- Request Details (Address & Schedule) --}}
+                                        @if($request->request)
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Địa điểm & Lịch học</h6>
+                                                <p class="mb-1">
+                                                    <strong>Địa chỉ:</strong> 
+                                                    {{ $request->request->address_detail ?? '' }}
+                                                    {{ $request->request->ward ? ', ' . $request->request->ward->full_name : '' }}
+                                                    {{ $request->request->province ? ', ' . $request->request->province->name : '' }}
+                                                </p>
+                                                @if($request->request->timeSlots && $request->request->timeSlots->isNotEmpty())
+                                                    <div class="mt-2">
+                                                        <strong>Lịch rảnh:</strong>
+                                                        <div class="d-flex flex-wrap gap-2 mt-1">
+                                                            @foreach($request->request->timeSlots as $slot)
+                                                                <span class="badge bg-light text-dark border">
+                                                                    {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                                                                </span>
+                                                            @endforeach
+                                                        </div>
+                                                    </div>
+                                                @endif
+                                            </div>
+                                        @endif
+                                    @endif
                                     
                                     {{-- Contact Information --}}
                                     <div class="mb-3">
@@ -355,14 +509,14 @@
                                     <div class="border-top pt-3">
                                         <small class="text-muted">
                                             <span class="material-symbols-outlined align-middle" style="font-size: 14px;">schedule</span>
-                                            Sent {{ $request->created_at->diffForHumans() }} ({{ $request->created_at->format('M d, Y H:i') }})
+                                            {{ __('ui.sent') }} {{ $request->created_at->diffForHumans() }} ({{ $request->created_at->format('d/m/Y H:i') }})
                                         </small>
                                     </div>
                                 </div>
                             </div>
                         </div>
                         <div class="modal-footer">
-                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('ui.close') }}</button>
                             @if($request->status == 'pending')
                                 <button class="btn btn-outline-danger" data-bs-dismiss="modal" data-bs-toggle="modal" data-bs-target="#declineModal{{ $request->id }}">
                                     <span class="material-symbols-outlined" style="font-size: 16px;">close</span>

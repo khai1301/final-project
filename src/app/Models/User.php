@@ -192,8 +192,9 @@ class User extends Authenticatable implements MustVerifyEmail
      */
     public function getAvatarUrlAttribute()
     {
-        if ($this->avatar && \Storage::disk('public')->exists($this->avatar)) {
-            return \Storage::url($this->avatar);
+        // If avatar exists, return S3 URL (same pattern as CV and certificates)
+        if ($this->avatar) {
+            return \Storage::disk('s3')->url($this->avatar);
         }
         
         // Default avatar using UI Avatars

@@ -31,7 +31,12 @@ class PaymentService
         $unlockFee = (int) Setting::get('contact_unlock_fee', 10000);
 
         // Create unique order code
-        $orderCode = (int) (time() . rand(100, 999));
+        // Create unique order code (random int to prevent guessing)
+        try {
+            $orderCode = random_int(1000000000, 9999999999); // 10 digits
+        } catch (\Exception $e) {
+            $orderCode = (int) (time() . rand(100, 999)); // Fallback
+        }
         
         // Create payment data
         $paymentData = new CreatePaymentLinkRequest(
@@ -120,6 +125,11 @@ class PaymentService
             'unlocked_at' => now(),
             'payment_status' => 'completed',
         ]);
+
+        // Update Request status to 'active' (Learning in progress)
+        if ($matching->request) {
+            $matching->request->update(['status' => 'active']);
+        }
 
         // Update payment record
         Payment::where('transaction_id', $orderCode)->update([

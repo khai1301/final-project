@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -88,11 +88,11 @@
     </script>
     @endif
     
-    @if(session('success'))
+@if(session('success'))
     <script>
         Swal.fire({
             icon: 'success',
-            title: 'Success!',
+            title: 'Thành công!',
             text: '{{ session('success') }}',
             timer: 3000
         });
@@ -103,7 +103,7 @@
     <script>
         Swal.fire({
             icon: 'error',
-            title: 'Error!',
+            title: 'Lỗi!',
             text: '{{ session('error') }}',
             timer: 3000
         });

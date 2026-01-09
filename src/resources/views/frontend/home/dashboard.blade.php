@@ -131,9 +131,12 @@
                 </div>
                 <div class="card-body">
                     @forelse($incomingRequests as $request)
+                    @php
+                        $avatarUrl = $request->sender->avatar ? \Storage::disk('s3')->url($request->sender->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($request->sender->name) . '&size=200&background=3780f6&color=fff';
+                    @endphp
                     <div class="border rounded p-3 mb-3">
                         <div class="d-flex align-items-center mb-2">
-                            <img src="{{ $request->sender->avatar_url }}" class="rounded-circle me-2" width="50" height="50">
+                            <img src="{{ $avatarUrl }}" class="rounded-circle me-2" width="50" height="50">
                             <div class="flex-grow-1">
                                 <h6 class="mb-0 fw-bold">{{ $request->sender->name }}</h6>
                                 <small class="text-muted">{{ $request->sender->email }}</small>

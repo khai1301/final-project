@@ -132,6 +132,16 @@ class StudentRequestController extends Controller
                 ]);
         }
         
+        // Check for accepted matchings
+        if ($request->matchings()->where('status', 'accepted')->exists()) {
+             return redirect()->route('student.requests.index')
+                ->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Không thể sửa',
+                    'text' => 'Không thể sửa yêu cầu đã có kết nối được chấp nhận'
+                ]);
+        }
+        
         $subjects = Subject::active()->orderBy('name')->get();
         $educationLevels = EducationLevel::active()->ordered()->get();
         $learningModes = LearningMode::active()->get();
@@ -163,6 +173,24 @@ class StudentRequestController extends Controller
                 'type' => 'error',
                 'title' => 'Không thể cập nhật',
                 'text' => 'Chỉ có thể cập nhật yêu cầu đang hoạt động hoặc đang mở'
+            ]);
+        }
+
+        // Check for accepted matchings
+        if ($learningRequest->matchings()->where('status', 'accepted')->exists()) {
+             return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Không thể cập nhật',
+                'text' => 'Không thể cập nhật yêu cầu đã có kết nối được chấp nhận'
+            ]);
+        }
+
+        // Check for accepted matchings
+        if ($learningRequest->matchings()->where('status', 'accepted')->exists()) {
+             return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Không thể cập nhật',
+                'text' => 'Không thể cập nhật yêu cầu đã có kết nối được chấp nhận'
             ]);
         }
 

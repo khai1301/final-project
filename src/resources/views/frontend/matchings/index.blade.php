@@ -6,7 +6,7 @@
         <div class="col-12">
             <h2 class="mb-4">
                 <span class="material-symbols-outlined align-middle me-2">link</span>
-                My Connections
+                {{ __('ui.connected') }}
             </h2>
         </div>
     </div>
@@ -39,7 +39,10 @@
                             @php
                                 $otherUser = $matching->getOtherUser(auth()->id());
                             @endphp
-                            <img src="{{ $otherUser->avatar_url }}" 
+                            @php
+                                $avatarUrl = $otherUser->avatar ? \Storage::disk('s3')->url($otherUser->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($otherUser->name) . '&size=200&background=3780f6&color=fff';
+                            @endphp
+                            <img src="{{ $avatarUrl }}" 
                                  alt="{{ $otherUser->name }}" class="rounded-circle" width="60" height="60">
                             <div>
                                 <h5 class="mb-1">{{ $otherUser->name }}</h5>
@@ -55,7 +58,7 @@
                                     </p>
                                 @endif
                                 <span class="badge bg-{{ $otherUser->isStudent() ? 'info' : 'success' }}-subtle text-{{ $otherUser->isStudent() ? 'info' : 'success' }}">
-                                    {{ $otherUser->isStudent() ? 'Student' : 'Tutor' }}
+                                    {{ $otherUser->isStudent() ? __('ui.student') : __('ui.tutor') }}
                                 </span>
                             </div>
                         </div>
@@ -63,7 +66,7 @@
                             @if($matching->status == 'pending')
                                 <span class="badge bg-warning">{{ __('ui.pending_status') }}</span>
                             @elseif($matching->status == 'accepted')
-                                <span class="badge bg-success">Connected</span>
+                                <span class="badge bg-success">{{ __('ui.connected') }}</span>
                             @elseif($matching->status == 'declined')
                                 <span class="badge bg-danger">{{ __('ui.declined_status') }}</span>
                             @else
@@ -117,7 +120,7 @@
         <div class="col-12">
             <div class="alert alert-info">
                 <span class="material-symbols-outlined align-middle me-2">info</span>
-                No connections yet. Start connecting with tutors or students!
+                Chưa có kết nối nào. Hãy bắt đầu kết nối với gia sư hoặc học sinh!
             </div>
         </div>
         @endforelse

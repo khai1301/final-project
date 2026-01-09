@@ -32,7 +32,7 @@ class HomeController extends Controller
                 ->whereHas('tutorProfile', function($q) {
                     $q->where('is_approved', true);
                 })
-                ->with('tutorProfile.subjects')
+                ->with('tutorProfile.subjects', 'verification')
                 ->latest()
                 ->get();
             
@@ -84,27 +84,36 @@ class HomeController extends Controller
         
         // Load data for ALL users (guest + authenticated) for landing page partials
         
-        // Featured Tutors: Newest tutors (for featured-tutors.blade.php)
+        // Featured Tutors: Newest approved tutors (for featured-tutors.blade.php)
         $featuredTutors = \App\Models\User::where('role', 'tutor')
             ->whereHas('tutorProfile', function($q) {
                 $q->where('is_approved', true);
             })
-            ->with('tutorProfile.subjects')
+            ->with([
+                'tutorProfile.subjects', 
+                'province',
+                'tutorProfile' => function($query) {
+                    $query->withCount(['certificates', 'teachingAreas', 'availableTimeSlots']);
+                }
+            ])
             ->latest()
             ->take(8)
             ->get();
         
-        // Top Tutors: By rating (for top-tutors.blade.php)
+        // Get top tutors (approved, ordered by creation date)
         $topTutors = \App\Models\User::where('role', 'tutor')
             ->whereHas('tutorProfile', function($q) {
                 $q->where('is_approved', true);
             })
-            ->with('tutorProfile.subjects')
-            ->leftJoin('tutor_profiles', 'users.id', '=', 'tutor_profiles.user_id')
-            ->orderByDesc('tutor_profiles.rating_avg')
-            ->orderByDesc('users.created_at')
-            ->select('users.*')
-            ->take(8)
+            ->with([
+                'tutorProfile.subjects', 
+                'province',
+                'tutorProfile' => function($query) {
+                    $query->withCount(['certificates', 'teachingAreas', 'availableTimeSlots']);
+                }
+            ])
+            ->latest()
+            ->limit(8)
             ->get();
         
         // Student Requests: Latest student requests (for tutor-requests.blade.php)
@@ -116,27 +125,20 @@ class HomeController extends Controller
         
         // Add connection status for students viewing tutors
         if ($user && $user->isStudent()) {
-            $latestRequest = \App\Models\Request::where('student_id', $user->id)
-                ->where('status', 'open')
-                ->latest()
-                ->first();
+            $tutorIds = $topTutors->pluck('id')->merge($featuredTutors->pluck('id'))->unique();
             
-            if ($latestRequest) {
-                // Add connection status to top tutors
-                foreach ($topTutors as $tutor) {
-                    $tutor->connection_status = \App\Models\Matching::getConnectionStatus(
-                        $tutor->id,
-                        $latestRequest->id
-                    );
-                }
+            $statuses = \App\Models\Matching::where('student_id', $user->id)
+                ->whereIn('tutor_id', $tutorIds)
+                ->latest() // Get most recent status if multiple exist
+                ->get()
+                ->pluck('status', 'tutor_id'); // [tutor_id => status]
                 
-                // Add connection status to featured tutors
-                foreach ($featuredTutors as $tutor) {
-                    $tutor->connection_status = \App\Models\Matching::getConnectionStatus(
-                        $tutor->id,
-                        $latestRequest->id
-                    );
-                }
+            foreach ($topTutors as $tutor) {
+                $tutor->connection_status = $statuses[$tutor->id] ?? null;
+            }
+            
+            foreach ($featuredTutors as $tutor) {
+                $tutor->connection_status = $statuses[$tutor->id] ?? null;
             }
         }
         

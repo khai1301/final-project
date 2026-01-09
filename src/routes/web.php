@@ -47,6 +47,8 @@ Route::middleware(['auth', 'role:tutor'])->group(function () {
     Route::get('/tutor/profile/edit', [TutorProfileController::class, 'edit'])->name('tutor.profile.edit');
     Route::put('/tutor/profile', [TutorProfileController::class, 'update'])->name('tutor.profile.update');
     Route::delete('/tutor/certificates/{id}', [TutorProfileController::class, 'deleteCertificate'])->name('tutor.certificate.delete');
+    Route::post('/tutor/certificates/add', [TutorProfileController::class, 'addCertificate'])->name('tutor.certificate.add');
+    Route::post('/tutor/certificates/update', [TutorProfileController::class, 'updateCertificate'])->name('tutor.certificate.update');
 });
 
 // Matching routes (for authenticated students and tutors)
@@ -82,6 +84,7 @@ Route::middleware(['auth'])->group(function () {
         ->name('payment.return');
     
     Route::get('/payment/callback', [\App\Http\Controllers\ContactUnlockController::class, 'paymentCallback'])->name('payment.callback');
+    Route::get('/payment/cancel', [\App\Http\Controllers\PaymentController::class, 'paymentCancel'])->name('payment.cancel');
     Route::get('/notifications/unread-count', [NotificationController::class, 'unreadCount'])->name('notifications.unread-count');
     Route::get('/api/provinces', [\App\Http\Controllers\LocationController::class, 'getProvinces'])->name('api.provinces');
     Route::get('/api/wards/{provinceId}', [\App\Http\Controllers\LocationController::class, 'getWardsByProvince'])->name('api.wards');
@@ -97,6 +100,9 @@ Route::middleware(['auth'])->group(function () {
     // CCCD Verification routes
     Route::get('/profile/id-verification', [\App\Http\Controllers\VerificationController::class, 'show'])->name('id-verification.show');
     Route::post('/profile/id-verification', [\App\Http\Controllers\VerificationController::class, 'verify'])->name('id-verification.verify');
+    
+    // Payment History
+    Route::get('/payment/history', [\App\Http\Controllers\PaymentController::class, 'history'])->name('payment.history');
 });
 
 // PayOS Webhook (no authentication required)
@@ -106,9 +112,7 @@ Route::post('/payment/webhook', [\App\Http\Controllers\PaymentController::class,
 
 
 Route::prefix('admin')->name('admin.')->middleware(['auth', 'role:admin'])->group(function () {
-    Route::get('/dashboard', function () {
-        return view('admin.dashboard');
-    })->name('dashboard');
+    Route::get('/dashboard', [\App\Http\Controllers\Admin\DashboardController::class, 'index'])->name('dashboard');
 
     Route::resource('users', UserController::class);
     Route::patch('users/{user}/toggle-ban', [UserController::class, 'toggleBan'])->name('users.toggle-ban');

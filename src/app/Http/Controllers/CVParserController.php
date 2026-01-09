@@ -112,18 +112,28 @@ class CVParserController extends Controller
                 throw new \Exception('Profile not found');
             }
 
-            // Update profile fields
-            $profile->update([
-                'education' => $request->input('education'),
-                'experience_years' => $request->input('experience_years'),
-                'hourly_rate_min' => $request->input('hourly_rate_min'),
-                'hourly_rate_max' => $request->input('hourly_rate_max'),
-                'bio' => $request->input('bio'),
-                'teaching_areas' => $request->input('teaching_areas', []),
-            ]);
+            // Prepare update data - only include fields that are present and not null
+            // This preserves existing data if AI returns null/missing fields
+            $updateData = [];
+            
+            if ($request->filled('education')) $updateData['education'] = $request->input('education');
+            if ($request->filled('experience_years')) $updateData['experience_years'] = $request->input('experience_years');
+            if ($request->filled('hourly_rate_min')) $updateData['hourly_rate_min'] = $request->input('hourly_rate_min');
+            if ($request->filled('hourly_rate_max')) $updateData['hourly_rate_max'] = $request->input('hourly_rate_max');
+            if ($request->filled('bio')) $updateData['bio'] = $request->input('bio');
+            
+            // For array fields, only update if provided as valid array
+            if ($request->has('teaching_areas') && is_array($request->input('teaching_areas'))) {
+                $updateData['teaching_areas'] = $request->input('teaching_areas');
+            }
 
-            // Sync subjects
-            if ($request->has('subject_ids')) {
+            // Update profile fields if there's anything to update
+            if (!empty($updateData)) {
+                $profile->update($updateData);
+            }
+
+            // Sync subjects only if provided and not empty
+            if ($request->has('subject_ids') && is_array($request->input('subject_ids')) && !empty($request->input('subject_ids'))) {
                 $profile->subjects()->sync($request->input('subject_ids'));
             }
 

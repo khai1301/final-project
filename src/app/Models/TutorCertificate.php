@@ -18,7 +18,7 @@ class TutorCertificate extends Model
     /**
      * Get the tutor profile that owns this certificate.
      */
-    public function tutorProfile(): BelongsTo
+    public function tutorProfile()
     {
         return $this->belongsTo(TutorProfile::class);
     }
