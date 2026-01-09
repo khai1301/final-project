@@ -64,10 +64,12 @@
                         <div class="row">
                             <div class="col-md-6">
                                 <div class="form-check form-switch mb-3">
+                                    <input type="hidden" name="payment_enabled" value="0">
                                     <input class="form-check-input" 
                                            type="checkbox" 
                                            id="payment_enabled" 
                                            name="payment_enabled"
+                                           value="1"
                                            {{ ($settings['payment_enabled']->value ?? false) ? 'checked' : '' }}>
                                     <label class="form-check-label fw-bold" for="payment_enabled">
                                         Bật Tính Năng Thanh Toán
@@ -78,10 +80,12 @@
                                 </div>
 
                                 <div class="form-check form-switch mb-3">
+                                    <input type="hidden" name="vnpay_enabled" value="0">
                                     <input class="form-check-input" 
                                            type="checkbox" 
                                            id="vnpay_enabled" 
                                            name="vnpay_enabled"
+                                           value="1"
                                            {{ ($settings['vnpay_enabled']->value ?? false) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="vnpay_enabled">
                                         Kích Hoạt VNPay
@@ -89,10 +93,12 @@
                                 </div>
 
                                 <div class="form-check form-switch mb-3">
+                                    <input type="hidden" name="momo_enabled" value="0">
                                     <input class="form-check-input" 
                                            type="checkbox" 
                                            id="momo_enabled" 
                                            name="momo_enabled"
+                                           value="1"
                                            {{ ($settings['momo_enabled']->value ?? false) ? 'checked' : '' }}>
                                     <label class="form-check-label" for="momo_enabled">
                                         Kích Hoạt MoMo

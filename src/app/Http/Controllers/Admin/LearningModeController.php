@@ -46,7 +46,11 @@ class LearningModeController extends Controller
 
         return redirect()
             ->route('admin.learning-modes.index')
-            ->with('success', 'Learning mode created successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Learning mode created successfully.'
+            ]);
     }
 
     /**
@@ -65,7 +69,11 @@ class LearningModeController extends Controller
 
         return redirect()
             ->route('admin.learning-modes.index')
-            ->with('success', 'Learning mode updated successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Learning mode updated successfully.'
+            ]);
     }
 
     /**
@@ -77,6 +85,10 @@ class LearningModeController extends Controller
 
         return redirect()
             ->route('admin.learning-modes.index')
-            ->with('success', 'Learning mode deleted successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Learning mode deleted successfully.'
+            ]);
     }
 }

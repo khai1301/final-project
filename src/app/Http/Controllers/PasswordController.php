@@ -31,7 +31,11 @@ class PasswordController extends Controller
                 'password' => Hash::make($validated['password'])
             ]);
             
-            return back()->with('success', __('messages.password_updated'));
+            return back()->with('swal', [
+                'type' => 'success',
+                'title' => 'Thành công',
+                'text' => __('messages.password_updated')
+            ]);
             
         } catch (\Exception $e) {
             return back()->withErrors(['error' => 'Lỗi khi đổi mật khẩu: ' . $e->getMessage()]);

@@ -89,7 +89,11 @@ class RequestController extends Controller
 
         return redirect()
             ->back()
-            ->with('success', 'Request status updated successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Request status updated successfully.'
+            ]);
     }
 
     /**
@@ -102,6 +106,10 @@ class RequestController extends Controller
 
         return redirect()
             ->route('admin.requests.index')
-            ->with('success', 'Learning request deleted successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Learning request deleted successfully.'
+            ]);
     }
 }

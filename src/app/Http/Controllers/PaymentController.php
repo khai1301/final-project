@@ -58,7 +58,11 @@ class PaymentController extends Controller
 
         // Check if already unlocked
         if ($matching->contact_unlocked) {
-            return back()->with('info', 'Contact already unlocked');
+            return back()->with('swal', [
+                'type' => 'info',
+                'title' => 'Thông báo',
+                'text' => 'Contact already unlocked'
+            ]);
         }
 
         // Check if accepted
@@ -115,7 +119,11 @@ class PaymentController extends Controller
             $this->paymentService->cancelPayment($orderCode);
 
             return redirect()->route('matching.my-requests')
-                ->with('info', 'Payment cancelled');
+                ->with('swal', [
+                    'type' => 'info',
+                    'title' => 'Thông báo',
+                    'text' => 'Payment cancelled'
+                ]);
         }
 
         // Handle success
@@ -164,7 +172,11 @@ class PaymentController extends Controller
         }
 
         return redirect()->route('matching.my-requests')
-            ->with('info', 'Bạn đã hủy thanh toán.');
+            ->with('swal', [
+                'type' => 'info',
+                'title' => 'Thông báo',
+                'text' => 'Bạn đã hủy thanh toán.'
+            ]);
     }
 
     /**

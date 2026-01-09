@@ -25,9 +25,6 @@ class SettingsController extends Controller
     {
         $request->validate([
             'contact_unlock_fee' => 'required|numeric|min:0|max:10000000',
-            'payment_enabled' => 'nullable|boolean',
-            'vnpay_enabled' => 'nullable|boolean',
-            'momo_enabled' => 'nullable|boolean',
         ]);
 
         // Update unlock fee
@@ -39,10 +36,10 @@ class SettingsController extends Controller
             'Phí mở khóa thông tin liên hệ học sinh (VNĐ)'
         );
 
-        // Update payment toggles
+        // Update payment toggles (checkboxes send value only when checked)
         Setting::set(
             'payment_enabled',
-            $request->has('payment_enabled') ? 'true' : 'false',
+            $request->boolean('payment_enabled') ? 'true' : 'false',
             'boolean',
             'payment',
             'Bật/tắt tính năng thanh toán'
@@ -50,7 +47,7 @@ class SettingsController extends Controller
 
         Setting::set(
             'vnpay_enabled',
-            $request->has('vnpay_enabled') ? 'true' : 'false',
+            $request->boolean('vnpay_enabled') ? 'true' : 'false',
             'boolean',
             'payment',
             'Kích hoạt VNPay'
@@ -58,12 +55,16 @@ class SettingsController extends Controller
 
         Setting::set(
             'momo_enabled',
-            $request->has('momo_enabled') ? 'true' : 'false',
+            $request->boolean('momo_enabled') ? 'true' : 'false',
             'boolean',
             'payment',
             'Kích hoạt MoMo'
         );
 
-        return back()->with('success', 'Cài đặt đã được cập nhật thành công!');
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Thành công',
+            'text' => 'Cài đặt đã được cập nhật thành công!'
+        ]);
     }
 }

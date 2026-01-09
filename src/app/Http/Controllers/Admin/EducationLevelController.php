@@ -46,7 +46,11 @@ class EducationLevelController extends Controller
 
         return redirect()
             ->route('admin.education-levels.index')
-            ->with('success', 'Education level created successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Education level created successfully.'
+            ]);
     }
 
     /**
@@ -65,7 +69,11 @@ class EducationLevelController extends Controller
 
         return redirect()
             ->route('admin.education-levels.index')
-            ->with('success', 'Education level updated successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Education level updated successfully.'
+            ]);
     }
 
     /**
@@ -77,6 +85,10 @@ class EducationLevelController extends Controller
 
         return redirect()
             ->route('admin.education-levels.index')
-            ->with('success', 'Education level deleted successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Education level deleted successfully.'
+            ]);
     }
 }

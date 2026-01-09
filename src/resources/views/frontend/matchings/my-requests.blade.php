@@ -78,7 +78,17 @@
                             @elseif($request->status == 'accepted')
                                 @php
                                     $isTutorViewingStudent = auth()->user()->role === 'tutor' && $other->role === 'student';
+                                    $isStudentViewingTutor = auth()->user()->role === 'student' && $other->role === 'tutor';
                                 @endphp
+                                
+                                {{-- Students viewing tutor details --}}
+                                @if($isStudentViewingTutor)
+                                    <button class="btn btn-sm btn-outline-info w-100 mb-2" data-bs-toggle="modal" data-bs-target="#sentTutorDetailsModal{{ $request->id }}">
+                                        <i class="bi bi-eye"></i> Chi tiết gia sư
+                                    </button>
+                                @endif
+                                
+                                {{-- Tutors viewing student details --}}
                                 @if($isTutorViewingStudent)
                                     <button class="btn btn-sm btn-outline-info w-100 mb-2" data-bs-toggle="modal" data-bs-target="#sentDetailsModal{{ $request->id }}">
                                         <i class="bi bi-eye"></i> Chi tiết
@@ -196,7 +206,146 @@
                                                         @endforeach
                                                     </div>
                                                 </div>
+                                            @else
+                                                <div class="mt-2">
+                                                    <strong>Lịch rảnh:</strong>
+                                                    <p class="text-muted small"><em>Học sinh chưa cập nhật lịch học cụ thể</em></p>
+                                                </div>
                                             @endif
+                                        </div>
+                                    @endif
+
+                                    {{-- Contact Info --}}
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold"><i class="bi bi-person-lines-fill me-2"></i>{{ __('ui.contact_info') }}</h6>
+                                        @if(!$request->contact_unlocked)
+                                            <div class="alert alert-warning py-2">
+                                                <small><i class="bi bi-lock-fill me-1"></i> {{ __('ui.contact_locked_info') }}</small>
+                                            </div>
+                                        @else
+                                            <p class="mb-1"><i class="bi bi-envelope me-2"></i> {{ $other->email }}</p>
+                                            @if($other->phone)
+                                            <p class="mb-1"><i class="bi bi-telephone me-2"></i> {{ $other->phone }}</p>
+                                            @endif
+                                        @endif
+                                    </div>
+
+                                    @if($request->message)
+                                    <div class="border-top pt-3">
+                                        <strong>{{ __('ui.message') }}:</strong>
+                                        <p class="text-muted">{{ $request->message }}</p>
+                                    </div>
+                                    @endif
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">{{ __('ui.close') }}</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            @endif
+
+            {{-- Sent Tutor Details Modal (For Student viewing Tutor) --}}
+            @if(isset($isStudentViewingTutor) && $isStudentViewingTutor && $other->role == 'tutor' && $other->tutorProfile)
+            <div class="modal fade" id="sentTutorDetailsModal{{ $request->id }}" tabindex="-1">
+                <div class="modal-dialog modal-lg">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title">
+                                <span class="material-symbols-outlined align-middle me-2">account_circle</span>
+                                Chi tiết gia sư
+                            </h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                        </div>
+                        <div class="modal-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center mb-3">
+                                    <img src="{{ $avatarUrl }}" class="rounded-circle mb-2" width="120" height="120" alt="{{ $other->name }}" style="object-fit: cover;">
+                                    <h5 class="d-flex align-items-center justify-content-center gap-1">
+                                        {{ $other->name }}
+                                        <x-verified-badge :user="$other" />
+                                    </h5>
+                                    <div class="mt-2">
+                                        <span class="badge bg-primary">Tutor</span>
+                                    </div>
+                                </div>
+                                <div class="col-md-9">
+                                    @php $tutorProfile = $other->tutorProfile; @endphp
+                                    
+                                    {{-- Bio --}}
+                                    @if($tutorProfile->bio)
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">
+                                            <span class="material-symbols-outlined align-middle" style="font-size: 18px;">info</span>
+                                            {{ __('ui.about') }}
+                                        </h6>
+                                        <p class="text-muted">{{ $tutorProfile->bio }}</p>
+                                    </div>
+                                    @endif
+                                    
+                                    {{-- Education --}}
+                                    @if($tutorProfile->education)
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">
+                                            <span class="material-symbols-outlined align-middle" style="font-size: 18px;">school</span>
+                                            {{ __('ui.education') }}
+                                        </h6>
+                                        <p class="text-muted">{{ $tutorProfile->education }}</p>
+                                    </div>
+                                    @endif
+                                    
+                                    {{-- Experience & Rate --}}
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">{{ __('ui.professional_details') }}</h6>
+                                        <div class="row">
+                                            <div class="col-6">
+                                                <p class="mb-1"><strong>{{ __('ui.experience') }}:</strong> {{ $tutorProfile->experience_years ?? 0 }} {{ __('ui.years') }}</p>
+                                            </div>
+                                            @if($tutorProfile->hourly_rate_min && $tutorProfile->hourly_rate_max)
+                                            <div class="col-6">
+                                                <p class="mb-1"><strong>{{ __('ui.rate') }}:</strong> {{ number_format($tutorProfile->hourly_rate_min / 1000) }}k - {{ number_format($tutorProfile->hourly_rate_max / 1000) }}k ₫/hr</p>
+                                            </div>
+                                            @endif
+                                        </div>
+                                    </div>
+                                    
+                                    {{-- Subjects --}}
+                                    @if($tutorProfile->subjects && $tutorProfile->subjects->count() > 0)
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">
+                                            <span class="material-symbols-outlined align-middle" style="font-size: 18px;">school</span>
+                                            {{ __('ui.subjects') }}
+                                        </h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach($tutorProfile->subjects as $subject)
+                                            <span class="badge bg-light text-dark">{{ $subject->name }}</span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @endif
+
+                                    {{-- Teaching Availability Schedule --}}
+                                    @if($tutorProfile->availableTimeSlots && $tutorProfile->availableTimeSlots->isNotEmpty())
+                                    <div class="mb-3">
+                                        <h6 class="fw-bold">
+                                            <i class="bi bi-calendar-check me-2"></i>Lịch rảnh dạy học
+                                        </h6>
+                                        <div class="d-flex flex-wrap gap-2">
+                                            @foreach($tutorProfile->availableTimeSlots as $slot)
+                                                <span class="badge bg-light text-dark border">
+                                                    {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                                                </span>
+                                            @endforeach
+                                        </div>
+                                    </div>
+                                    @else
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold">
+                                                <i class="bi bi-calendar-check me-2"></i>Lịch rảnh dạy học
+                                            </h6>
+                                            <p class="text-muted"><em>Gia sư chưa cập nhật lịch dạy</em></p>
                                         </div>
                                     @endif
 
@@ -418,6 +567,29 @@
                                             </div>
                                         </div>
                                         @endif
+
+                                        {{-- Teaching Availability Schedule --}}
+                                        @if($tutorProfile->availableTimeSlots && $tutorProfile->availableTimeSlots->isNotEmpty())
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold">
+                                                <i class="bi bi-calendar-check me-2"></i>Lịch rảnh dạy học
+                                            </h6>
+                                            <div class="d-flex flex-wrap gap-2">
+                                                @foreach($tutorProfile->availableTimeSlots as $slot)
+                                                    <span class="badge bg-light text-dark border">
+                                                        {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                                                    </span>
+                                                @endforeach
+                                            </div>
+                                        </div>
+                                        @else
+                                            <div class="mb-3">
+                                                <h6 class="fw-bold">
+                                                    <i class="bi bi-calendar-check me-2"></i>Lịch rảnh dạy học
+                                                </h6>
+                                                <p class="text-muted"><em>Gia sư chưa cập nhật lịch dạy</em></p>
+                                            </div>
+                                        @endif
                                     @endif
 
                                     {{-- Student-specific information (ADDED) --}}
@@ -459,6 +631,11 @@
                                                                 </span>
                                                             @endforeach
                                                         </div>
+                                                    </div>
+                                                @else
+                                                    <div class="mt-2">
+                                                        <strong>Lịch rảnh:</strong>
+                                                        <p class="text-muted small"><em>Học sinh chưa cập nhật lịch học cụ thể</em></p>
                                                     </div>
                                                 @endif
                                             </div>

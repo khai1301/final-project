@@ -58,7 +58,11 @@ class TutorProfileController extends Controller
         $profile = TutorProfile::findOrFail($id);
         $profile->update(['is_approved' => true]);
 
-        return redirect()->back()->with('success', 'Tutor profile approved successfully!');
+        return redirect()->back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => 'Tutor profile approved successfully!'
+        ]);
     }
 
     /**
@@ -69,7 +73,11 @@ class TutorProfileController extends Controller
         $profile = TutorProfile::findOrFail($id);
         $profile->update(['is_approved' => false]);
 
-        return redirect()->back()->with('success', 'Tutor profile unapproved!');
+        return redirect()->back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => 'Tutor profile unapproved!'
+        ]);
     }
 
     /**
@@ -95,6 +103,10 @@ class TutorProfileController extends Controller
         $profile->delete();
 
         return redirect()->route('admin.tutor-profiles.index')
-            ->with('success', 'Tutor profile deleted successfully!');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Tutor profile deleted successfully!'
+            ]);
     }
 }

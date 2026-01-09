@@ -35,13 +35,13 @@
     <!-- SweetAlert2 (Loaded via NPM) -->
 
     <script>
-        // Pass session data to window for admin.js
-        window.sessionMessages = {
-            success: "{{ session('success') }}",
-            error: "{{ session('error') }}",
-            status: "{{ session('status') }}",
-            warning: "{{ session('warning') }}"
-        };
+        // Pass session data to window for SweetAlert2
+        window.Laravel = {!! json_encode([
+            'csrfToken' => csrf_token(),
+            'flash' => [
+                'swal' => session('swal'),
+            ]
+        ]) !!};
     </script>
 
     @stack('scripts')

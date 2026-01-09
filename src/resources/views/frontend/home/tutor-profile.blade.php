@@ -9,7 +9,7 @@
     };
 </script>
 
-<div class="container py-4 mb-5">
+<div class="container py-5 mb-4">
     <div class="row justify-content-center">
         <div class="col-lg-10">
             {{-- Error Messages --}}
@@ -532,11 +532,12 @@
                                     <span class="material-symbols-outlined ms-1" style="font-size: 18px;">arrow_forward</span>
                                 </button>
                             </div>
-                        </div>
                     </div>
                 </form>
             </div>
+        </div>
     </div>
+</div> {{-- Close container --}}
 </div>
 
 <!-- AI Preview Modal -->

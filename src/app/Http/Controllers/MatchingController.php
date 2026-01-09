@@ -33,14 +33,29 @@ class MatchingController extends Controller
         
         // Get requests sent by this user
         $sentRequests = Matching::where('sender_id', $user->id)
-            ->with(['student', 'tutor'])
+            ->with([
+                'student', 
+                'student.studentProfile',
+                'tutor', 
+                'tutor.tutorProfile.subjects', 
+                'tutor.tutorProfile.availableTimeSlots',
+                'request',
+                'request.timeSlots'
+            ])
             ->latest()
             ->get();
         
-        // Get requests received by this user with sender's tutor profile
+        // Get requests received by this user with sender's profile
         $receivedRequests = Matching::forUser($user->id)
             ->where('sender_id', '!=', $user->id)
-            ->with(['sender', 'sender.tutorProfile.subjects'])
+            ->with([
+                'sender', 
+                'sender.tutorProfile.subjects', 
+                'sender.tutorProfile.availableTimeSlots',
+                'sender.studentProfile',
+                'request',
+                'request.timeSlots'
+            ])
             ->latest()
             ->get();
         

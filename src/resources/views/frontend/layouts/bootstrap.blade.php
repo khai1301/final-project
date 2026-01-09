@@ -76,8 +76,6 @@
             'csrfToken' => csrf_token(),
             'flash' => [
                 'swal' => session('swal'),
-                'success' => session('success'),
-                'error' => session('error'),
             ]
         ]) !!};
     </script>

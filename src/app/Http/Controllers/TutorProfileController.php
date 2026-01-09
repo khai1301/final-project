@@ -26,7 +26,11 @@ class TutorProfileController extends Controller
         // If no profile exists, redirect to create one
         if (!$profile) {
             return redirect()->route('tutor.profile.edit')
-                ->with('info', 'Please complete your profile first.');
+                ->with('swal', [
+                    'type' => 'info',
+                    'title' => 'Thông báo',
+                    'text' => 'Please complete your profile first.'
+                ]);
         }
         
         // Get all active subjects for reference

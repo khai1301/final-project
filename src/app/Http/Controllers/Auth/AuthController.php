@@ -27,7 +27,11 @@ class AuthController extends Controller
                 Auth::logout();
                 $request->session()->invalidate();
                 $request->session()->regenerateToken();
-                return back()->with('error', 'Your account has been banned. Please contact support.');
+                return back()->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'text' => 'Your account has been banned. Please contact support.'
+                ]);
             }
 
             $request->session()->regenerate();

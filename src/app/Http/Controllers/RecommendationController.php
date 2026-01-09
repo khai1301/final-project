@@ -85,7 +85,11 @@ class RecommendationController extends Controller
 
         if (!$tutorProfile) {
             return redirect()->route('tutor.profile.create')
-                ->with('error', 'Vui lòng tạo profile gia sư trước.');
+                ->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Lỗi',
+                    'text' => 'Vui lòng tạo profile gia sư trước.'
+                ]);
         }
 
         return view('tutor.recommendations', [

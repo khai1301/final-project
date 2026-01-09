@@ -82,7 +82,11 @@ class UserController extends Controller
             TutorProfile::create(['user_id' => $user->id]);
         }
 
-        return redirect()->route('admin.users.index')->with('success', 'User created successfully.');
+        return redirect()->route('admin.users.index')->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => 'User created successfully.'
+        ]);
     }
 
     /**
@@ -122,7 +126,11 @@ class UserController extends Controller
 
         $user->update($userData);
 
-        return redirect()->route('admin.users.index')->with('success', 'User updated successfully.');
+        return redirect()->route('admin.users.index')->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => 'User updated successfully.'
+        ]);
     }
 
     /**
@@ -131,12 +139,20 @@ class UserController extends Controller
     public function destroy(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot delete yourself.');
+            return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Error',
+                'text' => 'You cannot delete yourself.'
+            ]);
         }
 
         $user->delete();
 
-        return back()->with('success', 'User deleted successfully.');
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => 'User deleted successfully.'
+        ]);
     }
 
     /**
@@ -145,7 +161,11 @@ class UserController extends Controller
     public function toggleBan(User $user)
     {
         if ($user->id === auth()->id()) {
-            return back()->with('error', 'You cannot ban yourself.');
+            return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Error',
+                'text' => 'You cannot ban yourself.'
+            ]);
         }
 
         if ($user->isBanned()) {
@@ -156,7 +176,11 @@ class UserController extends Controller
             $message = 'User has been banned successfully.';
         }
 
-        return back()->with('status', $message);
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => $message
+        ]);
     }
 
     /**
@@ -165,11 +189,19 @@ class UserController extends Controller
     public function approveTutor(User $user)
     {
         if (!$user->isTutor()) {
-            return back()->with('error', 'This user is not a tutor.');
+            return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Error',
+                'text' => 'This user is not a tutor.'
+            ]);
         }
 
         $user->tutorProfile()->update(['is_approved' => true]);
 
-        return back()->with('success', 'Tutor has been approved successfully.');
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Success',
+            'text' => 'Tutor has been approved successfully.'
+        ]);
     }
 }

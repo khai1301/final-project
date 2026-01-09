@@ -50,7 +50,11 @@ class SubjectController extends Controller
 
         return redirect()
             ->route('admin.subjects.index')
-            ->with('success', 'Subject created successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Subject created successfully.'
+            ]);
     }
 
     /**
@@ -69,7 +73,11 @@ class SubjectController extends Controller
 
         return redirect()
             ->route('admin.subjects.index')
-            ->with('success', 'Subject updated successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Subject updated successfully.'
+            ]);
     }
 
     /**
@@ -81,6 +89,10 @@ class SubjectController extends Controller
 
         return redirect()
             ->route('admin.subjects.index')
-            ->with('success', 'Subject deleted successfully.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Success',
+                'text' => 'Subject deleted successfully.'
+            ]);
     }
 }

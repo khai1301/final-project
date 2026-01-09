@@ -49,12 +49,20 @@ class LocationSyncController extends Controller
 
             return redirect()
                 ->route('admin.location-sync.index')
-                ->with('success', $message);
+                ->with('swal', [
+                    'type' => 'success',
+                    'title' => 'Success',
+                    'text' => $message
+                ]);
 
         } catch (\Exception $e) {
             return redirect()
                 ->route('admin.location-sync.index')
-                ->with('error', 'Sync failed: ' . $e->getMessage());
+                ->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Error',
+                    'text' => 'Sync failed: ' . $e->getMessage()
+                ]);
         }
     }
 }

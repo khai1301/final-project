@@ -40,7 +40,11 @@ class NotificationController extends Controller
             return redirect($notification->action_url);
         }
 
-        return back()->with('success', __('messages.notification_marked_read'));
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Thành công',
+            'text' => __('messages.notification_marked_read')
+        ]);
     }
 
     /**
@@ -53,7 +57,11 @@ class NotificationController extends Controller
             ->unread()
             ->update(['is_read' => true]);
 
-        return back()->with('success', __('messages.all_notifications_read'));
+        return back()->with('swal', [
+            'type' => 'success',
+            'title' => 'Thành công',
+            'text' => __('messages.all_notifications_read')
+        ]);
     }
 
     /**

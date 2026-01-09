@@ -28,7 +28,11 @@ class ContactUnlockController extends Controller
         
         // Check if already unlocked
         if ($matching->contact_unlocked) {
-            return back()->with('info', __('messages.contact_already_unlocked'));
+            return back()->with('swal', [
+                'type' => 'info',
+                'title' => 'Thông báo',
+                'text' => __('messages.contact_already_unlocked')
+            ]);
         }
 
         // Get unlock fee from settings
@@ -53,7 +57,11 @@ class ContactUnlockController extends Controller
 
                 DB::commit();
 
-                return back()->with('success', __('messages.contact_unlocked_dev_mode'));
+                return back()->with('swal', [
+                    'type' => 'success',
+                    'title' => 'Thành công',
+                    'text' => __('messages.contact_unlocked_dev_mode')
+                ]);
             }
         } catch (\Exception $e) {
             DB::rollBack();
@@ -69,7 +77,11 @@ class ContactUnlockController extends Controller
         // TODO: Implement VNPay/MoMo integration
         // This is a placeholder for future payment gateway integration
         
-        return back()->with('info', __('messages.payment_dev_mode'));
+        return back()->with('swal', [
+            'type' => 'info',
+            'title' => 'Thông báo',
+            'text' => __('messages.payment_dev_mode')
+        ]);
     }
 
     /**
@@ -83,6 +95,10 @@ class ContactUnlockController extends Controller
         // Unlock contact info
         
         return redirect()->route('matching.my-requests')
-            ->with('success', 'Thanh toán thành công! Thông tin liên hệ đã được mở khóa.');
+            ->with('swal', [
+                'type' => 'success',
+                'title' => 'Thành công',
+                'text' => 'Thanh toán thành công! Thông tin liên hệ đã được mở khóa.'
+            ]);
     }
 }

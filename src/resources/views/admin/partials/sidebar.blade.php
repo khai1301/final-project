@@ -112,9 +112,9 @@
         </div>
         
         <div class="nav-item">
-            <a href="#" class="nav-link">
-                <i class="bi bi-gear"></i>
-                <span>{{ __('admin.settings') }}</span>
+            <a href="{{ route('admin.settings.index') }}" class="nav-link {{ request()->routeIs('admin.settings*') ? 'active' : '' }}">
+                <i class="bi bi-sliders"></i>
+                <span>Cấu hình hệ thống</span>
             </a>
         </div>
     </nav>
