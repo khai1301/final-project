@@ -3,6 +3,7 @@ import './auth/auth.js';
 import './admin/admin.js';
 import './admin/users.js';
 import './admin/dashboard.js';
+import './admin/chart.js';
 import './admin/crud.js';
 import './admin/requests.js'
 import './frontend/home.js';

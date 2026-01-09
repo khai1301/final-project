@@ -63,6 +63,15 @@ class DashboardController extends Controller
             ->take(5)
             ->get();
 
+        // 5. User Growth Data (30 Days)
+        $userGrowthData = [];
+        $dates = [];
+        for ($i = 29; $i >= 0; $i--) {
+            $date = Carbon::now()->subDays($i)->format('Y-m-d');
+            $dates[] = Carbon::now()->subDays($i)->format('d/m');
+            $userGrowthData[] = User::whereDate('created_at', $date)->count();
+        }
+
         return view('admin.dashboard', compact(
             'totalUsers', 'userGrowth',
             'activeSessions', 'sessionGrowth',
@@ -71,7 +80,8 @@ class DashboardController extends Controller
             'studentCount', 'tutorCount',
             'latestRequests',
             'pendingTutors',
-            'recentTransactions'
+            'recentTransactions',
+            'dates', 'userGrowthData'
         ));
     }
 }

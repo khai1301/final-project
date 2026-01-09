@@ -12,7 +12,9 @@
             </div>
             
             <div class="d-flex align-items-center gap-3">
-                <div class="search-box d-none d-md-block">
+                @yield('navbar-actions')
+                
+                {{-- <div class="search-box d-none d-md-block">
                     <i class="bi bi-search"></i>
                     <input type="text" class="form-control" placeholder="Search anything...">
                 </div>
@@ -22,14 +24,12 @@
                     <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger">
                         3
                     </span>
-                </button>
-                
-                @yield('navbar-actions')
+                </button> 
                 
                 <button class="btn btn-primary">
                     <i class="bi bi-plus-circle me-1"></i>
                     Add New Tutor
-                </button>
+                </button> --}}
             </div>
         </div>
     </div>

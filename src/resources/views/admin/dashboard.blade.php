@@ -5,7 +5,7 @@
 
 @section('content')
 <div class="container-fluid py-4">
-    <!-- Filters -->
+    <!-- Filters 
     <div class="row mb-4">
         <div class="col-12">
             <div class="d-flex justify-content-between align-items-center">
@@ -20,7 +20,7 @@
                 </button>
             </div>
         </div>
-    </div>
+    </div> -->
 
     <!-- KPI Cards -->
     <div class="row mb-4">
@@ -104,30 +104,22 @@
     <!-- Charts Section -->
     <div class="row mb-4">
         <div class="col-lg-8 mb-3">
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3>Tăng trưởng người dùng</h3>
-                    <p>Số lượng đăng ký mới trong 30 ngày qua</p>
-                </div>
-                <div class="chart-placeholder" style="height: 300px;">
-                    <div class="text-center">
-                        <i class="bi bi-bar-chart-line display-4 text-muted mb-3"></i>
-                        <p>Line chart showing steady upward trend</p>
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">Tăng trưởng người dùng (30 ngày)</h5>
+                    <div style="height: 300px; position: relative; width: 100%;">
+                        <canvas id="userGrowthChart"></canvas>
                     </div>
                 </div>
             </div>
         </div>
         
         <div class="col-lg-4 mb-3">
-            <div class="chart-container">
-                <div class="chart-header">
-                    <h3>Phân bố vai trò</h3>
-                    <p>Tỷ lệ Học viên / Gia sư</p>
-                </div>
-                <div class="chart-placeholder" style="height: 300px;">
-                    <div class="text-center">
-                        <i class="bi bi-pie-chart display-4 text-muted mb-3"></i>
-                        <p>Donut chart: Students 70%, Tutors 30%</p>
+            <div class="card border-0 shadow-sm h-100">
+                <div class="card-body">
+                    <h5 class="card-title fw-bold mb-4">Phân bố vai trò</h5>
+                    <div style="height: 300px; position: relative;">
+                        <canvas id="roleDistributionChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -279,5 +271,17 @@
         </div>
     </div>
 </div>
+
+@push('scripts')
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    window.dashboardData = {
+        dates: @json($dates),
+        userGrowthData: @json($userGrowthData),
+        studentCount: {{ $studentCount }},
+        tutorCount: {{ $tutorCount }}
+    };
+</script>
+@endpush
 @endsection
 

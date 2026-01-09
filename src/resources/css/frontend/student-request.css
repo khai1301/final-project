@@ -139,12 +139,13 @@
 }
 
 .btn-check:checked+.mode-card {
-    background-color: rgba(var(--bs-primary-rgb), 0.05);
-    border-color: var(--bs-primary);
+    background-color: rgba(var(--bs-primary-rgb), 0.1) !important;
+    border-color: var(--bs-primary) !important;
+    color: var(--bs-primary) !important;
 }
 
 .btn-check:checked+.mode-card .material-symbols-outlined {
-    color: var(--bs-primary);
+    color: var(--bs-primary) !important;
 }
 
 /* Schedule Checkboxes */
