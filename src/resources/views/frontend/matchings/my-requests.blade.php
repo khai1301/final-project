@@ -62,7 +62,11 @@
                             @elseif($request->status == 'accepted')
                                 <span class="badge bg-success">✓ {{ __('ui.accepted_status') }}</span>
                             @elseif($request->status == 'declined')
-                                <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
+                                @if($request->request && $request->request->is_matched)
+                                    <span class="badge bg-secondary">🔒 Đã đóng</span>
+                                @else
+                                    <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
+                                @endif
                             @elseif($request->status == 'cancelled')
                                 <span class="badge bg-secondary">🚫 {{ __('ui.cancelled_status') }}</span>
                             @endif
@@ -165,10 +169,17 @@
                                 <div class="col-md-9">
                                     {{-- Status & Reason (Moved here) --}}
                                     @if($request->status == 'declined' && $request->decline_reason)
-                                        <div class="alert alert-danger mb-3">
-                                            <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
-                                            <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
-                                        </div>
+                                        @if($request->request && $request->request->is_matched)
+                                            <div class="alert alert-secondary mb-3">
+                                                <strong><i class="bi bi-lock-fill me-1"></i> Yêu cầu đã đóng</strong>
+                                                <p class="mb-0 mt-1 small">Yêu cầu này đã được kết nối với gia sư khác.</p>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-danger mb-3">
+                                                <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
+                                                <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
+                                            </div>
+                                        @endif
                                     @elseif($request->status == 'cancelled' && $request->cancel_reason)
                                         <div class="alert alert-secondary mb-3">
                                             <strong><i class="bi bi-slash-circle me-1"></i> Yêu cầu đã hủy</strong>
@@ -292,10 +303,17 @@
                                 <div class="col-md-9">
                                     {{-- Status & Reason (Moved here) --}}
                                     @if($request->status == 'declined' && $request->decline_reason)
-                                        <div class="alert alert-danger mb-3">
-                                            <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
-                                            <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
-                                        </div>
+                                        @if($request->request && $request->request->is_matched)
+                                            <div class="alert alert-secondary mb-3">
+                                                <strong><i class="bi bi-lock-fill me-1"></i> Yêu cầu đã đóng</strong>
+                                                <p class="mb-0 mt-1 small">Yêu cầu này đã được kết nối với gia sư khác.</p>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-danger mb-3">
+                                                <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
+                                                <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
+                                            </div>
+                                        @endif
                                     @elseif($request->status == 'cancelled' && $request->cancel_reason)
                                         <div class="alert alert-secondary mb-3">
                                             <strong><i class="bi bi-slash-circle me-1"></i> Yêu cầu đã hủy</strong>
@@ -467,7 +485,11 @@
                             @elseif($request->status == 'accepted')
                                 <span class="badge bg-success">✓ {{ __('ui.accepted_status') }}</span>
                             @elseif($request->status == 'declined')
-                                <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
+                                @if($request->request && $request->request->is_matched)
+                                    <span class="badge bg-secondary">🔒 Đã đóng</span>
+                                @else
+                                    <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
+                                @endif
                             @elseif($request->status == 'cancelled')
                                 <span class="badge bg-secondary">🚫 {{ __('ui.cancelled_status') }}</span>
                             @endif
@@ -544,10 +566,17 @@
                                 <div class="col-md-9">
                                     {{-- Status & Reason (Moved here) --}}
                                     @if($request->status == 'declined' && $request->decline_reason)
-                                        <div class="alert alert-danger mb-3">
-                                            <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
-                                            <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
-                                        </div>
+                                        @if($request->request && $request->request->is_matched)
+                                            <div class="alert alert-secondary mb-3">
+                                                <strong><i class="bi bi-lock-fill me-1"></i> Yêu cầu đã đóng</strong>
+                                                <p class="mb-0 mt-1 small">Yêu cầu này đã được kết nối với gia sư khác.</p>
+                                            </div>
+                                        @else
+                                            <div class="alert alert-danger mb-3">
+                                                <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
+                                                <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
+                                            </div>
+                                        @endif
                                     @elseif($request->status == 'cancelled' && $request->cancel_reason)
                                         <div class="alert alert-secondary mb-3">
                                             <strong><i class="bi bi-slash-circle me-1"></i> Yêu cầu đã hủy</strong>

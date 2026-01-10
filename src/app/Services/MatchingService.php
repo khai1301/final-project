@@ -147,8 +147,8 @@ class MatchingService
         // Include TutorProfile updated_at in signature
         $candidateSignature = md5($tutorProfile->updated_at . '|' . $candidatesHash);
         
-        $cacheKeyData = "ai_recs_requests_data_{$tutorProfileId}";
-        $cacheKeySig = "ai_recs_requests_sig_{$tutorProfileId}";
+        $cacheKeyData = "ai_recs_requests_data_v2_{$tutorProfileId}";
+        $cacheKeySig = "ai_recs_requests_sig_v2_{$tutorProfileId}";
         $cacheDuration = 604800; // 7 days
 
         if (!$forceRefresh && 
@@ -693,6 +693,9 @@ PROMPT;
                         'location' => ($request->ward->name ?? '') . ', ' . ($request->province->name ?? ''),
                         'description' => $request->description,
                         'student_name' => $request->student->name ?? 'Unknown',
+                        'student_is_verified' => (bool) ($request->student->email_verified_at ?? false),
+                        'learning_mode' => $request->learningMode->name ?? 'N/A',
+                        'created_at' => $request->created_at->toIso8601String(),
                         'match_score' => $ranking['match_score'],
                         'match_reason' => $ranking['reason'],
                     ];
@@ -750,6 +753,9 @@ PROMPT;
                 'location' => ($request->ward->name ?? '') . ', ' . ($request->province->name ?? ''),
                 'description' => $request->description,
                 'student_name' => $request->student->name ?? 'Unknown',
+                'student_is_verified' => (bool) ($request->student->email_verified_at ?? false),
+                'learning_mode' => $request->learningMode->name ?? 'N/A',
+                'created_at' => $request->created_at->toIso8601String(),
                 'match_score' => 0,
                 'match_reason' => 'Sắp xếp theo ngân sách',
             ];

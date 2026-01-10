@@ -42,7 +42,7 @@ class PaymentService
         $paymentData = new CreatePaymentLinkRequest(
             orderCode: $orderCode,
             amount: $unlockFee,
-            description: "Unlock contact - Matching #{$matching->id}",
+            description: "Unlock #{$matching->id}",
             returnUrl: config('services.payos.return_url'),
             cancelUrl: config('services.payos.cancel_url')
         );
@@ -66,7 +66,7 @@ class PaymentService
             'currency' => 'VND',
             'payment_method' => 'payos',
             'status' => 'pending',
-            'description' => "Unlock contact - Matching #{$matching->id}",
+            'description' => "Unlock #{$matching->id}",
             'payment_data' => [
                 'checkout_url' => $result->checkoutUrl,
                 'order_code' => $orderCode,
@@ -94,7 +94,22 @@ class PaymentService
         try {
             $paymentInfo = $this->payOS->paymentRequests->get((int) $orderCode);
             
-            if ($paymentInfo->status === 'PAID') {
+            Log::info('PayOS API Verification Response', [
+                'order_code' => $orderCode,
+                'status' => $paymentInfo->status ?? 'unknown',
+                'full_info' => (array) $paymentInfo
+            ]);
+
+            // Handle PayOS Enum status (get value if object, or cast to string)
+            $status = $paymentInfo->status;
+            if (is_object($status) && property_exists($status, 'value')) {
+                $status = $status->value;
+            } elseif (is_object($status)) {
+                // If it's a stringable object or just to be safe
+                $status = (string) $status; 
+            }
+
+            if ($status === 'PAID') {
                 $this->completePayment($orderCode, (array) $paymentInfo);
                 return true;
             }
@@ -126,9 +141,12 @@ class PaymentService
             'payment_status' => 'completed',
         ]);
 
-        // Update Request status to 'active' (Learning in progress)
+        // Update Request status to 'matched' (Contact unlocked and learning starts)
         if ($matching->request) {
-            $matching->request->update(['status' => 'active']);
+            $matching->request->update([
+                'status' => 'matched',
+                'is_matched' => true // Ensure this is set
+            ]);
         }
 
         // Update payment record

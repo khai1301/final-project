@@ -167,7 +167,7 @@ class AIRecommendations {
      * Get cached data from localStorage
      */
     getCachedData(type, id) {
-        const cacheKey = `ai_rec_${type}_${id}`;
+        const cacheKey = `ai_rec_v2_${type}_${id}`;
         const cached = localStorage.getItem(cacheKey);
 
         if (!cached) return null;
@@ -193,7 +193,7 @@ class AIRecommendations {
      * Save to localStorage cache
      */
     setCachedData(type, id, data) {
-        const cacheKey = `ai_rec_${type}_${id}`;
+        const cacheKey = `ai_rec_v2_${type}_${id}`;
         const cacheData = {
             ...data,
             cached_at: Date.now()
@@ -293,37 +293,124 @@ class AIRecommendations {
     /**
      * Create request cards HTML
      */
+    /**
+     * Create request cards HTML
+     * Synchronized with requests/browse.blade.php design
+     */
+    /**
+     * Create request cards HTML
+     * Synchronized with requests/browse.blade.php design
+     */
     createRequestCards(requests) {
-        return requests.slice(0, 3).map((req, index) => `
-            <div class="col-md-6 col-lg-4">
-                <div class="home-request-card position-relative">
-                    <div class="match-badge">
-                        <span class="material-symbols-outlined">psychology</span>
-                        ${req.match_score}%
-                    </div>
-                    <div class="home-request-header">
-                        <span class="home-request-badge">${this.escapeHtml(req.subject)}</span>
-                        <span class="home-request-time">
-                            <span class="material-symbols-outlined">schedule</span>
-                            Mới nhất
-                        </span>
-                    </div>
-                    <div>
-                        <h3 class="home-request-title">${this.escapeHtml(req.title)}</h3>
-                        <p class="home-request-description">${this.escapeHtml(req.description || '').substring(0, 100)}...</p>
-                    </div>
-                    <div class="match-reason small mb-2">
-                        <strong>AI:</strong> ${this.escapeHtml(req.match_reason)}
-                    </div>
-                    <div class="home-request-footer">
-                        <div class="home-request-info">
-                            <span class="material-symbols-outlined">payments</span>
-                            ${Math.round(req.budget_min / 1000)}k-${Math.round(req.budget_max / 1000)}k₫/giờ
+        const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+
+        return requests.slice(0, 5).map((req, index) => {
+            // Verified badge HTML
+            const verifiedBadge = req.student_is_verified
+                ? `<span class="text-primary ms-1" title="Đã xác thực"><span class="material-symbols-outlined" style="font-size: 18px; vertical-align: text-bottom;">verified</span></span>`
+                : '';
+
+            // Format price
+            const minPrice = Math.round(req.budget_min / 1000);
+            const maxPrice = Math.round(req.budget_max / 1000);
+
+            // Badges
+            let badgesHtml = '';
+            if (req.subject) badgesHtml += `<span class="badge bg-primary me-2">${this.escapeHtml(req.subject)}</span>`;
+            if (req.education_level) badgesHtml += `<span class="badge bg-info me-2">${this.escapeHtml(req.education_level)}</span>`;
+            if (req.learning_mode) badgesHtml += `<span class="badge bg-success me-2">${this.escapeHtml(req.learning_mode)}</span>`;
+
+            // Description truncate
+            const description = this.escapeHtml(req.description || '');
+            const truncatedDesc = description.length > 150 ? description.substring(0, 150) + '...' : description;
+
+            // Format time ago (re-calculated on client sideto avoid stale cache)
+            const timeAgo = this.formatTimeAgo(req.created_at);
+
+            return `
+            <div class="col-12">
+                <div class="card shadow-sm hover-shadow h-100">
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-8">
+                                <h5 class="card-title">
+                                    ${this.escapeHtml(req.title)}
+                                    ${verifiedBadge}
+                                </h5>
+                                
+                                <div class="d-flex flex-wrap mb-3">
+                                    ${badgesHtml}
+                                </div>
+
+                                <!-- AI Match Overlay -->
+                                <div class="alert alert-light border-primary p-2 mb-3">
+                                    <div class="d-flex align-items-center mb-1">
+                                        <span class="material-symbols-outlined text-primary me-2">psychology</span>
+                                        <strong class="text-primary me-auto">${req.match_score}% Phù hợp</strong>
+                                    </div>
+                                    <small class="d-block text-muted">AI: ${this.escapeHtml(req.match_reason)}</small>
+                                </div>
+
+                                <p class="text-muted mb-3">
+                                    ${truncatedDesc}
+                                </p>
+
+                                <div class="d-flex flex-wrap gap-3 small text-muted">
+                                    <div class="d-flex align-items-center">
+                                        <span class="material-symbols-outlined me-1" style="font-size: 16px;">location_on</span>
+                                        ${this.escapeHtml(req.location)}
+                                    </div>
+                                    <div class="d-flex align-items-center">
+                                        <span class="material-symbols-outlined me-1" style="font-size: 16px;">schedule</span>
+                                        ${timeAgo}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="col-md-4 d-flex flex-column justify-content-between align-items-end">
+                                <div class="text-end mb-3">
+                                    <div class="h4 text-primary mb-0">
+                                        ${minPrice}k - ${maxPrice}k ₫
+                                    </div>
+                                    <small class="text-muted">/ giờ</small>
+                                </div>
+
+                                <form action="/matching/connect" method="POST">
+                                    <input type="hidden" name="_token" value="${csrfToken}">
+                                    <input type="hidden" name="request_id" value="${req.request_id}">
+                                    <button type="submit" class="btn btn-primary">
+                                        <span class="material-symbols-outlined" style="font-size: 18px; vertical-align: middle;">send</span>
+                                        Kết nối ngay
+                                    </button>
+                                </form>
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
-        `).join('');
+            `;
+        }).join('');
+    }
+
+    /**
+     * Calculate relative time from ISO string
+     */
+    formatTimeAgo(isoDate) {
+        if (!isoDate) return 'Mới đây';
+        const date = new Date(isoDate);
+        const now = new Date();
+        const seconds = Math.floor((now - date) / 1000);
+
+        if (seconds < 60) return 'Vừa xong';
+        const minutes = Math.floor(seconds / 60);
+        if (minutes < 60) return `${minutes} phút trước`;
+        const hours = Math.floor(minutes / 60);
+        if (hours < 24) return `${hours} giờ trước`;
+        const days = Math.floor(hours / 24);
+        if (days < 30) return `${days} ngày trước`;
+        const months = Math.floor(days / 30);
+        if (months < 12) return `${months} tháng trước`;
+        return `${Math.floor(days / 365)} năm trước`;
     }
 
     showLoading(container) {
@@ -360,7 +447,7 @@ class AIRecommendations {
         const id = button.dataset.id;
 
         // Clear cache
-        localStorage.removeItem(`ai_rec_${type}_${id}`);
+        localStorage.removeItem(`ai_rec_v2_${type}_${id}`);
 
         // Reload
         if (type === 'tutors') {

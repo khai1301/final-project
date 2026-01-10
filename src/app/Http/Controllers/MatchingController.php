@@ -249,48 +249,64 @@ class MatchingController extends Controller
             ]);
         }
 
-        $matching->accept();
+        DB::beginTransaction();
+        try {
+            $matching->accept();
 
-        // NEW: Mark the request as matched
-        $matching->request->update(['is_matched' => true]);
+            // NEW: Mark the request as matched
+            $matching->request->update(['is_matched' => true]);
 
-        // NEW: Automatically decline all other pending matchings for this request
-        Matching::where('request_id', $matching->request_id)
-            ->where('id', '!=', $matching->id)
-            ->where('status', 'pending')
-            ->update([
-                'status' => 'declined',
-                'decline_reason' => 'Yêu cầu này đã được đóng vì học viên đã chấp nhận kết nối với gia sư khác.'
-            ]);
+            // Ensure request_id is present
+            if ($matching->request_id) {
+                // NEW: Automatically decline all other pending matchings for this request
+                $updatedCount = Matching::where('request_id', $matching->request_id)
+                    ->where('id', '!=', $matching->id)
+                    ->where('status', 'pending')
+                    ->update([
+                        'status' => 'declined',
+                        'decline_reason' => 'Yêu cầu này đã được đóng vì học viên đã chấp nhận kết nối với gia sư khác.'
+                    ]);
+                
+                \Log::info("Auto-declined $updatedCount other matchings for request {$matching->request_id}");
+                
+                // Notify other tutors
+                $otherMatchings = Matching::where('request_id', $matching->request_id)
+                    ->where('id', '!=', $matching->id)
+                    ->where('status', 'declined')
+                    ->where('decline_reason', 'Yêu cầu này đã được đóng vì học viên đã chấp nhận kết nối với gia sư khác.')
+                    ->get();
+
+                foreach ($otherMatchings as $other) {
+                    if ($other->tutor_id == $user->id) continue;
+
+                    \App\Models\Notification::create([
+                        'user_id' => $other->tutor_id,
+                        'matching_id' => $other->id,
+                        'type' => 'connect_declined',
+                        'title' => 'Yêu cầu đã đóng',
+                        'message' => 'Yêu cầu học tập này đã được kết nối với gia sư khác.',
+                        'action_url' => route('matching.my-requests'),
+                    ]);
+                }
+            }
             
-        // Notify other tutors (optional but recommended)
-        $otherMatchings = Matching::where('request_id', $matching->request_id)
-            ->where('id', '!=', $matching->id)
-            ->where('status', 'declined') // fetch again to include the ones we just updated
-            ->where('decline_reason', 'Yêu cầu này đã được đóng vì học viên đã chấp nhận kết nối với gia sư khác.')
-            ->get();
+            DB::commit();
 
-        foreach ($otherMatchings as $other) {
-            // Validate: Don't notify the user who performed the action (just in case)
-            if ($other->tutor_id == $user->id) continue;
+            return back()->with('swal', [
+                'type' => 'success',
+                'title' => 'Đã kết nối!',
+                'text' => 'Bạn đã kết nối thành công. Thông tin liên hệ đã được mở khóa.'
+            ]);
 
-            // Always notify the Tutor of the other matching
-            // (Since the request is filled, the other tutor needs to know)
-            \App\Models\Notification::create([
-                'user_id' => $other->tutor_id, 
-                'matching_id' => $other->id,
-                'type' => 'connect_declined',
-                'title' => 'Yêu cầu đã đóng',
-                'message' => 'Yêu cầu học tập này đã được kết nối với gia sư khác.',
-                'action_url' => route('matching.my-requests'),
+        } catch (\Exception $e) {
+            DB::rollBack();
+            \Log::error('Accept matching failed: ' . $e->getMessage());
+            return back()->with('swal', [
+                'type' => 'error',
+                'title' => 'Lỗi',
+                'text' => 'Có lỗi xảy ra khi chấp nhận kết nối. Vui lòng thử lại.'
             ]);
         }
-
-        return back()->with('swal', [
-            'type' => 'success',
-            'title' => 'Đã kết nối!',
-            'text' => 'Bạn đã kết nối thành công. Thông tin liên hệ đã được mở khóa.'
-        ]);
     }
 
     /**

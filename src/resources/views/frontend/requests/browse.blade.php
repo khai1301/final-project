@@ -163,13 +163,13 @@
 
                                         <div class="d-flex flex-wrap gap-3 small text-muted">
                                             @if($req->province)
-                                            <div>
-                                                <span class="material-symbols-outlined" style="font-size: 16px;">location_on</span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="material-symbols-outlined me-1" style="font-size: 16px;">location_on</span>
                                                 {{ $req->ward?->name }}{{ $req->ward ? ', ' : '' }}{{ $req->province->name }}
                                             </div>
                                             @endif
-                                            <div>
-                                                <span class="material-symbols-outlined" style="font-size: 16px;">schedule</span>
+                                            <div class="d-flex align-items-center">
+                                                <span class="material-symbols-outlined me-1" style="font-size: 16px;">schedule</span>
                                                 {{ $req->created_at->diffForHumans() }}
                                             </div>
                                         </div>
