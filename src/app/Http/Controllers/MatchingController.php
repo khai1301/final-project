@@ -200,8 +200,8 @@ class MatchingController extends Controller
 
             return back()->with('swal', [
                 'type' => 'success',
-                'title' => 'Request Sent!',
-                'text' => 'Your connection request has been sent successfully.'
+                'title' => 'Yêu cầu kết nối đã được gửi!',
+                'text' => 'Yêu cầu kết nối của bạn đã được gửi thành công.'
             ]);
             
         } catch (\Exception $e) {
@@ -253,6 +253,38 @@ class MatchingController extends Controller
 
         // NEW: Mark the request as matched
         $matching->request->update(['is_matched' => true]);
+
+        // NEW: Automatically decline all other pending matchings for this request
+        Matching::where('request_id', $matching->request_id)
+            ->where('id', '!=', $matching->id)
+            ->where('status', 'pending')
+            ->update([
+                'status' => 'declined',
+                'decline_reason' => 'Yêu cầu này đã được đóng vì học viên đã chấp nhận kết nối với gia sư khác.'
+            ]);
+            
+        // Notify other tutors (optional but recommended)
+        $otherMatchings = Matching::where('request_id', $matching->request_id)
+            ->where('id', '!=', $matching->id)
+            ->where('status', 'declined') // fetch again to include the ones we just updated
+            ->where('decline_reason', 'Yêu cầu này đã được đóng vì học viên đã chấp nhận kết nối với gia sư khác.')
+            ->get();
+
+        foreach ($otherMatchings as $other) {
+            // Validate: Don't notify the user who performed the action (just in case)
+            if ($other->tutor_id == $user->id) continue;
+
+            // Always notify the Tutor of the other matching
+            // (Since the request is filled, the other tutor needs to know)
+            \App\Models\Notification::create([
+                'user_id' => $other->tutor_id, 
+                'matching_id' => $other->id,
+                'type' => 'connect_declined',
+                'title' => 'Yêu cầu đã đóng',
+                'message' => 'Yêu cầu học tập này đã được kết nối với gia sư khác.',
+                'action_url' => route('matching.my-requests'),
+            ]);
+        }
 
         return back()->with('swal', [
             'type' => 'success',

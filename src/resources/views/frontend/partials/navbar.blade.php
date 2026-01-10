@@ -89,7 +89,7 @@
                             @endphp
                             @forelse($recentNotifications as $notification)
                             <li>
-                                <a class="dropdown-item py-2 {{ !$notification->is_read ? 'bg-light' : '' }}" href="{{ route('notifications.index') }}">
+                                <a class="dropdown-item py-2 {{ !$notification->is_read ? 'bg-light' : '' }}" href="{{ route('notifications.click', $notification->id) }}">
                                     <div class="d-flex align-items-start">
                                         <span class="material-symbols-outlined text-primary me-2" style="font-size: 18px;">{{ $notification->type == 'connect_request' ? 'person_add' : ($notification->type == 'connect_accepted' ? 'check_circle' : 'cancel') }}</span>
                                         <div class="flex-grow-1">

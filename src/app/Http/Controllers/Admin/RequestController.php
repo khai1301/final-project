@@ -91,8 +91,8 @@ class RequestController extends Controller
             ->back()
             ->with('swal', [
                 'type' => 'success',
-                'title' => 'Success',
-                'text' => 'Request status updated successfully.'
+                'title' => 'Thành công',
+                'text' => 'Yêu cầu học tập đã được cập nhật thành công.'
             ]);
     }
 
@@ -108,8 +108,8 @@ class RequestController extends Controller
             ->route('admin.requests.index')
             ->with('swal', [
                 'type' => 'success',
-                'title' => 'Success',
-                'text' => 'Learning request deleted successfully.'
+                'title' => 'Thành công',
+                'text' => 'Yêu cầu học tập đã được xóa thành công.'
             ]);
     }
 }

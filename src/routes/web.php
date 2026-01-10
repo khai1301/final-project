@@ -67,6 +67,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/notifications', [NotificationController::class, 'index'])->name('notifications.index');
     Route::patch('/notifications/{id}/read', [NotificationController::class, 'markAsRead'])->name('notifications.read');
     Route::post('/notifications/read-all', [NotificationController::class, 'markAllAsRead'])->name('notifications.read-all');
+    Route::get('/notifications/{id}/click', [NotificationController::class, 'markAsRead'])->name('notifications.click');
     
     // Recommendation routes - NO verification needed (just viewing)
     Route::get('/api/recommendations/tutors/{requestId}', [RecommendationController::class, 'getTutorRecommendations'])->name('api.recommendations.tutors');

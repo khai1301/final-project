@@ -657,10 +657,10 @@
                                         </div>
                                     @endif
 
-                                    {{-- Request Details (Address & Schedule) --}}
+                                    {{-- Request Details (Address) --}}
                                     @if($request->request)
                                         <div class="mb-3">
-                                            <h6 class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Địa điểm & Lịch học</h6>
+                                            <h6 class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Địa điểm học</h6>
                                             <p class="mb-1">
                                                 <strong>Địa chỉ:</strong> 
                                                 @php
@@ -671,23 +671,6 @@
                                                 @endphp
                                                 {{ implode(', ', array_filter($addrParts)) }}
                                             </p>
-                                            @if($request->request->timeSlots && $request->request->timeSlots->isNotEmpty())
-                                                <div class="mt-2">
-                                                    <strong>Lịch rảnh:</strong>
-                                                    <div class="d-flex flex-wrap gap-2 mt-1">
-                                                        @foreach($request->request->timeSlots as $slot)
-                                                            <span class="badge bg-light text-dark border">
-                                                                {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
-                                                            </span>
-                                                        @endforeach
-                                                    </div>
-                                                </div>
-                                            @else
-                                                <div class="mt-2">
-                                                    <strong>Lịch rảnh:</strong>
-                                                    <p class="text-muted small"><em>Học sinh chưa cập nhật lịch học cụ thể</em></p>
-                                                </div>
-                                            @endif
                                         </div>
                                     @endif
                                     

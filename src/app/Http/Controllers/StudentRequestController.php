@@ -82,7 +82,7 @@ class StudentRequestController extends Controller
         // Create the learning request (only FK columns + core data)
         $learningRequest = LearningRequest::create([
             'student_id' => Auth::id(),
-            'title' => "Learning request for " . $request->input('subject'),
+            'title' => "Yêu cầu học tập cho môn " . $request->input('subject'),
             'subject_id' => $subject ? $subject->id : null,
             'education_level_id' => $educationLevel ? $educationLevel->id : null,
             'learning_mode_id' => $learningMode ? $learningMode->id : null,
@@ -213,7 +213,7 @@ class StudentRequestController extends Controller
         
         // Update the request
         $learningRequest->update([
-            'title' => "Learning request for " . $updateRequest->input('subject'),
+            'title' => "Yêu cầu học tập cho môn " . $updateRequest->input('subject'),
             'subject_id' => $subject ? $subject->id : null,
             'education_level_id' => $educationLevel ? $educationLevel->id : null,
             'learning_mode_id' => $learningMode ? $learningMode->id : null,
