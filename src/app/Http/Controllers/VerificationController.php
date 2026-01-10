@@ -61,40 +61,48 @@ class VerificationController extends Controller
             $mimeType = finfo_file($finfo, $filePath);
             finfo_close($finfo);
 
-            $cFile = curl_file_create($filePath, $mimeType, $file->getClientOriginalName());
-            $data = [
-                'image' => $cFile,
-                'filename' => $file->getClientOriginalName()
-            ];
-
-            // Execute cURL request
-            $curl = curl_init();
-            curl_setopt_array($curl, [
-                CURLOPT_URL => "https://api.fpt.ai/vision/idr/vnm",
-                CURLOPT_CUSTOMREQUEST => "POST",
-                CURLOPT_POSTFIELDS => $data,
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_HTTPHEADER => [
-                    "api-key: {$apiKey}"
-                ],
+            $fileSize = $file->getSize();
+            Log::info('Starting KYC Verification', [
+                'user_id' => auth()->id(),
+                'file_name' => $file->getClientOriginalName(),
+                'file_size' => $fileSize,
+                'mime_type' => $mimeType
             ]);
 
-            $response = curl_exec($curl);
+            // Use Laravel HTTP Client instead of raw cURL for better compatibility
+            try {
+                $response = Http::withHeaders([
+                    'api-key' => $apiKey
+                ])
+                ->timeout(60) // 60 seconds timeout
+                ->attach(
+                    'image', 
+                    fopen($filePath, 'r'), 
+                    $file->getClientOriginalName(),
+                    ['Content-Type' => $mimeType]
+                )
+                ->post('https://api.fpt.ai/vision/idr/vnm');
 
-            $err = curl_error($curl);
-            curl_close($curl);
-
-            if ($err) {
-                Log::error('KYC API cURL Error: ' . $err);
+            } catch (\Illuminate\Http\Client\ConnectionException $e) {
+                Log::error('KYC API Connection Error: ' . $e->getMessage());
                 return back()->with('swal', [
                     'type' => 'error',
                     'title' => 'Lỗi kết nối',
-                    'text' => 'Có lỗi xảy ra khi kết nối đến dịch vụ xác thực. Vui lòng thử lại.'
+                    'text' => 'Kết nối đến AI bị gián đoạn hoặc quá thời gian. Vui lòng thử lại.'
+                ]);
+            }
+
+            if ($response->failed()) {
+                Log::error('KYC API Error Response: ' . $response->status(), ['body' => $response->body()]);
+                return back()->with('swal', [
+                    'type' => 'error',
+                    'title' => 'Lỗi dịch vụ',
+                    'text' => 'Dịch vụ AI không phản hồi hoặc gặp lỗi. Mã: ' . $response->status()
                 ]);
             }
 
             // Parse response
-            $result = json_decode($response, true);
+            $result = $response->json();
             
             // Log for debugging
             Log::info('KYC API Response', ['response' => $result]);

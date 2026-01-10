@@ -56,11 +56,13 @@
     
     @stack('styles')
 </head>
-<body>
+<body class="d-flex flex-column min-vh-100">
     {{-- Navbar --}}
     @include('frontend.partials.navbar')
     
+    <main class="flex-grow-1">
         @yield('content')
+    </main>
     
     {{-- Footer --}}
     @include('frontend.partials.footer')

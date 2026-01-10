@@ -413,3 +413,37 @@
         gap: 12px;
     }
 }
+
+/* 2-Column Register Form Styles */
+.register-container {
+    width: 100%;
+    max-width: 900px;
+    /* Wider container for 2 columns */
+}
+
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 32px;
+}
+
+.form-section-title {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--primary);
+    margin-bottom: 20px;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--gray-200);
+}
+
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        /* Stack on mobile */
+        gap: 20px;
+    }
+
+    .register-container {
+        padding: 16px;
+    }
+}
