@@ -18,7 +18,7 @@
                 @auth
                     {{-- Common for all authenticated --}}
                     <li class="nav-item">
-                        <a class="nav-link fw-medium" href="#" style="color: #4b5563 !important;">{{ __('ui.home') }}</a>
+                        <a class="nav-link fw-medium" href="{{ route('home.index') }}" style="color: #4b5563 !important;">{{ __('ui.home') }}</a>
                     </li>
 
                     @if(auth()->user()->role === 'tutor')

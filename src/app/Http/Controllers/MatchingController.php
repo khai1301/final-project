@@ -257,7 +257,7 @@ class MatchingController extends Controller
         return back()->with('swal', [
             'type' => 'success',
             'title' => 'Đã kết nối!',
-            'text' => 'Bạn đã kết nối thành công với người dùng này.'
+            'text' => 'Bạn đã kết nối thành công. Thông tin liên hệ đã được mở khóa.'
         ]);
     }
 

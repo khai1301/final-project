@@ -1,12 +1,18 @@
-{{-- Student Requests Section - Latest Open Requests --}}
-@if(isset($studentRequests) && $studentRequests->count() > 0)
+{{-- Student Requests Section --}}
+@php
+    $requestsList = $requests ?? $studentRequests ?? collect([]);
+    $sectionTitle = $title ?? __('ui.student_requests_title');
+    $sectionDesc = $subtitle ?? __('ui.see_what_students_need');
+@endphp
+
+@if($requestsList->count() > 0)
 <section class="home-requests">
     <div class="container">
         {{-- Section Header --}}
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
             <div>
-                <h2 class="home-section-title mb-2">{{ __('ui.student_requests_title') }}</h2>
-                <p class="home-section-description mb-0">{{ __('ui.see_what_students_need') }}</p>
+                <h2 class="home-section-title mb-2">{{ $sectionTitle }}</h2>
+                <p class="home-section-description mb-0">{{ $sectionDesc }}</p>
             </div>
             <div>
                 @auth
@@ -21,36 +27,9 @@
             </div>
         </div>
 
-        {{-- AI Recommendations Section (For Tutors) --}}
-        @auth
-            @if(auth()->user()->isTutor() && isset($tutorProfileId) && $tutorProfileId)
-            <div class="mb-5">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <div class="ai-icon-wrapper">
-                        <span class="material-symbols-outlined">psychology</span>
-                    </div>
-                    <div>
-                        <h3 class="mb-0 h5">{{ __('ui.requests_match_you') }}</h3>
-                        <small class="text-muted">{{ __('ui.ai_analyzed_profile_requests') }}</small>
-                    </div>
-                </div>
-                
-                <div class="row g-4" 
-                     data-ai-requests 
-                     data-tutor-profile-id="{{ $tutorProfileId }}">
-                    {{-- AI will auto-load recommendations here --}}
-                    <div class="col-12 text-center py-5">
-                        <div class="spinner-border text-primary mb-3" role="status"></div>
-                        <p class="text-muted">Đang phân tích với AI để tìm yêu cầu phù hợp...</p>
-                    </div>
-                </div>
-            </div>
-            @endif
-        @endauth
-
         {{-- Request Cards Grid --}}
         <div class="row g-4">
-            @foreach($studentRequests as $request)
+            @foreach($requestsList as $request)
             <div class="col-md-6 col-lg-4">
                 <div class="home-request-card">
                     <div class="home-request-header">
@@ -62,6 +41,21 @@
                             {{ $request->created_at->diffForHumans() }}
                         </span>
                     </div>
+                    {{-- AI Match Badge --}}
+                    @if(isset($request->match_score))
+                        <div class="mb-2">
+                             <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill">
+                                <span class="material-symbols-outlined align-middle me-1" style="font-size: 14px;">auto_awesome</span>
+                                {{ $request->match_score }}% Phù Hợp
+                            </span>
+                            @if(isset($request->match_reason))
+                                <div class="small text-muted mt-1 fst-italic">
+                                     <!-- <span class="material-symbols-outlined align-middle text-warning" style="font-size: 14px;">lightbulb</span> -->
+                                     {{ $request->match_reason }}
+                                </div>
+                            @endif
+                        </div>
+                    @endif
                     <div>
                         <h3 class="home-request-title">{{ Str::limit($request->title, 50) }}</h3>
                         <p class="home-request-description">

@@ -22,17 +22,6 @@ class MatchingService
     public function recommendTutorsForRequest(int $requestId, bool $forceRefresh = false): array
     {
         $startTime = microtime(true);
-        $cacheKey = "ai_recommendations_tutors_{$requestId}";
-        $cacheDuration = 86400; // 24 hours
-
-        // Return cached result if available and not forcing refresh
-        if (!$forceRefresh && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
-            $cached['cached'] = true;
-            $cached['execution_time_ms'] = 0;
-            return $cached;
-        }
-
         $request = Request::with([
             'subject',
             'educationLevel',
@@ -47,24 +36,49 @@ class MatchingService
         $filteredTutors = $this->preFilterTutors($request);
         $preFilterTime = round((microtime(true) - $preFilterStart) * 1000, 2);
 
+        // --- SMART CACHING STRATEGY ---
+        $candidatesHash = $filteredTutors->map(function($t) {
+            return $t->id . '_' . $t->updated_at;
+        })->implode('|');
+        
+        // Include Request updated_at in signature so if Request changes, cache invalidates
+        $candidateSignature = md5($request->updated_at . '|' . $candidatesHash);
+        
+        $cacheKeyData = "ai_recs_tutors_data_{$requestId}";
+        $cacheKeySig = "ai_recs_tutors_sig_{$requestId}";
+        $cacheDuration = 604800; // 7 days
+
+        if (!$forceRefresh && 
+            \Illuminate\Support\Facades\Cache::has($cacheKeyData) && 
+            \Illuminate\Support\Facades\Cache::get($cacheKeySig) === $candidateSignature) {
+            
+            $result = \Illuminate\Support\Facades\Cache::get($cacheKeyData);
+            $result['cached'] = true;
+            $result['execution_time_ms'] = round((microtime(true) - $startTime) * 1000, 2);
+            $result['performance']['pre_filter_ms'] = $preFilterTime;
+            // Keep original AI time or set to 0? Set to 0 to show it didn't run.
+            $result['performance']['ai_ranking_ms'] = 0; 
+            return $result;
+        }
+
         if ($filteredTutors->isEmpty()) {
-            $totalTime = round((microtime(true) - $startTime) * 1000, 2);
             $result = [
                 'success' => true,
                 'data' => [],
                 'message' => 'Không tìm thấy gia sư phù hợp với yêu cầu của bạn.',
                 'cached' => false,
-                'execution_time_ms' => $totalTime,
-                'performance' => [
-                    'pre_filter_ms' => $preFilterTime,
-                    'ai_ranking_ms' => 0,
-                    'total_ms' => $totalTime
-                ]
+                'cache_expires_at' => now()->addSeconds($cacheDuration)->toIso8601String(),
+                'execution_time_ms' => round((microtime(true) - $startTime) * 1000, 2),
+                'performance' => ['pre_filter_ms' => $preFilterTime, 'ai_ranking_ms' => 0]
             ];
+            // Cache the empty result too
+            \Illuminate\Support\Facades\Cache::put($cacheKeyData, $result, $cacheDuration);
+            \Illuminate\Support\Facades\Cache::put($cacheKeySig, $candidateSignature, $cacheDuration);
+            
             return $result;
         }
 
-        // Phase 2: AI ranking
+        // Phase 2: AI ranking (Only if signature changed and not empty)
         $aiStart = microtime(true);
         $rankedTutors = $this->rankTutorsWithAI($filteredTutors, $request);
         $aiTime = round((microtime(true) - $aiStart) * 1000, 2);
@@ -88,23 +102,23 @@ class MatchingService
         ];
 
         // Log performance for monitoring
-        Log::info('AI Matching Performance - Tutors for Request', [
+        Log::info('AI Matching Performance - Tutors (Fresh Run)', [
             'request_id' => $requestId,
             'pre_filter_ms' => $preFilterTime,
             'ai_ranking_ms' => $aiTime,
-            'total_ms' => $totalTime,
-            'tutors_count' => count($rankedTutors)
+            'total_ms' => $totalTime
         ]);
 
-        // Cache the result
-        \Illuminate\Support\Facades\Cache::put($cacheKey, $result, $cacheDuration);
+        // Cache the result AND the signature
+        \Illuminate\Support\Facades\Cache::put($cacheKeyData, $result, $cacheDuration);
+        \Illuminate\Support\Facades\Cache::put($cacheKeySig, $candidateSignature, $cacheDuration);
 
         return $result;
     }
 
     /**
      * Recommend requests for a tutor
-     * Uses caching to avoid unnecessary AI API calls
+     * Uses Smart Caching (Signature-based)
      * 
      * @param int $tutorProfileId
      * @param bool $forceRefresh Force refresh cache
@@ -113,17 +127,6 @@ class MatchingService
     public function recommendRequestsForTutor(int $tutorProfileId, bool $forceRefresh = false): array
     {
         $startTime = microtime(true);
-        $cacheKey = "ai_recommendations_requests_{$tutorProfileId}";
-        $cacheDuration = 86400; // 24 hours
-
-        // Return cached result if available and not forcing refresh
-        if (!$forceRefresh && \Illuminate\Support\Facades\Cache::has($cacheKey)) {
-            $cached = \Illuminate\Support\Facades\Cache::get($cacheKey);
-            $cached['cached'] = true;
-            $cached['execution_time_ms'] = 0;
-            return $cached;
-        }
-
         $tutorProfile = TutorProfile::with([
             'user',
             'subjects',
@@ -136,24 +139,48 @@ class MatchingService
         $filteredRequests = $this->preFilterRequests($tutorProfile);
         $preFilterTime = round((microtime(true) - $preFilterStart) * 1000, 2);
 
+        // --- SMART CACHING STRATEGY ---
+        $candidatesHash = $filteredRequests->map(function($r) {
+            return $r->id . '_' . $r->updated_at;
+        })->implode('|');
+        
+        // Include TutorProfile updated_at in signature
+        $candidateSignature = md5($tutorProfile->updated_at . '|' . $candidatesHash);
+        
+        $cacheKeyData = "ai_recs_requests_data_{$tutorProfileId}";
+        $cacheKeySig = "ai_recs_requests_sig_{$tutorProfileId}";
+        $cacheDuration = 604800; // 7 days
+
+        if (!$forceRefresh && 
+            \Illuminate\Support\Facades\Cache::has($cacheKeyData) && 
+            \Illuminate\Support\Facades\Cache::get($cacheKeySig) === $candidateSignature) {
+            
+            $result = \Illuminate\Support\Facades\Cache::get($cacheKeyData);
+            $result['cached'] = true;
+            $result['execution_time_ms'] = round((microtime(true) - $startTime) * 1000, 2);
+            $result['performance']['pre_filter_ms'] = $preFilterTime;
+            $result['performance']['ai_ranking_ms'] = 0;
+            return $result;
+        }
+
         if ($filteredRequests->isEmpty()) {
-            $totalTime = round((microtime(true) - $startTime) * 1000, 2);
-            $result = [
+             $result = [
                 'success' => true,
                 'data' => [],
                 'message' => 'Không tìm thấy yêu cầu nào phù hợp với profile của bạn.',
                 'cached' => false,
-                'execution_time_ms' => $totalTime,
-                'performance' => [
-                    'pre_filter_ms' => $preFilterTime,
-                    'ai_ranking_ms' => 0,
-                    'total_ms' => $totalTime
-                ]
+                'cache_expires_at' => now()->addSeconds($cacheDuration)->toIso8601String(),
+                'execution_time_ms' => round((microtime(true) - $startTime) * 1000, 2),
+                'performance' => ['pre_filter_ms' => $preFilterTime, 'ai_ranking_ms' => 0]
             ];
+            // Cache Empty
+            \Illuminate\Support\Facades\Cache::put($cacheKeyData, $result, $cacheDuration);
+            \Illuminate\Support\Facades\Cache::put($cacheKeySig, $candidateSignature, $cacheDuration);
+
             return $result;
         }
 
-        // Phase 2: AI ranking
+        // Phase 2: AI ranking (Fresh)
         $aiStart = microtime(true);
         $rankedRequests = $this->rankRequestsWithAI($filteredRequests, $tutorProfile);
         $aiTime = round((microtime(true) - $aiStart) * 1000, 2);
@@ -176,17 +203,17 @@ class MatchingService
             ]
         ];
 
-        // Log performance for monitoring
-        Log::info('AI Matching Performance - Requests for Tutor', [
+        // Log performance
+        Log::info('AI Matching Performance - Requests (Fresh Run)', [
             'tutor_profile_id' => $tutorProfileId,
             'pre_filter_ms' => $preFilterTime,
             'ai_ranking_ms' => $aiTime,
-            'total_ms' => $totalTime,
-            'requests_count' => count($rankedRequests)
+            'total_ms' => $totalTime
         ]);
 
-        // Cache the result
-        \Illuminate\Support\Facades\Cache::put($cacheKey, $result, $cacheDuration);
+        // Cache Data & Signature
+        \Illuminate\Support\Facades\Cache::put($cacheKeyData, $result, $cacheDuration);
+        \Illuminate\Support\Facades\Cache::put($cacheKeySig, $candidateSignature, $cacheDuration);
 
         return $result;
     }
@@ -201,23 +228,36 @@ class MatchingService
     {
         $subjectId = $request->subject_id;
         $budgetMax = $request->budget_max;
-        $wardId = $request->ward_id;
+        $provinceId = $request->province_id;
+        $isOnline = $request->learningMode && $request->learningMode->slug === 'online';
 
         return TutorProfile::query()
             // Only approved tutors
             ->where('is_approved', true)
+            // Prevent self-matching (Student sees their own Tutor profile)
+            ->where('user_id', '!=', $request->student_id)
+            // Exclude tutors who are already connected (pending or accepted) with this request
+            ->whereNotIn('user_id', function($query) use ($request) {
+                $query->select('tutor_id')
+                      ->from('matchings')
+                      ->where('request_id', $request->id)
+                      ->whereIn('status', ['pending', 'accepted']);
+            })
             // Must teach the required subject
             ->whereHas('subjects', function ($query) use ($subjectId) {
                 $query->where('subjects.id', $subjectId);
             })
-            // Budget must be within range
+            // Budget must be within range (approximate)
             ->where('hourly_rate_min', '<=', $budgetMax)
-            // Must teach in the same ward or nearby
-            ->when($wardId, function ($query) use ($wardId) {
-                $query->whereHas('teachingAreas', function ($q) use ($wardId) {
-                    $q->where('ward_id', $wardId);
+            
+            // Location Filter: Relaxed if Online
+            ->when(!$isOnline && $provinceId, function ($query) use ($provinceId) {
+                // If NOT online, enforce Province match
+                $query->whereHas('teachingAreas', function ($q) use ($provinceId) {
+                    $q->where('province_id', $provinceId);
                 });
             })
+            
             // Load relationships for AI analysis
             ->with([
                 'user',
@@ -239,22 +279,39 @@ class MatchingService
     private function preFilterRequests(TutorProfile $tutorProfile)
     {
         $subjectIds = $tutorProfile->subjects ? $tutorProfile->subjects->pluck('id')->toArray() : [];
-        $wardIds = $tutorProfile->teachingAreas ? $tutorProfile->teachingAreas->pluck('ward_id')->toArray() : [];
+        $provinceIds = $tutorProfile->teachingAreas ? $tutorProfile->teachingAreas->pluck('province_id')->unique()->toArray() : [];
         $minRate = $tutorProfile->hourly_rate_min;
+        $tutorUserId = $tutorProfile->user_id;
 
         return Request::query()
             // Only open requests
             ->where('status', 'open')
+            // Prevent self-matching (Tutor sees their own Student request)
+            ->where('student_id', '!=', $tutorUserId)
+            // Exclude requests this tutor is already connected with (pending or accepted)
+            ->whereNotIn('id', function($query) use ($tutorUserId) {
+                $query->select('request_id')
+                      ->from('matchings')
+                      ->where('tutor_id', $tutorUserId)
+                      ->whereIn('status', ['pending', 'accepted']);
+            })
             // Subject must match
             ->when(!empty($subjectIds), function ($query) use ($subjectIds) {
                 $query->whereIn('subject_id', $subjectIds);
             })
             // Budget must be acceptable
             ->where('budget_max', '>=', $minRate)
-            // Location must match
-            ->when(!empty($wardIds), function ($query) use ($wardIds) {
-                $query->whereIn('ward_id', $wardIds);
+            
+            // Location Filter: Province Match OR Request is Online
+            ->where(function($query) use ($provinceIds) {
+                $query->when(!empty($provinceIds), function ($q) use ($provinceIds) {
+                    $q->whereIn('province_id', $provinceIds);
+                })
+                ->orWhereHas('learningMode', function ($q) {
+                    $q->where('slug', 'online');
+                });
             })
+
             // Load relationships for AI analysis
             ->with([
                 'student',

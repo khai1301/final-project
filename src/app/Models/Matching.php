@@ -21,6 +21,8 @@ class Matching extends Model
         'payment_status',
         'payment_method',
         'transaction_id',
+        'cancel_reason',
+        'decline_reason',
     ];
 
     protected $casts = [

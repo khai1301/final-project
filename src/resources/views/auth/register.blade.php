@@ -110,7 +110,7 @@
                         <div class="role-selection">
                             <label class="role-option">
                                 <input type="radio" name="role" value="student" 
-                                       {{ old('role', 'student') == 'student' ? 'checked' : '' }}>
+                                       {{ old('role', request('role', 'student')) == 'student' ? 'checked' : '' }}>
                                 <span class="role-card">
                                     <span class="material-symbols-outlined">school</span>
                                     <span class="role-label">{{ __('ui.student') }}</span>
@@ -118,7 +118,7 @@
                             </label>
                             <label class="role-option">
                                 <input type="radio" name="role" value="tutor" 
-                                       {{ old('role') == 'tutor' ? 'checked' : '' }}>
+                                       {{ old('role', request('role')) == 'tutor' ? 'checked' : '' }}>
                                 <span class="role-card">
                                     <span class="material-symbols-outlined">person</span>
                                     <span class="role-label">{{ __('ui.tutor') }}</span>

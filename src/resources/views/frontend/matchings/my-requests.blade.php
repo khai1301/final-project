@@ -62,12 +62,9 @@
                             @elseif($request->status == 'accepted')
                                 <span class="badge bg-success">✓ {{ __('ui.accepted_status') }}</span>
                             @elseif($request->status == 'declined')
-                                <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}
-                                @if($request->decline_reason)
-                                <p class="small mt-2 mb-0"><strong>{{ __('ui.reason') }}:</strong> {{ $request->decline_reason }}</p>
-                                @endif
+                                <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
                             @elseif($request->status == 'cancelled')
-                                <span class="badge bg-secondary">{{ __('ui.cancelled_status') }}</span>
+                                <span class="badge bg-secondary">🚫 {{ __('ui.cancelled_status') }}</span>
                             @endif
                         </div>
                         <div class="col-md-2">
@@ -166,6 +163,19 @@
                                     </div>
                                 </div>
                                 <div class="col-md-9">
+                                    {{-- Status & Reason (Moved here) --}}
+                                    @if($request->status == 'declined' && $request->decline_reason)
+                                        <div class="alert alert-danger mb-3">
+                                            <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
+                                            <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
+                                        </div>
+                                    @elseif($request->status == 'cancelled' && $request->cancel_reason)
+                                        <div class="alert alert-secondary mb-3">
+                                            <strong><i class="bi bi-slash-circle me-1"></i> Yêu cầu đã hủy</strong>
+                                            <p class="mb-0 mt-1 small">{{ $request->cancel_reason }}</p>
+                                        </div>
+                                    @endif
+
                                     {{-- Student Info --}}
                                     @if($other->studentProfile)
                                         <div class="mb-3">
@@ -236,6 +246,14 @@
                                         <p class="text-muted">{{ $request->message }}</p>
                                     </div>
                                     @endif
+
+                                    {{-- Request Info --}}
+                                    <div class="border-top pt-3">
+                                        <small class="text-muted">
+                                            <span class="material-symbols-outlined align-middle" style="font-size: 14px;">schedule</span>
+                                            {{ __('ui.sent') }} {{ $request->created_at->diffForHumans() }} ({{ $request->created_at->format('d/m/Y H:i') }})
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -272,6 +290,19 @@
                                     </div>
                                 </div>
                                 <div class="col-md-9">
+                                    {{-- Status & Reason (Moved here) --}}
+                                    @if($request->status == 'declined' && $request->decline_reason)
+                                        <div class="alert alert-danger mb-3">
+                                            <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
+                                            <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
+                                        </div>
+                                    @elseif($request->status == 'cancelled' && $request->cancel_reason)
+                                        <div class="alert alert-secondary mb-3">
+                                            <strong><i class="bi bi-slash-circle me-1"></i> Yêu cầu đã hủy</strong>
+                                            <p class="mb-0 mt-1 small">{{ $request->cancel_reason }}</p>
+                                        </div>
+                                    @endif
+
                                     @php $tutorProfile = $other->tutorProfile; @endphp
                                     
                                     {{-- Bio --}}
@@ -370,6 +401,14 @@
                                         <p class="text-muted">{{ $request->message }}</p>
                                     </div>
                                     @endif
+
+                                    {{-- Request Info --}}
+                                    <div class="border-top pt-3">
+                                        <small class="text-muted">
+                                            <span class="material-symbols-outlined align-middle" style="font-size: 14px;">schedule</span>
+                                            {{ __('ui.sent') }} {{ $request->created_at->diffForHumans() }} ({{ $request->created_at->format('d/m/Y H:i') }})
+                                        </small>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -429,6 +468,8 @@
                                 <span class="badge bg-success">✓ {{ __('ui.accepted_status') }}</span>
                             @elseif($request->status == 'declined')
                                 <span class="badge bg-danger">✗ {{ __('ui.declined_status') }}</span>
+                            @elseif($request->status == 'cancelled')
+                                <span class="badge bg-secondary">🚫 {{ __('ui.cancelled_status') }}</span>
                             @endif
                         </div>
                         <div class="col-md-2">
@@ -501,16 +542,20 @@
                                 
                                 {{-- Detailed Information --}}
                                 <div class="col-md-9">
-                                    {{-- Request Message --}}
-                                    @if($request->message)
-                                    <div class="mb-3">
-                                        <h6 class="fw-bold">
-                                            <span class="material-symbols-outlined align-middle" style="font-size: 18px;">message</span>
-                                            {{ __('ui.message_label') }}
-                                        </h6>
-                                        <p class="text-muted">{{ $request->message }}</p>
-                                    </div>
+                                    {{-- Status & Reason (Moved here) --}}
+                                    @if($request->status == 'declined' && $request->decline_reason)
+                                        <div class="alert alert-danger mb-3">
+                                            <strong><i class="bi bi-x-circle me-1"></i> Yêu cầu bị từ chối</strong>
+                                            <p class="mb-0 mt-1 small">{{ $request->decline_reason }}</p>
+                                        </div>
+                                    @elseif($request->status == 'cancelled' && $request->cancel_reason)
+                                        <div class="alert alert-secondary mb-3">
+                                            <strong><i class="bi bi-slash-circle me-1"></i> Yêu cầu đã hủy</strong>
+                                            <p class="mb-0 mt-1 small">{{ $request->cancel_reason }}</p>
+                                        </div>
                                     @endif
+
+
                                     
                                     {{-- Tutor-specific information --}}
                                     @if($request->sender->role == 'tutor' && $request->sender->tutorProfile)
@@ -592,8 +637,8 @@
                                         @endif
                                     @endif
 
-                                    {{-- Student-specific information (ADDED) --}}
-                                    @if($request->sender->role == 'student' && $request->sender->studentProfile)
+                                    {{-- Student-specific information --}}
+                                    @if($request->sender->studentProfile)
                                         @php $studentProfile = $request->sender->studentProfile; @endphp
                                         <div class="mb-3">
                                             <h6 class="fw-bold"><i class="bi bi-mortarboard me-2"></i>Thông tin học tập</h6>
@@ -610,36 +655,40 @@
                                                 </div>
                                             @endif
                                         </div>
+                                    @endif
 
-                                        {{-- Request Details (Address & Schedule) --}}
-                                        @if($request->request)
-                                            <div class="mb-3">
-                                                <h6 class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Địa điểm & Lịch học</h6>
-                                                <p class="mb-1">
-                                                    <strong>Địa chỉ:</strong> 
-                                                    {{ $request->request->address_detail ?? '' }}
-                                                    {{ $request->request->ward ? ', ' . $request->request->ward->full_name : '' }}
-                                                    {{ $request->request->province ? ', ' . $request->request->province->name : '' }}
-                                                </p>
-                                                @if($request->request->timeSlots && $request->request->timeSlots->isNotEmpty())
-                                                    <div class="mt-2">
-                                                        <strong>Lịch rảnh:</strong>
-                                                        <div class="d-flex flex-wrap gap-2 mt-1">
-                                                            @foreach($request->request->timeSlots as $slot)
-                                                                <span class="badge bg-light text-dark border">
-                                                                    {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
-                                                                </span>
-                                                            @endforeach
-                                                        </div>
+                                    {{-- Request Details (Address & Schedule) --}}
+                                    @if($request->request)
+                                        <div class="mb-3">
+                                            <h6 class="fw-bold"><i class="bi bi-geo-alt me-2"></i>Địa điểm & Lịch học</h6>
+                                            <p class="mb-1">
+                                                <strong>Địa chỉ:</strong> 
+                                                @php
+                                                    $addrParts = [];
+                                                    if(!empty($request->request->address_detail)) $addrParts[] = $request->request->address_detail;
+                                                    if($request->request->ward) $addrParts[] = $request->request->ward->name;
+                                                    if($request->request->province) $addrParts[] = $request->request->province->name;
+                                                @endphp
+                                                {{ implode(', ', array_filter($addrParts)) }}
+                                            </p>
+                                            @if($request->request->timeSlots && $request->request->timeSlots->isNotEmpty())
+                                                <div class="mt-2">
+                                                    <strong>Lịch rảnh:</strong>
+                                                    <div class="d-flex flex-wrap gap-2 mt-1">
+                                                        @foreach($request->request->timeSlots as $slot)
+                                                            <span class="badge bg-light text-dark border">
+                                                                {{ $slot->getDayName() }}: {{ \Carbon\Carbon::parse($slot->start_time)->format('H:i') }} - {{ \Carbon\Carbon::parse($slot->end_time)->format('H:i') }}
+                                                            </span>
+                                                        @endforeach
                                                     </div>
-                                                @else
-                                                    <div class="mt-2">
-                                                        <strong>Lịch rảnh:</strong>
-                                                        <p class="text-muted small"><em>Học sinh chưa cập nhật lịch học cụ thể</em></p>
-                                                    </div>
-                                                @endif
-                                            </div>
-                                        @endif
+                                                </div>
+                                            @else
+                                                <div class="mt-2">
+                                                    <strong>Lịch rảnh:</strong>
+                                                    <p class="text-muted small"><em>Học sinh chưa cập nhật lịch học cụ thể</em></p>
+                                                </div>
+                                            @endif
+                                        </div>
                                     @endif
                                     
                                     {{-- Contact Information --}}
@@ -682,6 +731,13 @@
                                         @endif
                                     </div>
                                     
+                                    @if($request->message)
+                                    <div class="border-top pt-3 mb-3">
+                                        <strong>{{ __('ui.message_label') }}:</strong>
+                                        <p class="text-muted">{{ $request->message }}</p>
+                                    </div>
+                                    @endif
+
                                     {{-- Request Info --}}
                                     <div class="border-top pt-3">
                                         <small class="text-muted">

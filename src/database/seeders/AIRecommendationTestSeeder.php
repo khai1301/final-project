@@ -22,7 +22,7 @@ class AIRecommendationTestSeeder extends Seeder
      */
     public function run(): void
     {
-        $this->command->info('🌱 Starting AI Recommendation Test Data Seeder...');
+        $this->command->info('🌱 Starting Comprehensive Test Data Seeder...');
         $this->command->newLine();
 
         // ====== STEP 1: Ensure Required Master Data ======
@@ -46,15 +46,12 @@ class AIRecommendationTestSeeder extends Seeder
             );
         }
         $subjects = Subject::all();
-        $this->command->info("  ✓ Subjects: " . $subjects->pluck('name')->implode(', '));
 
         $this->command->info('🎓 Step 2: Ensuring education levels exist...');
         $requiredLevels = [
             ['name' => 'Lớp 10', 'order' => 1],
             ['name' => 'Lớp 11', 'order' => 2],
             ['name' => 'Lớp 12', 'order' => 3],
-            ['name' => 'Đại học', 'order' => 4],
-            ['name' => 'Người đi làm', 'order' => 5],
         ];
         
         foreach ($requiredLevels as $levelData) {
@@ -66,14 +63,11 @@ class AIRecommendationTestSeeder extends Seeder
                 ]
             );
         }
-        $educationLevels = EducationLevel::all();
-        $this->command->info("  ✓ Education levels: " . $educationLevels->pluck('name')->implode(', '));
 
         $this->command->info('🏠 Step 3: Ensuring learning modes exist...');
         $requiredModes = [
             ['name' => 'Tại nhà', 'slug' => 'tai-nha', 'icon' => 'home'],
             ['name' => 'Online', 'slug' => 'online', 'icon' => 'laptop'],
-            ['name' => 'Tại trung tâm', 'slug' => 'trung-tam', 'icon' => 'school'],
         ];
         
         foreach ($requiredModes as $modeData) {
@@ -86,111 +80,83 @@ class AIRecommendationTestSeeder extends Seeder
                 ]
             );
         }
-        $learningModes = LearningMode::all();
-        $this->command->info("  ✓ Learning modes: " . $learningModes->pluck('name')->implode(', '));
 
         // ====== STEP 2: Get Location Data ======
         $this->command->newLine();
         $this->command->info('📍 Step 4: Getting location data...');
         
         $timeSlots = TimeSlot::all();
-        $province = Province::first();
+        $provinces = Province::take(2)->get(); // Get up to 2 provinces
+        $province1 = $provinces->first();
+        $province2 = $provinces->count() > 1 ? $provinces->last() : $province1;
         
-        if (!$province) {
+        if (!$province1) {
             $this->command->error('❌ No province found. Please run location seeders first.');
             return;
         }
         
-        $wards = Ward::where('province_code', $province->code)->take(5)->get();
+        $wards1 = Ward::where('province_code', $province1->code)->take(5)->get();
+        $wards2 = Ward::where('province_code', $province2->code)->take(5)->get();
 
-        if ($timeSlots->isEmpty() || $wards->isEmpty()) {
+        if ($timeSlots->isEmpty() || $wards1->isEmpty()) {
             $this->command->error('❌ Missing time slots or wards. Please run basic seeders first.');
             return;
         }
-        
-        $this->command->info("  ✓ Province: {$province->name}");
-        $this->command->info("  ✓ Wards: {$wards->count()}");
-        $this->command->info("  ✓ Time slots: {$timeSlots->count()}");
 
         // ====== STEP 3: Create Students ======
         $this->command->newLine();
-        $this->command->info('�‍🎓 Step 5: Creating students...');
+        $this->command->info('👨‍🎓 Step 5: Creating students...');
         $students = [];
         
+        // Students 1-5 (Province 1)
         for ($i = 1; $i <= 5; $i++) {
             $student = User::firstOrCreate(
                 ['email' => "student{$i}@test.com"],
                 [
-                    'name' => "Học Sinh Test {$i}",
+                    'name' => "Học Sinh P1-{$i}",
                     'password' => Hash::make('password'),
                     'role' => 'student',
                     'phone' => '0912345' . str_pad($i, 3, '0', STR_PAD_LEFT),
+                    'province_id' => $province1->id, // Add province to user for "No Request" sorting
                 ]
             );
             $students[] = $student;
-            $this->command->info("  ✓ {$student->name}");
+            $this->command->info("  ✓ {$student->name} (Province 1)");
         }
+
+        // Student 6 (Province 2, No Requests)
+        $student6 = User::firstOrCreate(
+            ['email' => "student6@test.com"],
+            [
+                'name' => "Học Sinh P2-NoRequest",
+                'password' => Hash::make('password'),
+                'role' => 'student',
+                'phone' => '0912345006',
+                'province_id' => $province2->id,
+            ]
+        );
+        $this->command->info("  ✓ {$student6->name} (Province 2, No Active Requests)");
+
 
         // ====== STEP 4: Create Tutors with Profiles ======
         $this->command->newLine();
-        $this->command->info('👨‍🏫 Step 6: Creating tutors with profiles...');
+        $this->command->info('👨‍🏫 Step 6: Creating tutors...');
         
+        $tutors = [];
         $tutorData = [
-            [
-                'name' => 'Nguyễn Văn An',
-                'email' => 'tutor1@test.com',
-                'education' => 'Thạc sĩ Toán học - Đại học Bách Khoa',
-                'experience' => 5,
-                'rate_min' => 150000,
-                'rate_max' => 250000,
-                'bio' => 'Chuyên dạy Toán THPT, có 5 năm kinh nghiệm. Học sinh của tôi đã đạt nhiều giải thưởng học sinh giỏi quốc gia.',
-                'subjects' => ['Toán', 'Vật lý'],
-            ],
-            [
-                'name' => 'Trần Thị Bích',
-                'email' => 'tutor2@test.com',
-                'education' => 'Cử nhân Ngữ văn - Đại học Sư phạm',
-                'experience' => 3,
-                'rate_min' => 100000,
-                'rate_max' => 180000,
-                'bio' => 'Giáo viên Ngữ văn nhiệt huyết, đã có 3 năm kinh nghiệm giảng dạy. Chuyên luyện thi THPT Quốc gia môn Văn.',
-                'subjects' => ['Ngữ văn'],
-            ],
-            [
-                'name' => 'Lê Minh Công',
-                'email' => 'tutor3@test.com',
-                'education' => 'Thạc sĩ Hóa học - ĐH Khoa học Tự nhiên',
-                'experience' => 7,
-                'rate_min' => 200000,
-                'rate_max' => 300000,
-                'bio' => 'Chuyên gia Hóa học với 7 năm kinh nghiệm. Đã hướng dẫn nhiều học sinh đạt điểm 9-10 môn Hóa.',
-                'subjects' => ['Hóa học', 'Sinh học'],
-            ],
-            [
-                'name' => 'Phạm Thu Hà',
-                'email' => 'tutor4@test.com',
-                'education' => 'Thạc sĩ Ngôn ngữ Anh - ĐH Ngoại ngữ',
-                'experience' => 4,
-                'rate_min' => 120000,
-                'rate_max' => 200000,
-                'bio' => 'Giảng viên Tiếng Anh với IELTS 8.0. Chuyên luyện thi IELTS, TOEFL và Tiếng Anh giao tiếp.',
-                'subjects' => ['Tiếng Anh'],
-            ],
-            [
-                'name' => 'Hoàng Quốc Dũng',
-                'email' => 'tutor5@test.com',
-                'education' => 'Tiến sĩ Vật lý - ĐH Bách Khoa',
-                'experience' => 10,
-                'rate_min' => 250000,
-                'rate_max' => 400000,
-                'bio' => 'Giáo sư Vật lý với hơn 10 năm kinh nghiệm. Chuyên ôn thi Olympic Vật lý và THPT Quốc gia.',
-                'subjects' => ['Vật lý', 'Toán'],
-            ],
+            // Tutors in Province 1 (Approved)
+            ['name' => 'Tutor P1 A (Math)', 'subjects' => ['Toán'], 'province' => $province1, 'wards' => $wards1],
+            ['name' => 'Tutor P1 B (Phys)', 'subjects' => ['Vật lý'], 'province' => $province1, 'wards' => $wards1],
+            ['name' => 'Tutor P1 C (Math, Chem)', 'subjects' => ['Toán', 'Hóa học'], 'province' => $province1, 'wards' => $wards1],
+            
+            // Tutors in Province 2 (Approved)
+            ['name' => 'Tutor P2 A (Eng)', 'subjects' => ['Tiếng Anh'], 'province' => $province2, 'wards' => $wards2],
+            ['name' => 'Tutor P2 B (Lit)', 'subjects' => ['Ngữ văn'], 'province' => $province2, 'wards' => $wards2],
         ];
 
         foreach ($tutorData as $index => $data) {
             $tutor = User::firstOrCreate(
-                ['email' => $data['email']],
+                ['email' => "tutor" . ($index + 1) . "@test.com"],
                 [
                     'name' => $data['name'],
                     'password' => Hash::make('password'),
@@ -198,18 +164,17 @@ class AIRecommendationTestSeeder extends Seeder
                     'phone' => '0987654' . str_pad($index + 1, 3, '0', STR_PAD_LEFT),
                 ]
             );
+            $tutors[] = $tutor;
 
             $profile = TutorProfile::updateOrCreate(
                 ['user_id' => $tutor->id],
                 [
-                    'education' => $data['education'],
-                    'experience_years' => $data['experience'],
-                    'hourly_rate_min' => $data['rate_min'],
-                    'hourly_rate_max' => $data['rate_max'],
-                    'bio' => $data['bio'],
+                    'education' => 'Đại học Test',
+                    'experience_years' => rand(1, 10),
+                    'hourly_rate_min' => 100000,
+                    'hourly_rate_max' => 200000,
+                    'bio' => 'Bio for ' . $data['name'],
                     'is_approved' => true,
-                    'rating_avg' => rand(40, 50) / 10,
-                    'review_count' => rand(10, 50),
                 ]
             );
 
@@ -217,119 +182,124 @@ class AIRecommendationTestSeeder extends Seeder
             $subjectIds = Subject::whereIn('name', $data['subjects'])->pluck('id');
             $profile->subjects()->sync($subjectIds);
 
-            // Attach time slots
-            $randomSlots = $timeSlots->random(min(5, $timeSlots->count()))->pluck('id');
-            $profile->availableTimeSlots()->sync($randomSlots);
-
-            // Attach teaching areas
+            // Attach teaching areas (Specific Province)
             $profile->teachingAreas()->delete();
-            foreach ($wards->random(min(3, $wards->count())) as $ward) {
-                $profile->teachingAreas()->firstOrCreate([
-                    'ward_id' => $ward->id,
-                    'province_id' => $province->id,
-                ]);
-            }
-
-            $this->command->info("  ✓ {$tutor->name}");
-        }
-
-        // ====== STEP 5: Create Student Requests ======
-        $this->command->newLine();
-        $this->command->info('📝 Step 7: Creating student requests...');
-        
-        $requestData = [
-            [
-                'title' => 'Cần gia sư Toán lớp 12',
-                'subject' => 'Toán',
-                'level' => 'Lớp 12',
-                'description' => 'Em đang học lớp 12, cần gia sư dạy Toán để ôn thi THPT Quốc gia. Em cần tập trung vào phần Giải tích và Hình học không gian.',
-                'budget_min' => 120000,
-                'budget_max' => 200000,
-            ],
-            [
-                'title' => 'Tìm gia sư Tiếng Anh giao tiếp',
-                'subject' => 'Tiếng Anh',
-                'level' => 'Lớp 11',
-                'description' => 'Em muốn cải thiện kỹ năng giao tiếp Tiếng Anh. Mục tiêu là có thể nói chuyện tự nhiên và đạt IELTS 6.5.',
-                'budget_min' => 100000,
-                'budget_max' => 180000,
-            ],
-            [
-                'title' => 'Gia sư Hóa học lớp 10',
-                'subject' => 'Hóa học',
-                'level' => 'Lớp 10',
-                'description' => 'Em cần học Hóa học cơ bản lớp 10. Em còn yếu phần cân bằng hóa học và tính toán mol.',
-                'budget_min' => 80000,
-                'budget_max' => 150000,
-            ],
-            [
-                'title' => 'Cần gia sư Vật lý THPT',
-                'subject' => 'Vật lý',
-                'level' => 'Lớp 11',
-                'description' => 'Em cần gia sư dạy Vật lý lớp 11, đặc biệt là phần Điện học và Dao động. Em đang chuẩn bị thi học sinh giỏi.',
-                'budget_min' => 200000,
-                'budget_max' => 350000,
-            ],
-            [
-                'title' => 'Gia sư Ngữ văn lớp 12',
-                'subject' => 'Ngữ văn',
-                'level' => 'Lớp 12',
-                'description' => 'Em đang ôn thi THPT môn Văn. Em cần giúp đỡ về phần làm bài văn nghị luận xã hội và nghị luận văn học.',
-                'budget_min' => 90000,
-                'budget_max' => 160000,
-            ],
-        ];
-
-        foreach ($requestData as $index => $data) {
-            $student = $students[$index];
-            $subject = Subject::where('name', $data['subject'])->first();
-            $level = EducationLevel::where('name', $data['level'])->first();
-            $learningMode = LearningMode::where('slug', 'tai-nha')->first();
-            $ward = $wards->random();
-
-            // Delete old requests
-            Request::where('student_id', $student->id)->delete();
-
-            $request = Request::create([
-                'student_id' => $student->id,
-                'title' => $data['title'],
-                'subject_id' => $subject->id,
-                'education_level_id' => $level->id,
-                'learning_mode_id' => $learningMode->id,
-                'description' => $data['description'],
-                'budget_min' => $data['budget_min'],
-                'budget_max' => $data['budget_max'],
-                'province_id' => $province->id,
-                'ward_id' => $ward->id,
-                'address_detail' => 'Địa chỉ chi tiết sẽ thảo luận sau',
-                'status' => 'open',
+            $profile->teachingAreas()->create([
+                'province_id' => $data['province']->id,
+                'ward_id' => $data['wards']->random()->id
             ]);
 
-            // Attach time slots
-            $randomSlots = $timeSlots->random(min(3, $timeSlots->count()))->pluck('id');
-            $request->timeSlots()->attach($randomSlots);
-
-            $this->command->info("  ✓ {$request->title}");
+            $this->command->info("  ✓ {$tutor->name} (Approved)");
         }
 
-        // ====== SUMMARY ======
+        // Tutor 6: Unapproved (Province 1)
+        $tutor6 = User::firstOrCreate(
+            ['email' => "tutor6@test.com"],
+            ['name' => "Tutor Unapproved", 'password' => Hash::make('password'), 'role' => 'tutor']
+        );
+        $profile6 = TutorProfile::updateOrCreate(
+            ['user_id' => $tutor6->id],
+            ['bio' => 'Waiting for approval', 'is_approved' => false]
+        );
+        $profile6->teachingAreas()->create(['province_id' => $province1->id]);
+        $this->command->info("  ✓ Tutor 6 (Unapproved)");
+
+        // Tutor 7: No Profile
+        $tutor7 = User::firstOrCreate(
+            ['email' => "tutor7@test.com"],
+            ['name' => "Tutor NoProfile", 'password' => Hash::make('password'), 'role' => 'tutor']
+        );
+        $this->command->info("  ✓ Tutor 7 (No Profile)");
+
+
+        // ====== STEP 5: Create Requests ======
         $this->command->newLine();
-        $this->command->info('✅ Test data created successfully!');
+        $this->command->info('📝 Step 7: Creating requests...');
+
+        // Student 1-3 (Province 1)
+        foreach (array_slice($students, 0, 3) as $i => $student) {
+             Request::create([
+                'student_id' => $student->id,
+                'title' => "Request P1 Student {$i}",
+                'subject_id' => Subject::where('name', 'Toán')->first()->id, // Everyone wants Math in P1
+                'province_id' => $province1->id,
+                'status' => 'open',
+                'description' => 'Test request description',
+                'budget_min' => 100000, 'budget_max' => 200000,
+                'learning_mode_id' => LearningMode::first()->id
+            ]);
+        }
+
+        // Student 4-5 (Province 2 - Even though they live in P1? Let's say they want P2)
+        // Actually earlier I said Students 1-5 are P1. Let's make Student 4 & 5 Requests in P2 to test mismatch logic?
+        // No, keep it simple. Student 4 & 5 make requests in P2.
+        foreach (array_slice($students, 3, 2) as $i => $student) {
+             Request::create([
+                'student_id' => $student->id,
+                'title' => "Request P2 Student " . ($i+4),
+                'subject_id' => Subject::where('name', 'Tiếng Anh')->first()->id,
+                'province_id' => $province2->id,
+                'status' => 'open',
+                'description' => 'Test request P2',
+                'budget_min' => 150000, 'budget_max' => 250000,
+                'learning_mode_id' => LearningMode::first()->id
+            ]);
+        }
+        $this->command->info("  ✓ Created 5 requests (3 in P1, 2 in P2)");
+
+
+        // ====== STEP 6: Create Matchings (For Ranking) ======
         $this->command->newLine();
-        $this->command->info('📊 Summary:');
-        $this->command->info("  • Students: 5");
-        $this->command->info("  • Tutors: 5 (all approved)");
-        $this->command->info("  • Open Requests: 5");
+        $this->command->info('🤝 Step 8: Creating matchings...');
+
+        // Tutor 1 (P1, Math): 3 Completed Paid Matches -> Champion
+        $this->createMatching($tutors[0], $students[0], 'accepted', true);
+        $this->createMatching($tutors[0], $students[1], 'accepted', true);
+        $this->createMatching($tutors[0], $student6, 'accepted', true); // Student 6 from P2 hired Tutor 1 (Online maybe?)
+        $this->command->info("  ✓ Tutor 1: 3 Paid Matches");
+
+        // Tutor 2 (P1, Phys): 1 Completed Paid Match
+        $this->createMatching($tutors[1], $students[2], 'accepted', true);
+        $this->command->info("  ✓ Tutor 2: 1 Paid Match");
+
+        // Tutor 3 (P1, Math/Chem): 5 Accepted but UNPAID Matches (Should not rank high)
+        $this->createMatching($tutors[2], $students[0], 'accepted', false); // Unpaid
+        $this->createMatching($tutors[2], $students[1], 'accepted', false);
+        $this->command->info("  ✓ Tutor 3: 2 Unpaid Matches (Should not count for ranking)");
+
+        // Tutor 4 (P2): 0 Matches
+        
         $this->command->newLine();
-        $this->command->info('🔐 Login Credentials:');
-        $this->command->info("  Students: student1@test.com - student5@test.com");
-        $this->command->info("  Tutors: tutor1@test.com - tutor5@test.com");
-        $this->command->info("  Password: password");
-        $this->command->newLine();
-        $this->command->info('🧪 Next steps:');
-        $this->command->info('  1. Login as student1@test.com');
-        $this->command->info('  2. Go to homepage /');
-        $this->command->info('  3. See "Gợi Ý Dành Riêng Cho Bạn" with AI recommendations');
-        $this->command->newLine();
+        $this->command->info('✅ Test Data Generation Complete!');
+    }
+
+    private function createMatching($tutor, $student, $status, $paid)
+    {
+        // Must attach to a request? Or can be direct?
+        // Current logic requires request matches?
+        // Actually, matching usually links to a request.
+        // I'll create dummy requests for these past matches if needed, OR just create Matching without request if nullable (it was made non-nullable recently? I should check).
+        // A previous summary said "Refactor Request Matching Logic... make request_id foreign key non-nullable".
+        // So I MUST create a closed request for each matching.
+        
+        $request = Request::create([
+            'student_id' => $student->id,
+            'title' => "Past Request for " . $tutor->name,
+            'subject_id' => 1, // Any
+            'province_id' => 1,
+            'status' => 'closed', // Closed because matched
+            'description' => 'History',
+            'budget_min' => 100, 'budget_max' => 200,
+            'learning_mode_id' => 1
+        ]);
+
+        \App\Models\Matching::create([
+            'tutor_id' => $tutor->id,
+            'student_id' => $student->id,
+            'request_id' => $request->id,
+            'status' => $status,
+            'contact_unlocked' => $paid,
+            'sender_id' => $student->id
+        ]);
     }
 }

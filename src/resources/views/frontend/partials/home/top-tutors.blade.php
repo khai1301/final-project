@@ -1,11 +1,18 @@
-{{-- Top Tutors Section - By Rating (High to Low) --}}
+{{-- Top Tutors Section --}}
+@php
+    $tutorsList = $tutors ?? $topTutors ?? collect([]);
+    $sectionTitle = $title ?? __('ui.top_tutors');
+    $sectionDesc = $subtitle ?? __('ui.learn_from_top_rated');
+@endphp
+
+@if($tutorsList->count() > 0)
 <section class="home-tutors">
     <div class="container">
         {{-- Section Header --}}
         <div class="d-flex flex-column flex-md-row align-items-md-end justify-content-between mb-4 gap-3">
             <div>
-                <h2 class="home-section-title mb-2">{{ __('ui.top_tutors') }}</h2>
-                <p class="home-section-description mb-0">{{ __('ui.learn_from_top_rated') }}</p>
+                <h2 class="home-section-title mb-2">{{ $sectionTitle }}</h2>
+                <p class="home-section-description mb-0">{{ $sectionDesc }}</p>
             </div>
             @guest
             <div class="d-none d-md-block">
@@ -17,42 +24,30 @@
             @endguest
         </div>
 
-        {{-- AI Recommendations Section (For Verified Students with Active Requests) --}}
-        @auth
-            @if(auth()->user()->isStudent() && auth()->user()->is_verified && isset($latestRequestId) && $latestRequestId)
-            <div class="mb-5">
-                <div class="d-flex align-items-center gap-2 mb-3">
-                    <div class="ai-icon-wrapper">
-                        <span class="material-symbols-outlined">psychology</span>
-                    </div>
-                    <div>
-                        <h3 class="mb-0 h5">{{ __('ui.personalized_recommendations') }}</h3>
-                        <small class="text-muted">{{ __('ui.ai_analyzed_best_match') }}</small>
-                    </div>
-                </div>
-                
-                <div class="row g-4" 
-                     data-ai-tutors 
-                     data-request-id="{{ $latestRequestId }}">
-                    {{-- AI will auto-load recommendations here --}}
-                    <div class="col-12 text-center py-5">
-                        <div class="spinner-border text-primary mb-3" role="status"></div>
-                        <p class="text-muted">Đang phân tích với AI để tìm gia sư phù hợp nhất...</p>
-                    </div>
-                </div>
-            </div>
-            @endif
-        @endauth
-
         {{-- Tutor Cards Grid --}}
-        @if(isset($topTutors) && $topTutors->count() > 0)
         <div class="row g-4">
-            @foreach($topTutors as $tutor)
+            @foreach($tutorsList as $tutor)
             <div class="col-sm-6 col-lg-3">
                 <div class="card h-100 border-0 shadow-sm hover-shadow" style="transition: all 0.3s;">
-                    <div class="card-body">
+                    <div class="card-body position-relative">
+                        {{-- AI Match Badge --}}
+                        @if(isset($tutor->match_score))
+                            <div class="mb-3 text-center">
+                                <span class="badge bg-success bg-opacity-10 text-success border border-success border-opacity-25 rounded-pill py-2 px-3">
+                                    <span class="material-symbols-outlined align-middle me-1" style="font-size: 16px;">auto_awesome</span>
+                                    {{ $tutor->match_score }}% Phù Hợp
+                                </span>
+                                @if(isset($tutor->match_reason))
+                                    <div class="small text-muted mt-2 d-flex align-items-center justify-content-center gap-1">
+                                        <!-- <span class="material-symbols-outlined text-warning filled" style="font-size: 14px;">lightbulb</span> -->
+                                        {{ $tutor->match_reason }}
+                                    </div>
+                                @endif
+                            </div>
+                        @endif
+
                         {{-- Avatar & Name --}}
-                        <div class="text-center mb-3">
+                        <div class="text-center mb-3 text-truncate">
                             @php
                                 $avatarUrl = $tutor->avatar ? \Storage::disk('s3')->url($tutor->avatar) : 'https://ui-avatars.com/api/?name=' . urlencode($tutor->name) . '&size=200&background=3780f6&color=fff';
                             @endphp

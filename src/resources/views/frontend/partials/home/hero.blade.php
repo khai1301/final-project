@@ -1,5 +1,5 @@
 {{-- Hero Section --}}
-<section class="home-hero">
+<section class="home-hero d-flex align-items-center" style="min-height: calc(100vh - 69px);">
     {{-- Blur Effects --}}
     <div class="home-hero-blur-left"></div>
     <div class="home-hero-blur-right"></div>
@@ -10,24 +10,15 @@
             <div class="col-lg-6">
                 <div class="d-flex flex-column gap-4">
                     {{-- Badge --}}
-                    <!-- <div>
-                        <span class="home-badge">
-                            <span class="home-badge-pulse">
-                                <span class="home-badge-pulse-dot"></span>
-                                <span class="home-badge-pulse-core"></span>
-                            </span>
-                            Mới: AI Ghép đôi V2.0 đã ra mắt
-                        </span>
-                    </div> -->
 
                     {{-- Title --}}
                     <h1 class="home-hero-title">
-                        Tìm gia sư phù hợp trong vài phút với <span class="home-hero-gradient-text">AI tự động ghép đôi</span>
+                        {!! \App\Models\Setting::get('home_hero_title', 'Tìm gia sư phù hợp trong vài phút với <span class="home-hero-gradient-text">AI tự động ghép đôi</span>') !!}
                     </h1>
 
                     {{-- Description --}}
                     <p class="home-hero-description">
-                        Ngừng lướt qua hàng trăm hồ sơ. Để AI phân tích phong cách học tập, ngân sách và mục tiêu của bạn để kết nối với gia sư được xác minh hoàn hảo nhất.
+                        {!! \App\Models\Setting::get('home_hero_subtitle', 'Ngừng lướt qua hàng trăm hồ sơ. Để AI phân tích phong cách học tập, ngân sách và mục tiêu của bạn để kết nối với gia sư được xác minh hoàn hảo nhất.') !!}
                     </p>
 
                     {{-- CTA Buttons --}}
@@ -48,53 +39,8 @@
 
             {{-- Right Column: Hero Image with Search --}}
             <div class="col-lg-6">
-                <div class="home-hero-image" style="background-image: url('https://lh3.googleusercontent.com/aida-public/AB6AXuB2yl0cS0XnP8jTK2WvMEa_rE5irPLNUEM9N-fifsx3wqc6ALMJOVtWaqcW9LI-sFZWF4B3v6Zwp3ckjHq5UIxwuz6Iw72BYFsDxxAEXFDn2Rs6Z1s6GQG3sLumwt4zkM0TTvqNgylRVeqx4ZUyXuysu8_6PK2YgGUrNmlTTYEcVQaxeCKaaR-nnAmJUBziAvCUz_uM9KBmHf48x1lnrh3OjnGs0Jjf1rIK2DW6E6ix1-xOz8cgRlmNlRYcQVVHn_jDFI77uPv2gM4');">
+                <div class="home-hero-image" style="background-image: url('{{ \App\Models\Setting::get('home_hero_image', 'https://lh3.googleusercontent.com/aida-public/AB6AXuB2yl0cS0XnP8jTK2WvMEa_rE5irPLNUEM9N-fifsx3wqc6ALMJOVtWaqcW9LI-sFZWF4B3v6Zwp3ckjHq5UIxwuz6Iw72BYFsDxxAEXFDn2Rs6Z1s6GQG3sLumwt4zkM0TTvqNgylRVeqx4ZUyXuysu8_6PK2YgGUrNmlTTYEcVQaxeCKaaR-nnAmJUBziAvCUz_uM9KBmHf48x1lnrh3OjnGs0Jjf1rIK2DW6E6ix1-xOz8cgRlmNlRYcQVVHn_jDFI77uPv2gM4') }}');">
                     <div class="home-hero-image-overlay"></div>
-                    
-                    {{-- Search Card --}}
-                    <!-- <div class="home-search-card">
-                        <h3 class="home-search-title">Bắt đầu Học</h3>
-                        <form action="#" method="GET">
-                            <div class="row g-3">
-                                {{-- Subject Input --}}
-                                <div class="col-md-4 col-12">
-                                    <div class="home-search-input-wrapper">
-                                        <span class="material-symbols-outlined">search</span>
-                                        <input type="text" name="subject" class="home-search-input" placeholder="Môn học..." />
-                                    </div>
-                                </div>
-
-                                {{-- Location Input --}}
-                                <div class="col-md-3 col-6">
-                                    <div class="home-search-input-wrapper">
-                                        <span class="material-symbols-outlined">location_on</span>
-                                        <input type="text" name="location" class="home-search-input" placeholder="Khu vực/Online" />
-                                    </div>
-                                </div>
-
-                                {{-- Budget Select --}}
-                                <div class="col-md-3 col-6">
-                                    <div class="home-search-select-wrapper">
-                                        <span class="material-symbols-outlined">attach_money</span>
-                                        <select name="budget" class="home-search-select">
-                                            <option value="" disabled selected>Ngân sách</option>
-                                            <option value="1">Dưới 100k/giờ</option>
-                                            <option value="2">100k - 300k/giờ</option>
-                                            <option value="3">Trên 300k/giờ</option>
-                                        </select>
-                                        <span class="material-symbols-outlined dropdown-icon">expand_more</span>
-                                    </div>
-                                </div>
-
-                                {{-- Search Button --}}
-                                <div class="col-md-2 col-12">
-                                    <button type="submit" class="home-search-btn w-100">
-                                        <span class="material-symbols-outlined">arrow_forward</span>
-                                    </button>
-                                </div>
-                            </div>
-                        </form>
-                    </div> -->
                 </div>
             </div>
         </div>

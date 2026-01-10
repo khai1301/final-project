@@ -338,7 +338,7 @@ return [
     'popular_subjects' => 'Môn học phổ biến',
     'browse_by_subject' => 'Duyệt theo môn học',
     'view_all_subjects' => 'Xem tất cả môn học',
-    'learn_from_top_rated' => 'Học từ những gia sư được đánh giá cao nhất',
+    'learn_from_top_rated' => 'Học từ những gia sư chất lượng',
     'personalized_recommendations' => 'Gợi Ý Dành Riêng Cho Bạn',
     'ai_analyzed_best_match' => 'AI đã phân tích và tìm những gia sư phù hợp nhất',
     
